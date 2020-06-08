@@ -1,3 +1,4 @@
+# lgr_omics.proteomics.quality_control.maxquant
 import os
 import pandas as pd
 
@@ -13,12 +14,14 @@ def collect_maxquant_qc_data(root_path):
     df.index = range(len(df))
     return df
 
+
 def update_maxquant_qc_data(root_path, force_update=False):
     paths = [dirname(i) for i in glob(f'{root_path}/**/summary.txt', recursive=True)]
     for path in paths:
         generate_maxquant_qc_data(path, force_update=force_update)
-    
-def generate_maxquant_qc_data(txt_path, to_csv=True, force_update=False):
+
+
+def maxquant_qc(txt_path, output='maxquant_quality_control.csv', force_update=False):
     '''
     Runs all MaxQuant quality control functions 
     and returns a concatenated pandas.Series() 
@@ -27,26 +30,31 @@ def generate_maxquant_qc_data(txt_path, to_csv=True, force_update=False):
         txt_path: path with MaxQuant txt output.
     '''
     txt_path = P(txt_path)
+    to_csv = False
+    meta_json = txt_path/P('meta.json')
+
+    if output is not None:
+        fn_output = txt_path/P(output)
+        if output.endswith('.csv'):
+            to_csv = True
+
     assert isdir(txt_path), f'Path does not exists: {txt_path}'
-    qc_csv = txt_path/P('maxquant_quality_control.csv')
-    if isfile(qc_csv) and not force_update:
-        df = txt_path/P('maxquant_quality_control.csv')
-    else:
-        meta_json = txt_path/P('meta.json')
-        dfs = []
-        if isfile(meta_json):
-            meta = pd.read_json(meta_json, typ='series')
-            dfs.append(meta)
-        for df in [maxquant_qc_summary(txt_path),
-                   maxquant_qc_protein_groups(txt_path),
-                   maxquant_qc_peptides(txt_path),
-                   maxquant_qc_msmScans(txt_path)]:
-            dfs.append(df)
-        df = pd.concat(dfs, sort=False).to_frame().T
-        df['RUNDIR'] = str(txt_path)
-        if to_csv:
-            df.to_csv(qc_csv, index=False)
+    
+    dfs = []
+    if isfile(meta_json):
+        meta = pd.read_json(meta_json, typ='series')
+        dfs.append(meta)
+    for df in [maxquant_qc_summary(txt_path),
+            maxquant_qc_protein_groups(txt_path),
+            maxquant_qc_peptides(txt_path),
+            maxquant_qc_msmScans(txt_path)]:
+        dfs.append(df)
+    df = pd.concat(dfs, sort=False).to_frame().T
+    df['RUNDIR'] = str(txt_path)
+    if to_csv:
+        df.to_csv(fn_output, index=False)
     return df
+
 
 def maxquant_qc_summary(txt_path):
     filename = 'summary.txt'
@@ -56,6 +64,7 @@ def maxquant_qc_summary(txt_path):
             "Av. Absolute Mass Deviation [mDa]",
             "Mass Standard Deviation [mDa]"]
     return pd.read_csv(txt_path/P(filename), sep='\t', nrows=1, usecols=cols).T[0]
+
 
 def maxquant_qc_protein_groups(txt_path):
     filename = 'proteinGroups.txt'
@@ -74,6 +83,7 @@ def maxquant_qc_protein_groups(txt_path):
         "Protein_mean_seq_cov [%]": mean_sequence_coverage
         }
     return pd.Series(result).round(2)
+
 
 def maxquant_qc_peptides(txt_path):
     filename = 'peptides.txt'
@@ -100,6 +110,7 @@ def maxquant_qc_peptides(txt_path):
         result[f'N_peptides_last_amino_acid_{amino} [%]'] = df['Last amino acid'].eq(amino).sum() / n_peptides * 100
     result['N_peptides_last_amino_acid_other [%]'] = (~df['Last amino acid'].isin(last_amino_acids)).sum() / n_peptides * 100       
     return pd.Series(result).round(2)
+
 
 def maxquant_qc_msmScans(txt_path, t0=None, tf=None):
     filename = 'msmsScans.txt'

@@ -1,10 +1,6 @@
 import os
 import pandas as pd
 
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
-
 from .quality_control.rawtools import collect_rawtools_qc_data, update_rawtools_qc_data
 from .quality_control.maxquant import collect_maxquant_qc_data, update_maxquant_qc_data
 

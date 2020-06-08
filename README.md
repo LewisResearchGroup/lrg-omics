@@ -3,3 +3,28 @@
 Lewis Research Group (LRG) codebase for omics data generation, processing, quality control and integration. 
 
 
+# Create the environment
+
+    conda create -n lrg_omics -c bioconda -c conda-forge -c plotly jupyterlab matplotlib pandas scikit-learn seaborn tqdm rawtools plotly dash pyteomics pymzml versioneer pytest
+
+    conda activate lrg_omics
+    
+    pip install versioneer
+
+
+##  Download and install from source
+
+    git clone ...
+    cd lrg_omics
+    pip install -e . 
+
+
+## Install new kernel into JupyterLab
+
+    conda activate lrg_omics
+    ipython kernel install --name "LRG" --user
+
+    
+
+
+
