@@ -21,7 +21,7 @@ def update_maxquant_qc_data(root_path, force_update=False):
         generate_maxquant_qc_data(path, force_update=force_update)
 
 
-def maxquant_qc(txt_path, output='maxquant_quality_control.csv', force_update=False):
+def maxquant_qc(txt_path):
     '''
     Runs all MaxQuant quality control functions 
     and returns a concatenated pandas.Series() 
@@ -30,29 +30,19 @@ def maxquant_qc(txt_path, output='maxquant_quality_control.csv', force_update=Fa
         txt_path: path with MaxQuant txt output.
     '''
     txt_path = P(txt_path)
-    to_csv = False
     meta_json = txt_path/P('meta.json')
-
-    if output is not None:
-        fn_output = txt_path/P(output)
-        if output.endswith('.csv'):
-            to_csv = True
-
     assert isdir(txt_path), f'Path does not exists: {txt_path}'
-    
     dfs = []
     if isfile(meta_json):
         meta = pd.read_json(meta_json, typ='series')
         dfs.append(meta)
     for df in [maxquant_qc_summary(txt_path),
-            maxquant_qc_protein_groups(txt_path),
-            maxquant_qc_peptides(txt_path),
-            maxquant_qc_msmScans(txt_path)]:
+               maxquant_qc_protein_groups(txt_path),
+               maxquant_qc_peptides(txt_path),
+               maxquant_qc_msmScans(txt_path)]:
         dfs.append(df)
     df = pd.concat(dfs, sort=False).to_frame().T
     df['RUNDIR'] = str(txt_path)
-    if to_csv:
-        df.to_csv(fn_output, index=False)
     return df
 
 
