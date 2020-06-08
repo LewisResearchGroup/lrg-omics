@@ -1,19 +1,5 @@
-# A skeleton for python modules. 
+# LRG codebase for omics integration 
 
-A skeleton for python modules using versioneer to automatically add version numbers.
+Lewis Research Group (LRG) codebase for omics data generation, processing, quality control and integration. 
 
-# Get ready
-
-First remove the .git directory. Then initiate a new repository.
-Change the occurences of NAME to the name of your project.
-Finally, run `versioneer install` to initiate versioneer. 
-
-
-Commands:
-
-    rm -rf .git
-    git init
-    git add --all
-    git commit -am 'first commit'
-    versioneer install
 
