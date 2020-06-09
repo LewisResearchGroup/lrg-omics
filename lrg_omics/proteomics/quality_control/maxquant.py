@@ -4,21 +4,33 @@ import pandas as pd
 
 from pathlib import Path as P
 from glob import glob
-from os.path import dirname, isdir, isfile, basename
+from os.path import dirname, isdir, isfile, basename, join, abspath
 
-def collect_maxquant_qc_data(root_path):
-    update_maxquant_qc_data(root_path)
-    csvs = glob(f'{root_path}/**/maxquant_quality_control.csv', recursive=True)
-    dfs = [pd.read_csv(csv) for csv in csvs]
-    df = pd.concat(dfs, sort=False)
-    df.index = range(len(df))
+
+def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):
+    '''
+    Generate MaxQuant quality control in all
+    sub-directories of `root_path` where summary.txt is found.
+    '''
+    paths = [ abspath(dirname(i)) for i in glob(f'{root_path}/**/summary.txt', 
+                                      recursive=True)]
+    if from_csvs:
+        dfs = [ maxquant_qc_csv(path, force_update=force_update) for path in paths ] 
+    else: 
+        dfs = [ maxquant_qc(path) for path in paths ]
+    return pd.concat(dfs, sort=False).reset_index(drop=True)
+
+
+def maxquant_qc_csv(txt_path, out_fn='maxquant_quality_control.csv', 
+                    force_update=False,):
+    abs_path = join(txt_path, out_fn)
+    if isfile(abs_path) and not force_update:
+        df = pd.read_csv(abs_path)
+    else:
+        df = maxquant_qc(txt_path)
+        if out_fn is not None:
+            df.to_csv(abs_path, index=False)
     return df
-
-
-def update_maxquant_qc_data(root_path, force_update=False):
-    paths = [dirname(i) for i in glob(f'{root_path}/**/summary.txt', recursive=True)]
-    for path in paths:
-        generate_maxquant_qc_data(path, force_update=force_update)
 
 
 def maxquant_qc(txt_path):
@@ -29,7 +41,7 @@ def maxquant_qc(txt_path):
     Args:
         txt_path: path with MaxQuant txt output.
     '''
-    txt_path = P(txt_path)
+    txt_path = P( abspath(txt_path) ) 
     meta_json = txt_path/P('meta.json')
     assert isdir(txt_path), f'Path does not exists: {txt_path}'
     dfs = []
@@ -53,7 +65,8 @@ def maxquant_qc_summary(txt_path):
             "Peptide Sequences Identified", 
             "Av. Absolute Mass Deviation [mDa]",
             "Mass Standard Deviation [mDa]"]
-    return pd.read_csv(txt_path/P(filename), sep='\t', nrows=1, usecols=cols).T[0]
+    return pd.read_csv(txt_path/P(filename), sep='\t', 
+                       nrows=1, usecols=cols).T[0]
 
 
 def maxquant_qc_protein_groups(txt_path):
@@ -61,7 +74,6 @@ def maxquant_qc_protein_groups(txt_path):
     df = pd.read_csv(txt_path/P(filename), sep='\t')
     n_contaminants = df['Potential contaminant'].eq('+').sum()
     n_reverse = df['Reverse'].fillna('-').eq('+').sum()
-    # assert df[['Potential contaminant', 'Reverse']].eq('+').sum(axis=1).max() <= 1
     n_true_hits = len(df) - (n_contaminants + n_reverse)
     mean_sequence_coverage = df[(df['Potential contaminant'].isnull()) &
                                 (df['Reverse'].isnull())]['Sequence coverage [%]'].mean()
@@ -83,7 +95,6 @@ def maxquant_qc_peptides(txt_path):
     n_peptides = len(df)
     n_contaminants = df['Potential contaminant'].eq('+').sum()
     n_reverse = df['Reverse'].fillna('-').eq('+').sum()
-    # assert df[['Potential contaminant', 'Reverse']].eq('+').sum(axis=1).max() <= 1
     ox_pep_seq = len(df) - df['Oxidation (M) site IDs'].isnull().sum()
     ox_pep_seq_percent = ox_pep_seq / n_peptides * 100
     result = {
@@ -113,7 +124,6 @@ def maxquant_qc_msmScans(txt_path, t0=None, tf=None):
     df_filtered_peaks = df[['Retention time', 'Filtered peaks']].set_index('Retention time')
     x = df_filtered_peaks.loc[t0:tf].index
     y = df_filtered_peaks.loc[t0:tf, 'Filtered peaks'].values
-    results = {'Mean_parent_intensity_fraction': mean_parent_int_frac, 
-              }
+    results = { 'Mean_parent_int_frac': mean_parent_int_frac }
     return pd.Series(results).round(2)
 

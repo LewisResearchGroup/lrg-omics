@@ -1,14 +1,13 @@
 import os
 import pandas as pd
 
-from .quality_control.rawtools import collect_rawtools_qc_data, update_rawtools_qc_data
-from .quality_control.maxquant import collect_maxquant_qc_data, update_maxquant_qc_data
+from .quality_control.rawtools import collect_rawtools_qc_data
+from .quality_control.maxquant import collect_maxquant_qc_data
 
 
-def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
+def formated_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     try:
         df = collect_rawtools_qc_data(path).drop_duplicates()
-        df['md5'] = df.RawFile.apply(lambda x: x.split('/')[-2])
         df.index = df.iloc[::-1].index
         df.reset_index(inplace=True)
         df['RawFilePath'] = df['RawFile'].apply(os.path.dirname)
