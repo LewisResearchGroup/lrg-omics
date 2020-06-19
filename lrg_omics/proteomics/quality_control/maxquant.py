@@ -79,14 +79,38 @@ def maxquant_qc_protein_groups(txt_path):
     n_true_hits = len(df) - (n_contaminants + n_reverse)
     mean_sequence_coverage = df[(df['Potential contaminant'].isnull()) &
                                 (df['Reverse'].isnull())]['Sequence coverage [%]'].mean(skipna=True)
+
+    df1 = df[(df['Potential contaminant'] != '+') &
+             (df.Reverse != '+') &
+             (df['Majority protein IDs'] != 'QC1|Peptide1') &
+             (df['Majority protein IDs'] != 'QC2|Peptide2') &
+             (df['Only identified by site'] != '+')]
+
+    m_v = df1[['Reporter intensity corrected 1',
+               'Reporter intensity corrected 2',
+               'Reporter intensity corrected 3',
+               'Reporter intensity corrected 4',
+               'Reporter intensity corrected 5',
+               'Reporter intensity corrected 6',
+               'Reporter intensity corrected 7',
+               'Reporter intensity corrected 8',
+               'Reporter intensity corrected 9',
+               'Reporter intensity corrected 10',
+               'Reporter intensity corrected 11']].isin([0]).sum().to_list()
+
+    tmt = ['TMT1', 'TMT2', 'TMT3', 'TMT4', 'TMT5', 'TMT6', 'TMT7', 'TMT8', 'TMT9', 'TMT10', 'TMT11']
+
+    print(list(zip(tmt, m_v)))
+
     result = {
         "N_protein_groups": len(df),
         "N_protein_true_hits": n_true_hits,
+        "N_missing_values": list(zip(tmt, m_v)),
         "N_protein_potential_contaminants": n_contaminants,
         "N_protein_reverse_seq": n_reverse,
         "Protein_mean_seq_cov [%]": mean_sequence_coverage
     }
-    return pd.Series(result).round(2)
+    return pd.Series(result)
 
 
 def maxquant_qc_peptides(txt_path):
@@ -211,7 +235,7 @@ def maxquant_qc_evidence(txt_path):
         for keys in dict_evidence_qc1:
             no_scans.append(dict_evidence_qc1[keys][5])
 
-        df_info_qc1 = {
+        dict_info_qc1 = {
             "qc1_peptide_charges": charges,
             "No_qc1_missing_values": 11 - np.count_nonzero(np.array(intensities_sum)),
             "reporter_intensity_corrected_qc1_ave": np.nanmean(np.array(log_intensities_sum)),
@@ -223,11 +247,11 @@ def maxquant_qc_evidence(txt_path):
             "number_of_scans_qc1": no_scans
         }
 
-        results.update(df_info_qc1)
+        results.update(dict_info_qc1)
 
     else:
 
-        df_info_qc1 = {
+        dict_info_qc1 = {
             "qc1_peptide_charge": "not detected",
             "No_qc1_missing_values": "not detected",
             "reporter_intensity_corrected_qc1_ave": "not detected",
@@ -238,7 +262,7 @@ def maxquant_qc_evidence(txt_path):
             "number_of_scans_qc1": 'not detected'
         }
 
-        results.update(df_info_qc1)
+        results.update(dict_info_qc1)
 
     dict_evidence_qc2 = {}
     if len(qc_peptides_from_evidence_table['QC2|Peptide2_index']) != 0:
@@ -302,7 +326,7 @@ def maxquant_qc_evidence(txt_path):
         for keys in dict_evidence_qc2:
             no_scans.append(dict_evidence_qc2[keys][5])
 
-        df_info_qc2 = {
+        dict_info_qc2 = {
             "qc2_peptide_charges": charges,
             "No_qc2_missing_values": 11 - np.count_nonzero(np.array(intensities_sum)),
             "reporter_intensity_corrected_qc2_ave": np.nanmean(np.array(log_intensities_sum)),
@@ -314,11 +338,11 @@ def maxquant_qc_evidence(txt_path):
             "number_of_scans_qc2": no_scans
         }
 
-        results.update(df_info_qc2)
+        results.update(dict_info_qc2)
 
     else:
 
-        df_info_qc2 = {
+        dict_info_qc2 = {
             "qc2_peptide_charge": "not detected",
             "No_qc2_missing_values": "not detected",
             "reporter_intensity_corrected_qc2_ave": "not detected",
@@ -329,90 +353,112 @@ def maxquant_qc_evidence(txt_path):
             "number_of_scans_qc2": 'not detected'
         }
 
-        results.update(df_info_qc2)
+        results.update(dict_info_qc2)
 
     dict_evidence_qc3 = {}
 
     df_qc3 = df[df.Proteins.str.contains('QC3|BSA', na=False)]
-    df_qc3 = df_qc3[['Sequence', 'Proteins', 'Calibrated retention time', 'Reporter intensity corrected 1',
-                     'Reporter intensity corrected 2', 'Reporter intensity corrected 3',
-                     'Reporter intensity corrected 4',
-                     'Reporter intensity corrected 5', 'Reporter intensity corrected 6',
-                     'Reporter intensity corrected 7',
-                     'Reporter intensity corrected 8', 'Reporter intensity corrected 9',
-                     'Reporter intensity corrected 10',
-                     'Reporter intensity corrected 11']]
+    if len(df_qc3) != 0:
+        df_qc3 = df_qc3[['Sequence', 'Proteins', 'Calibrated retention time', 'Reporter intensity corrected 1',
+                         'Reporter intensity corrected 2', 'Reporter intensity corrected 3',
+                         'Reporter intensity corrected 4',
+                         'Reporter intensity corrected 5', 'Reporter intensity corrected 6',
+                         'Reporter intensity corrected 7',
+                         'Reporter intensity corrected 8', 'Reporter intensity corrected 9',
+                         'Reporter intensity corrected 10',
+                         'Reporter intensity corrected 11']]
+        
+        df_qc3.index = pd.RangeIndex(len(df_qc3.index))
+        
+        df_qc3_mod = df_qc3.groupby(['Sequence'], as_index=False).agg({'Calibrated retention time': [np.nanmean],
+                                                                       'Reporter intensity corrected 1': [np.nansum],
+                                                                       'Reporter intensity corrected 2': [np.nansum],
+                                                                       'Reporter intensity corrected 3': [np.nansum],
+                                                                       'Reporter intensity corrected 4': [np.nansum],
+                                                                       'Reporter intensity corrected 5': [np.nansum],
+                                                                       'Reporter intensity corrected 6': [np.nansum],
+                                                                       'Reporter intensity corrected 7': [np.nansum],
+                                                                       'Reporter intensity corrected 8': [np.nansum],
+                                                                       'Reporter intensity corrected 9': [np.nansum],
+                                                                       'Reporter intensity corrected 10': [np.nansum],
+                                                                       'Reporter intensity corrected 11': [np.nansum]})
+        df_qc3_mod.columns = df_qc3_mod.columns.droplevel(1)
+        no_of_pept = len(df_qc3_mod)
+        df_qc3_mod.loc["Row_Total"] = df_qc3_mod.iloc[:, 2:].sum(numeric_only=True)
+        df_qc3_mod.loc["Row_Log2_Total"] = [np.log2(x) for x in df_qc3_mod.loc["Row_Total"].to_list()]
 
-    df_qc3.index = pd.RangeIndex(len(df_qc3.index))
-
-    df_qc3_mod = df_qc3.groupby(['Sequence'], as_index=False).agg({'Calibrated retention time': [np.nanmean],
-                                                                   'Reporter intensity corrected 1': [np.nansum],
-                                                                   'Reporter intensity corrected 2': [np.nansum],
-                                                                   'Reporter intensity corrected 3': [np.nansum],
-                                                                   'Reporter intensity corrected 4': [np.nansum],
-                                                                   'Reporter intensity corrected 5': [np.nansum],
-                                                                   'Reporter intensity corrected 6': [np.nansum],
-                                                                   'Reporter intensity corrected 7': [np.nansum],
-                                                                   'Reporter intensity corrected 8': [np.nansum],
-                                                                   'Reporter intensity corrected 9': [np.nansum],
-                                                                   'Reporter intensity corrected 10': [np.nansum],
-                                                                   'Reporter intensity corrected 11': [np.nansum]})
-    df_qc3_mod.columns = df_qc3_mod.columns.droplevel(1)
-    no_of_pept = len(df_qc3_mod)
-    df_qc3_mod.loc["Row_Total"] = df_qc3_mod.iloc[:, 2:].sum(numeric_only=True)
-    df_qc3_mod.loc["Row_Log2_Total"] = [np.log2(x) for x in df_qc3_mod.loc["Row_Total"].to_list()]
-
-    dict_evidence_qc3.update({"Number of BSA pept": no_of_pept,
-                              "No_qc3_missing_values": 11 - np.count_nonzero(np.array(df_qc3_mod.iloc[-1, 2:])),
-                              "reporter_intensity_corrected_qc3_ave": np.nanmean(
-                                  np.array(df_qc3_mod.loc["Row_Log2_Total"])),
-                              "reporter_intensity_corrected_qc3_sd": np.nanstd(
-                                  np.array(df_qc3_mod.loc["Row_Log2_Total"]), ddof=0),
-                              "reporter_intensity_corrected_qc3_cv": (np.nanstd(
-                                  np.array(df_qc3_mod.loc["Row_Log2_Total"]), ddof=0)
-                                                                      / np.nanmean(
-                                          np.array(df_qc3_mod.loc["Row_Log2_Total"]))) * 100,
-                              'RT for ATEEQLK':
-                                  float(
-                                      df_qc3_mod[df_qc3_mod['Sequence'].str.contains('ATEEQLK').replace(np.nan, False)][
-                                          'Calibrated retention time']),
-                              'Ave Intensity for ATEEQLK': float(df_qc3_mod[
-                                                                     df_qc3_mod['Sequence'].str.contains(
-                                                                         'ATEEQLK').replace(
-                                                                         np.nan, False)].iloc[:, 2:].mean(skipna=True,
-                                                                                                          axis=1)),
-                              'RT for AEFVEVTK':
-                                  float(df_qc3_mod[
-                                            df_qc3_mod['Sequence'].str.contains('AEFVEVTK').replace(np.nan, False)][
-                                            'Calibrated retention time']),
-                              'Ave Intensity for AEFVEVTK': float(df_qc3_mod[
-                                                                      df_qc3_mod['Sequence'].str.contains(
-                                                                          'AEFVEVTK').replace(
-                                                                          np.nan, False)].iloc[:, 2:].mean(skipna=True,
-                                                                                                           axis=1)),
-                              'RT for QTALVELL':
-                                  float(df_qc3_mod[
-                                            df_qc3_mod['Sequence'].str.contains('QTALVELL').replace(np.nan, False)][
-                                            'Calibrated retention time']),
-                              'Ave Intensity for QTALVELL': float(df_qc3_mod[
-                                                                      df_qc3_mod['Sequence'].str.contains(
-                                                                          'QTALVELL').replace(
-                                                                          np.nan, False)].iloc[:, 2:].mean(skipna=True,
-                                                                                                           axis=1)),
-                              'RT for TVMENFVAFVDK':
-                                  float(df_qc3_mod[
-                                            df_qc3_mod['Sequence'].str.contains('TVMENFVAFVDK').replace(np.nan, False)][
-                                            'Calibrated retention time']),
-                              'Ave Intensity for TVMENFVAFVDK': float(df_qc3_mod[
+        dict_evidence_qc3.update({"Number of BSA pept": no_of_pept,
+                                  "No_qc3_missing_values": 11 - np.count_nonzero(np.array(df_qc3_mod.iloc[-1, 2:])),
+                                  "reporter_intensity_corrected_qc3_ave": np.nanmean(
+                                      np.array(df_qc3_mod.loc["Row_Log2_Total"])),
+                                  "reporter_intensity_corrected_qc3_sd": np.nanstd(
+                                      np.array(df_qc3_mod.loc["Row_Log2_Total"]), ddof=0),
+                                  "reporter_intensity_corrected_qc3_cv": (np.nanstd(
+                                      np.array(df_qc3_mod.loc["Row_Log2_Total"]), ddof=0)
+                                                                          / np.nanmean(
+                                              np.array(df_qc3_mod.loc["Row_Log2_Total"]))) * 100,
+                                  'RT for ATEEQLK':
+                                      float(
+                                          df_qc3_mod[
+                                              df_qc3_mod['Sequence'].str.contains('ATEEQLK').replace(np.nan, False)][
+                                              'Calibrated retention time']),
+                                  'Ave Intensity for ATEEQLK': float(df_qc3_mod[
+                                                                         df_qc3_mod['Sequence'].str.contains(
+                                                                             'ATEEQLK').replace(
+                                                                             np.nan, False)].iloc[:, 2:].mean(
+                                      skipna=True,
+                                      axis=1)),
+                                  'RT for AEFVEVTK':
+                                      float(df_qc3_mod[
+                                                df_qc3_mod['Sequence'].str.contains('AEFVEVTK').replace(np.nan, False)][
+                                                'Calibrated retention time']),
+                                  'Ave Intensity for AEFVEVTK': float(df_qc3_mod[
                                                                           df_qc3_mod['Sequence'].str.contains(
-                                                                              'TVMENFVAFVDK').replace(
+                                                                              'AEFVEVTK').replace(
                                                                               np.nan, False)].iloc[:, 2:].mean(
-                                  skipna=True,
-                                  axis=1))
-                              })
-    results.update(dict_evidence_qc3)
+                                      skipna=True,
+                                      axis=1)),
+                                  'RT for QTALVELL':
+                                      float(df_qc3_mod[
+                                                df_qc3_mod['Sequence'].str.contains('QTALVELL').replace(np.nan, False)][
+                                                'Calibrated retention time']),
+                                  'Ave Intensity for QTALVELL': float(df_qc3_mod[
+                                                                          df_qc3_mod['Sequence'].str.contains(
+                                                                              'QTALVELL').replace(
+                                                                              np.nan, False)].iloc[:, 2:].mean(
+                                      skipna=True,
+                                      axis=1)),
+                                  'RT for TVMENFVAFVDK':
+                                      float(df_qc3_mod[
+                                                df_qc3_mod['Sequence'].str.contains('TVMENFVAFVDK').replace(np.nan,
+                                                                                                            False)][
+                                                'Calibrated retention time']),
+                                  'Ave Intensity for TVMENFVAFVDK': float(df_qc3_mod[
+                                                                              df_qc3_mod['Sequence'].str.contains(
+                                                                                  'TVMENFVAFVDK').replace(
+                                                                                  np.nan, False)].iloc[:, 2:].mean(
+                                      skipna=True,
+                                      axis=1))
+                                  })
+        results.update(dict_evidence_qc3)
+        
+    else:
+        dict_evidence_qc3.update({"Number of BSA pept": "not detected",
+                                  "No_qc3_missing_values": "not detected",
+                                  "reporter_intensity_corrected_qc3_ave": "not detected",
+                                  "reporter_intensity_corrected_qc3_sd": "not detected",
+                                  "reporter_intensity_corrected_qc3_cv": "not detected",
+                                  'RT for ATEEQLK': "not detected",
+                                  'Ave Intensity for ATEEQLK': "not detected",
+                                  'RT for AEFVEVTK': "not detected",
+                                  'Ave Intensity for AEFVEVTK': "not detected",
+                                  'RT for QTALVELL': "not detected",
+                                  'Ave Intensity for QTALVELL': "not detected",
+                                  'RT for TVMENFVAFVDK': "not detected",
+                                  'Ave Intensity for TVMENFVAFVDK': "not detected"
+                                  })
+        results.update(dict_evidence_qc3)
 
-    df_qc3_mod.to_csv('s.csv')
     return pd.Series(results)
 
 
