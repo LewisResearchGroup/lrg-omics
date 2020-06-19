@@ -158,7 +158,7 @@ def maxquant_qc_evidence(txt_path):
     filename = 'evidence.txt'
     df = pd.read_csv(txt_path / P(filename), sep='\t')
 
-    results = {
+    result = {
         'Uncalibrated - Calibrated m/z [ppm] (ave)': df['Uncalibrated - Calibrated m/z [ppm]'].mean(skipna=True),
         'Uncalibrated - Calibrated m/z [ppm] (sd)': df['Uncalibrated - Calibrated m/z [ppm]'].std(ddof=0, skipna=True),
         'Uncalibrated - Calibrated m/z [Da] (ave)': df['Uncalibrated - Calibrated m/z [Da]'].mean(skipna=True),
@@ -245,7 +245,7 @@ def maxquant_qc_evidence(txt_path):
             "N_of_scans_qc1": no_scans
         }
 
-        results.update(dict_info_qc1)
+        result.update(dict_info_qc1)
 
     else:
 
@@ -260,7 +260,7 @@ def maxquant_qc_evidence(txt_path):
             "N_of_scans_qc1": 'not detected'
         }
 
-        results.update(dict_info_qc1)
+        result.update(dict_info_qc1)
 
     dict_evidence_qc2 = {}
     if len(qc_peptides_from_evidence_table['QC2|Peptide2_index']) != 0:
@@ -336,7 +336,7 @@ def maxquant_qc_evidence(txt_path):
             "N_of_scans_qc2": no_scans
         }
 
-        results.update(dict_info_qc2)
+        result.update(dict_info_qc2)
 
     else:
 
@@ -351,7 +351,7 @@ def maxquant_qc_evidence(txt_path):
             "N_of_scans_qc2": 'not detected'
         }
 
-        results.update(dict_info_qc2)
+        result.update(dict_info_qc2)
 
     dict_evidence_qc3 = {}
 
@@ -438,7 +438,7 @@ def maxquant_qc_evidence(txt_path):
                                       skipna=True,
                                       axis=1))
                                   })
-        results.update(dict_evidence_qc3)
+        result.update(dict_evidence_qc3)
         
     else:
         dict_evidence_qc3.update({"N_of_BSA_pepts": "not detected",
@@ -455,9 +455,9 @@ def maxquant_qc_evidence(txt_path):
                                   'RT_for_TVMENFVAFVDK': "not detected",
                                   'Ave_Intensity_for_TVMENFVAFVDK': "not detected"
                                   })
-        results.update(dict_evidence_qc3)
+        result.update(dict_evidence_qc3)
 
-    return pd.Series(results)
+    return pd.Series(result)
 
 
 # para trabajar ahora, borrar despues
