@@ -96,7 +96,7 @@ def maxquant_qc_protein_groups(txt_path):
                'Reporter intensity corrected 8',
                'Reporter intensity corrected 9',
                'Reporter intensity corrected 10',
-               'Reporter intensity corrected 11']].isin([0]).sum().to_list()
+               'Reporter intensity corrected 11']].replace(np.nan, 0).isin([0]).sum().to_list()
 
     tmt = ['TMT1', 'TMT2', 'TMT3', 'TMT4', 'TMT5', 'TMT6', 'TMT7', 'TMT8', 'TMT9', 'TMT10', 'TMT11']
 
