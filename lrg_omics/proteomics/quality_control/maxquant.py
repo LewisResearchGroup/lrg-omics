@@ -459,16 +459,3 @@ def maxquant_qc_evidence(txt_path):
 
     return pd.Series(result)
 
-
-# para trabajar ahora, borrar despues
-root_path = '/var/www/html/proteomics/files/raw/20200430/SA001-R3-B-2ul/maxquant/Standard-QC__SA_MS2/SA001-R3-B-2ul.raw'
-txt_path = '/var/www/html/proteomics/files/raw/20200430/SA001-R3-B-2ul/maxquant/Standard-QC__SA_MS2/SA001-R3-B-2ul.raw/txt'
-
-a = collect_maxquant_qc_data(root_path)
-b = maxquant_qc_csv(txt_path)
-c = maxquant_qc(txt_path)
-d = maxquant_qc_summary(txt_path)
-e = maxquant_qc_protein_groups(txt_path)
-f = maxquant_qc_peptides(txt_path)
-g = maxquant_qc_msmScans(txt_path)
-h = maxquant_qc_evidence(txt_path)
