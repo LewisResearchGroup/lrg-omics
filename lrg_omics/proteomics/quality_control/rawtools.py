@@ -93,7 +93,7 @@ def rawtools_mgf_cmd(raw, output_dir):
         *.mgf
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x -r TMT11 2 --chro 2T'
+    cmd = f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x -u -l -m -r TMT11 2 -chro 12TB'
     return cmd
 
 
