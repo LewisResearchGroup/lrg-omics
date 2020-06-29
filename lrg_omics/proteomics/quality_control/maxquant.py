@@ -84,17 +84,7 @@ def maxquant_qc_protein_groups(txt_path):
              (df['Majority protein IDs'] != 'QC2|Peptide2') &
              (df['Only identified by site'] != '+')]
 
-    m_v = df1[['Reporter intensity corrected 1',
-               'Reporter intensity corrected 2',
-               'Reporter intensity corrected 3',
-               'Reporter intensity corrected 4',
-               'Reporter intensity corrected 5',
-               'Reporter intensity corrected 6',
-               'Reporter intensity corrected 7',
-               'Reporter intensity corrected 8',
-               'Reporter intensity corrected 9',
-               'Reporter intensity corrected 10',
-               'Reporter intensity corrected 11']].replace(np.nan, 0).isin([0]).sum().to_list()
+    m_v = df1.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()
 
     tmt = ['TMT1', 'TMT2', 'TMT3', 'TMT4', 'TMT5', 'TMT6', 'TMT7', 'TMT8', 'TMT9', 'TMT10', 'TMT11']
 
