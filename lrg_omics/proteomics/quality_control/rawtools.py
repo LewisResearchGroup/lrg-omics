@@ -42,7 +42,8 @@ def update_rawtools_qc_data(raw_root, output_root=None, run=False, verbose=False
         return commands
 
 
-def rawtools_cmds(raw, raw_root, output_root=None, force=False, run=False, verbose=False):
+def rawtools_cmds(raw, raw_root, output_root=None, 
+                  force=False, run=False, verbose=False):
     '''
     Returns commands to run, if target folder is not already present.
     Otherwise, an empty list is returned.
@@ -71,7 +72,7 @@ def rawtools_cmds(raw, raw_root, output_root=None, force=False, run=False, verbo
     os.makedirs(output_dir, exist_ok=True)
     maybe_create_symlink(abspath(raw), output_dir/P(os.path.basename(raw)))
     commands = [rawtools_qc_cmd(output_dir, output_dir), 
-                rawtools_mgf_cmd(output_raw, output_dir)]
+                rawtools_metrics_cmd(output_raw, output_dir)]
     if verbose:
         for cmd in commands:
             print(f' CMD: {cmd}')
@@ -83,7 +84,7 @@ def rawtools_cmds(raw, raw_root, output_root=None, force=False, run=False, verbo
     return commands
 
 
-def rawtools_mgf_cmd(raw, output_dir):
+def rawtools_metrics_cmd(raw, output_dir):
     '''
     Generates command to run rawtools parse to generate
     the RawTools files:
@@ -93,7 +94,8 @@ def rawtools_mgf_cmd(raw, output_dir):
         *.mgf
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x -u -l -m -r TMT11 2 -chro 12TB 2>rawtools_metrics.err 1>rawtools_metrics.out'
+    cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x '
+           '-u -l -m -r TMT11 2 -chro 12TB 2>rawtools_metrics.err 1>rawtools_metrics.out')
     return cmd
 
 
@@ -103,7 +105,8 @@ def rawtools_qc_cmd(input_dir, output_dir):
     generate the file QcDataTable.csv.
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = f'cd {output_dir}; rawtools.sh -d "{input_dir}" -qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out'
+    cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
+            '-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
     return cmd
 
 
