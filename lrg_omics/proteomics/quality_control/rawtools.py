@@ -95,7 +95,7 @@ def rawtools_metrics_cmd(raw, output_dir):
     '''
     os.makedirs(output_dir, exist_ok=True)
     cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x '
-           '-u -l -m -r TMT11 2 -chro 12TB 2>rawtools_metrics.err 1>rawtools_metrics.out')
+           f'-u -l -m -r TMT11 2 -chro 12TB 2>rawtools_metrics.err 1>rawtools_metrics.out')
     return cmd
 
 
@@ -106,7 +106,7 @@ def rawtools_qc_cmd(input_dir, output_dir):
     '''
     os.makedirs(output_dir, exist_ok=True)
     cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
-            '-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
+           f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
     return cmd
 
 
