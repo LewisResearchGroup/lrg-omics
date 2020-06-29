@@ -5,7 +5,7 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 
 # Create the environment
 
-    conda create -n lrg_omics -c bioconda -c conda-forge -c plotly jupyterlab matplotlib pandas scikit-learn seaborn tqdm rawtools dash pytest "notebook>=5.3" "ipywidgets>=7.2" plotly=4.8.1
+    conda create -n lrg_omics -c bioconda -c conda-forge -c plotly jupyterlab matplotlib pandas scikit-learn seaborn tqdm rawtools dash pytest "notebook>=5.3" "ipywidgets>=7.2" plotly=4.8.1 nodejs
 
     conda activate lrg_omics
     
