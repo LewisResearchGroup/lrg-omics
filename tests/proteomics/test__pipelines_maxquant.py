@@ -1,4 +1,4 @@
-from os.path import isfile, isdir, join, abspath, dirname
+from os.path import isfile, join, abspath
 from glob import glob 
 
 from lrg_omics.proteomics.pipelines.maxquant import run_maxquant
@@ -18,7 +18,7 @@ def test__run_maxquant(tmpdir):
     assert isfile(fake_raw_file)
     
     run_dir = join( tmpdir, 'run')
-    tmp_dir = join( tmpdir, 'tmp')
+    #tmp_dir = join( tmpdir, 'tmp')
     
     cmds = run_maxquant(raw=fake_raw_file, fasta=fasta_file, mqpar=mqpar_file, 
                         pipename='test_pipe', run_root=run_dir)

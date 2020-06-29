@@ -2,17 +2,10 @@
 import os
 import lrg_omics
 
-from os.path import isdir, isfile, basename, join, abspath, dirname
+from os.path import isfile, basename, join, abspath, dirname
 from datetime import date
 from pathlib import Path as P
-from ..common import maybe_make_dir_and_chdir, maybe_create_folders, get_all_raws, relative_path, maybe_create_symlink
-from glob import glob
-from multiprocessing import Process, Queue, Pool
-
-import shutil
-import itertools
-import re
-
+from ..common import maybe_make_dir_and_chdir, maybe_create_symlink
 
 FAKEPATH = abspath( 'tests/data/maxquant/tmt11/txt' )
 

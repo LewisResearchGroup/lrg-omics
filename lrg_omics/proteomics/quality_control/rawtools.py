@@ -1,13 +1,11 @@
 import os
 import pandas as pd
 
-from os.path import isdir, isfile, basename, dirname, abspath
+from os.path import isdir, isfile, dirname, abspath
 from glob import glob
-from datetime import date
 from pathlib import Path as P
 
-from ..common import maybe_make_dir_and_chdir, maybe_create_folders, \
-    relative_path, maybe_create_symlink, get_all_raws
+from ..common import relative_path, maybe_create_symlink, get_all_raws
 
 
 def collect_rawtools_qc_data(root_path):
@@ -119,7 +117,6 @@ def rawtools_output_files_exist(path):
     '''
     raw_files = glob(str(path)+'/*.raw')
     assert len(raw_files) > 0
-    filenames = []
     for raw_file in raw_files:
         mgf = raw_file + '.mgf'
         matrix = raw_file + '_Matrix.txt'

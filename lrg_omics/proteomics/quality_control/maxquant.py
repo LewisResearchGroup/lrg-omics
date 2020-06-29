@@ -1,12 +1,10 @@
 # lgr_omics.proteomics.quality_control.maxquant
-import os
 import pandas as pd
 import numpy as np
-from statistics import mean, stdev
 
 from pathlib import Path as P
 from glob import glob
-from os.path import dirname, isdir, isfile, basename, join, abspath
+from os.path import dirname, isdir, isfile, join, abspath
 
 
 def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):
@@ -147,9 +145,6 @@ def maxquant_qc_msmScans(txt_path, t0=None, tf=None):
     if tf is None:
         tf = df['Retention time'].max()
     mean_parent_int_frac = df['Parent intensity fraction'].mean(skipna=True)
-    df_filtered_peaks = df[['Retention time', 'Filtered peaks']].set_index('Retention time')
-    x = df_filtered_peaks.loc[t0:tf].index
-    y = df_filtered_peaks.loc[t0:tf, 'Filtered peaks'].values
     results = {'Mean_parent_int_frac': mean_parent_int_frac}
     return pd.Series(results).round(2)
 
