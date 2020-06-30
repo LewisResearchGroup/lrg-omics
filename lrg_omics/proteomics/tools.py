@@ -55,7 +55,6 @@ def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
             'RAW_file': 'RawFile', 
             'FASTA_file': 'FastaFile', 
             'MQPAR_TEMP_file': 'MaxQuantPar'}, inplace=True)
-        df['md5'] = df.RawFile.apply(lambda x: x.split('/')[-2])
         df['Missed Cleavages [%]'] = (100-df['N_missed_cleavages_eq_0 [%]'])
         for col in ['MAXQUANTBIN', 'proteomics_tools version', 'RUNDIR', 'Date']:
             try:
