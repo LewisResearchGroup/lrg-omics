@@ -1,6 +1,6 @@
 import re
 
-class MQParser():
+class MQparser():
     def __init__(self, filename=None, as_template=False):
         self._content = None
         
