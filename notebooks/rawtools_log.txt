@@ -1,0 +1,2 @@
+2020-06-29 14:44:24.347 -06:00 [INF] Program started with arguments: 
+2020-06-29 14:44:30.329 -06:00 [INF] Program started with arguments: -h
