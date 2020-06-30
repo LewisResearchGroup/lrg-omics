@@ -44,28 +44,25 @@ def formated_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     
 def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
     assert os.path.isdir(path)
-    try:
-        df = collect_maxquant_qc_data(path).drop_duplicates()
-        df.index = df.iloc[::-1].index
-        df.reset_index(inplace=True)
-        df['Date'] = pd.to_datetime(df.Date)
-        df.rename(columns={
-            'index': 'Index',
-            'PIPENAME': 'Pipename', 
-            'RAW_file': 'RawFile', 
-            'FASTA_file': 'FastaFile', 
-            'MQPAR_TEMP_file': 'MaxQuantPar'}, inplace=True)
-        df['Missed Cleavages [%]'] = (100-df['N_missed_cleavages_eq_0 [%]'])
-        for col in ['MAXQUANTBIN', 'proteomics_tools version', 'RUNDIR', 'Date']:
-            try:
-                del df[col]
-            except:
-                pass
-        for col in ['FastaFile', 'RawFile', 'MaxQuantPar']:
-            try:
-                df[col] = df[col].apply(os.path.basename)
-            except:
-                pass
-    except:
-        df = pd.DataFrame()
-    return df.round(2)
+    df = collect_maxquant_qc_data(path) #.drop_duplicates()
+    df.index = df.iloc[::-1].index
+    df.reset_index(inplace=True)
+    df.rename(columns={
+        'index': 'Index',
+        'PIPENAME': 'Pipename', 
+        'RAW_file': 'RawFile', 
+        'FASTA_file': 'FastaFile', 
+        'MQPAR_TEMP_file': 'MaxQuantPar'}, inplace=True)
+    df['Missed Cleavages [%]'] = (100-df['N_missed_cleavages_eq_0 [%]'])
+    for col in ['MAXQUANTBIN', 'proteomics_tools version', 'RUNDIR', 'Date']:
+        try:
+            del df[col]
+        except:
+            pass
+    for col in ['FastaFile', 'RawFile', 'MaxQuantPar']:
+        try:
+            df[col] = df[col].apply(os.path.basename)
+        except:
+            pass
+
+    return df
