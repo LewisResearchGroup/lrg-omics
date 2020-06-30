@@ -39,7 +39,7 @@ def formated_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     except:
         df = pd.DataFrame()
         df['RawFile'] = ''
-    return df.round(2)
+    return df
     
     
 def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
