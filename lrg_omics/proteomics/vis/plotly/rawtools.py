@@ -16,7 +16,7 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
             go.Scatter(
                 x=rawtools_matrix.index,
                 y=rawtools_matrix[col], 
-                fill=None, name=col,
+                name=col,
                 mode='lines',
                 line=dict(width=0.5, color=colors[i]),  
                 **kwargs),
