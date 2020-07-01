@@ -1,4 +1,5 @@
 import plotly.io as pio
+import plotly.graph_objects as go
 
 def set_template():
     pio.templates["draft"] = go.layout.Template(
