@@ -18,8 +18,9 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
                 y=rawtools_matrix[col], 
                 fill=None, name=col,
                 mode='lines',
-                line=dict(width=0.5, color=colors[i])),
-                **kwargs)
+                line=dict(width=0.5, color=colors[i]),  
+                **kwargs),
+               )
     fig.update_layout(legend_title_text='', 
                       title=title)
     return fig

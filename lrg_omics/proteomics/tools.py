@@ -60,5 +60,4 @@ def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
             df[col] = df[col].apply(os.path.basename)
         except:
             pass
-
     return df
