@@ -9,7 +9,7 @@ colors = ['rgba(80, 80, 200, 0.5)',
           'rgba(150, 150, 80, 0.5)']
 
 
-def lines_plot(rawtools_matrix, cols, colors=colors, title=None):
+def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
     fig = go.Figure()
     for i, col in enumerate( cols ):
         fig.add_trace(
@@ -18,7 +18,8 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None):
                 y=rawtools_matrix[col], 
                 fill=None, name=col,
                 mode='lines',
-                line=dict(width=0.5, color=colors[i])))
+                line=dict(width=0.5, color=colors[i])),
+                **kwargs)
     fig.update_layout(legend_title_text='', 
                       title=title)
     return fig
