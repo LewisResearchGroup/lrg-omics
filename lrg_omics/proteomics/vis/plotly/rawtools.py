@@ -4,7 +4,7 @@ from .template import *
 
 def median_intensity(rawtools_matrix, title=None):
     fig = px.area(rawtools_matrix, 
-                  x='MS1RetTime(min)',
+                  x=None,
                   y=['PeakParentScanIntensity', 
                      'Ms1MedianIntensity', 
                      'Ms2MedianIntensity'],
@@ -17,13 +17,13 @@ def median_intensity(rawtools_matrix, title=None):
 
 
 def filltime(rawtools_matrix, title=None):
-    fig = px.area(rawtools_matrix, x="MS1RetTime(min)", 
+    fig = px.area(rawtools_matrix, x=None, 
                   y=["Ms1FillTime", "Ms2FillTime"], 
                   color_discrete_sequence=px.colors.qualitative.Bold,
                   title=title)
     fig.add_trace(
         go.Scatter(
-            x=rawtools_matrix['MS1RetTime(min)'],
+            x=None,
             y=rawtools_matrix['DutyCycle(s)'],
             mode="lines",
             line=go.scatter.Line(color="black"),
