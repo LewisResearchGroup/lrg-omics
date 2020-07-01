@@ -2,7 +2,7 @@ import plotly.express as px
 from .template import *
 
 
-def fig_median_intensiity(rawtools_matrix, title=None):
+def median_intensity(rawtools_matrix, title=None):
     fig = px.area(rawtools_matrix, 
                   x='MS1RetTime(min)',
                   y=['PeakParentScanIntensity', 
@@ -16,7 +16,7 @@ def fig_median_intensiity(rawtools_matrix, title=None):
     return fig
 
 
-def fig_filltime(rawtools_matrix, title=None):
+def filltime(rawtools_matrix, title=None):
     fig = px.area(rawtools_matrix, x="MS1RetTime(min)", 
                   y=["Ms1FillTime", "Ms2FillTime"], 
                   color_discrete_sequence=px.colors.qualitative.Bold,
