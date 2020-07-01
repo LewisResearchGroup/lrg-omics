@@ -9,7 +9,7 @@ colors = ['rgba(80, 80, 200, 0.5)',
           'rgba(150, 150, 80, 0.5)']
 
 
-def line_plots(rawtools_matrix, cols, colors=colors, title=None):
+def lines_plot(rawtools_matrix, cols, colors=colors, title=None):
     fig = go.Figure()
     for i, col in enumerate( cols ):
         fig.add_trace(
@@ -18,15 +18,13 @@ def line_plots(rawtools_matrix, cols, colors=colors, title=None):
                 y=rawtools_matrix[col], 
                 fill=None, name=col,
                 mode='lines',
-                line=dict(width=0.5, color=colors[i])))
-    fig.update_layout(legend_title_text='', 
-                      title=title)
+    fig.update_layout(legend_title_text='', title=title)
     return fig
                                  
                                  
 def filltime(rawtools_matrix, title=None):
     cols = ['Ms1FillTime', 'Ms2FillTime', 'DutyCycle(s)']
-    return line_plots(rawtools_matrix, cols=cols, title=title)
+    return lines_plot(rawtools_matrix, cols=cols, title=title)
 
 def median_intensity(rawtools_matrix, title=None):
     cols = ['PeakParentScanIntensity', 
@@ -34,7 +32,7 @@ def median_intensity(rawtools_matrix, title=None):
             'Ms2MedianIntensity']
     if title is None:
         title = 'Intensity'
-    fig = line_plots(rawtools_matrix, cols=cols, title=title)
+    fig = lines_plot(rawtools_matrix, cols=cols, title=title)
     fig.update_layout(yaxis_type="log")
     return fig 
 
