@@ -15,7 +15,7 @@ def fig_median_intensiity(rawtools_matrix):
     return fig
 
 
-def fig_filltime(rawtools_matrix)
+def fig_filltime(rawtools_matrix):
     fig = px.area(rawtools_matrix, x="MS1RetTime(min)", 
                   y=["Ms1FillTime", "Ms2FillTime"], 
                   color_discrete_sequence=px.colors.qualitative.Bold)
