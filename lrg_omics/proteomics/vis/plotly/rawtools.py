@@ -17,9 +17,10 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None):
                 x=rawtools_matrix.index,
                 y=rawtools_matrix[col], 
                 fill=None, name=col,
-                mode='lines'))
-    fig.update_layout(legend_title_text='')
-    fig.update_layout(title=title)
+                mode='lines',
+                line=dict(width=0.5, color=colors[i])))
+    fig.update_layout(legend_title_text='', 
+                      title=title)
     return fig
                                  
                                  
