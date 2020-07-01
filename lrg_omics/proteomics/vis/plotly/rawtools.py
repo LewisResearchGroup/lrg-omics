@@ -2,12 +2,13 @@ import plotly.express as px
 from .template import *
 
 
-def fig_median_intensiity(rawtools_matrix):
+def fig_median_intensiity(rawtools_matrix, title=None):
     fig = px.area(rawtools_matrix, 
                   x='MS1RetTime(min)',
                   y=['PeakParentScanIntensity', 
                      'Ms1MedianIntensity', 
                      'Ms2MedianIntensity'],
+                  title=title
                   )
     fig.update_layout(title='Intensity')
     fig.update_layout(yaxis_type="log")
@@ -15,10 +16,11 @@ def fig_median_intensiity(rawtools_matrix):
     return fig
 
 
-def fig_filltime(rawtools_matrix):
+def fig_filltime(rawtools_matrix, title=None):
     fig = px.area(rawtools_matrix, x="MS1RetTime(min)", 
                   y=["Ms1FillTime", "Ms2FillTime"], 
-                  color_discrete_sequence=px.colors.qualitative.Bold)
+                  color_discrete_sequence=px.colors.qualitative.Bold,
+                  title=title)
     fig.add_trace(
         go.Scatter(
             x=rawtools_matrix['MS1RetTime(min)'],
