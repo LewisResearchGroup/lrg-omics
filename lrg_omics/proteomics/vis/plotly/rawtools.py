@@ -2,37 +2,41 @@ import plotly.express as px
 from .template import *
 
 
-def median_intensity(rawtools_matrix, title=None):
-    fig = px.area(rawtools_matrix, 
-                  x=None,
-                  y=['PeakParentScanIntensity', 
-                     'Ms1MedianIntensity', 
-                     'Ms2MedianIntensity'],
-                  title=title
-                  )
-    fig.update_layout(title='Intensity')
-    fig.update_layout(yaxis_type="log")
-    fig.update_layout(legend_title_text='')
+
+
+colors = ['rgba(80, 80, 200, 0.5)', 
+          'rgba(80, 150, 150, 0.5)',
+          'rgba(150, 150, 80, 0.5)']
+
+
+def line_plots(rawtools_matrix, cols, colors=colors, title=None):
+    fig = go.Figure()
+    for i, col in enumerate( cols ):
+        fig.add_trace(
+            go.Scatter(
+                x=rawtools_matrix.index,
+                y=rawtools_matrix[col], 
+                fill=None, name=col,
+                mode='lines',
+                line=dict(width=0.5, color=colors[i])))
+    fig.update_layout(legend_title_text='', 
+                      title=title)
     return fig
-
-
+                                 
+                                 
 def filltime(rawtools_matrix, title=None):
-    fig = px.area(rawtools_matrix, x=None, 
-                  y=["Ms1FillTime", "Ms2FillTime"], 
-                  color_discrete_sequence=px.colors.qualitative.Bold,
-                  title=title)
-    fig.add_trace(
-        go.Scatter(
-            x=None,
-            y=rawtools_matrix['DutyCycle(s)'],
-            mode="lines",
-            line=go.scatter.Line(color="black"),
-            showlegend=True,
-            name='DutyCycle(s)',
-        )
-    )
-    fig.update_layout(legend_title_text='')
-    return fig
+    cols = ['Ms1FillTime', 'Ms2FillTime', 'DutyCycle(s)']
+    return line_plots(rawtools_matrix, cols=cols, title=title)
+
+def median_intensity(rawtools_matrix, title=None):
+    cols = ['PeakParentScanIntensity', 
+            'Ms1MedianIntensity', 
+            'Ms2MedianIntensity']
+    if title is None:
+        title = 'Intensity'
+    fig = line_plots(rawtools_matrix, cols=cols, title=title)
+    fig.update_layout(yaxis_type="log")
+    return fig 
 
 def histograms(rawtools_matrix, cols=['ParentIonMass'], title=None):
     fig = px.histogram(rawtools_matrix[cols[0]])
