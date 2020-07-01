@@ -21,8 +21,8 @@ def fig_filltime(rawtools_matrix):
                   color_discrete_sequence=px.colors.qualitative.Bold)
     fig.add_trace(
         go.Scatter(
-            x=df['MS1RetTime(min)'],
-            y=df['DutyCycle(s)'],
+            x=rawtools_matrix['MS1RetTime(min)'],
+            y=rawtools_matrix['DutyCycle(s)'],
             mode="lines",
             line=go.scatter.Line(color="black"),
             showlegend=True,
@@ -33,7 +33,7 @@ def fig_filltime(rawtools_matrix):
     return fig
 
 def histograms(rawtools_matrix, cols=['ParentIonMass'], title=None):
-    fig = px.histogram(df[cols[0]])
+    fig = px.histogram(rawtools_matrix[cols[0]])
     if len(cols) == 1:
         fig.update_layout(title=cols[0])
         fig.update_layout(showlegend=False)
