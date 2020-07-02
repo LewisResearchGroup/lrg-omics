@@ -86,17 +86,7 @@ def maxquant_qc_protein_groups(txt_path):
              (df['Majority protein IDs'] != 'QC2|Peptide2') &
              (df['Only identified by site'] != '+')]
 
-    m_v = df1[['Reporter intensity corrected 1 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 2 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 3 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 4 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 5 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 6 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 7 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 8 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 9 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 10 Standard-QC__SA_MS2',
-               'Reporter intensity corrected 11 Standard-QC__SA_MS2']].replace(np.nan, 0).isin([0]).sum().to_list()
+    m_v = df1.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()
 
     tmt = ['TMT1', 'TMT2', 'TMT3', 'TMT4', 'TMT5', 'TMT6', 'TMT7', 'TMT8', 'TMT9', 'TMT10', 'TMT11']
 
@@ -176,17 +166,17 @@ def maxquant_qc_evidence(txt_path):
         for i in range(len(qc_peptides_from_evidence_table['QC1|Peptide1_index'])):
             reporter_intensity_corrected_qc1_values = df.loc[
                 qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], [
-                    'Reporter intensity corrected 1 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 2 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 3 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 4 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 5 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 6 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 7 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 8 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 9 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 10 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 11 Standard-QC__SA_MS2']].astype(
+                    'Reporter intensity corrected 1',
+                    'Reporter intensity corrected 2',
+                    'Reporter intensity corrected 3',
+                    'Reporter intensity corrected 4',
+                    'Reporter intensity corrected 5',
+                    'Reporter intensity corrected 6',
+                    'Reporter intensity corrected 7',
+                    'Reporter intensity corrected 8',
+                    'Reporter intensity corrected 9',
+                    'Reporter intensity corrected 10',
+                    'Reporter intensity corrected 11']].astype(
                 float).to_list()
 
             dict_evidence_qc1.update(
@@ -267,17 +257,17 @@ def maxquant_qc_evidence(txt_path):
         for i in range(len(qc_peptides_from_evidence_table['QC2|Peptide2_index'])):
             reporter_intensity_corrected_qc2_values = df.loc[
                 qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], [
-                    'Reporter intensity corrected 1 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 2 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 3 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 4 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 5 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 6 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 7 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 8 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 9 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 10 Standard-QC__SA_MS2',
-                    'Reporter intensity corrected 11 Standard-QC__SA_MS2']].astype(
+                    'Reporter intensity corrected 1',
+                    'Reporter intensity corrected 2',
+                    'Reporter intensity corrected 3',
+                    'Reporter intensity corrected 4',
+                    'Reporter intensity corrected 5',
+                    'Reporter intensity corrected 6',
+                    'Reporter intensity corrected 7',
+                    'Reporter intensity corrected 8',
+                    'Reporter intensity corrected 9',
+                    'Reporter intensity corrected 10',
+                    'Reporter intensity corrected 11']].astype(
                 float).to_list()
 
             dict_evidence_qc2.update(
@@ -358,32 +348,32 @@ def maxquant_qc_evidence(txt_path):
     df_qc3 = df[df.Proteins.str.contains('QC3|BSA', na=False)]
     if len(df_qc3) != 0:
         df_qc3 = df_qc3[['Sequence', 'Proteins', 'Calibrated retention time',
-                         'Reporter intensity corrected 1 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 2 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 3 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 4 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 5 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 6 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 7 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 8 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 9 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 10 Standard-QC__SA_MS2',
-                         'Reporter intensity corrected 11 Standard-QC__SA_MS2']]
+                         'Reporter intensity corrected 1',
+                         'Reporter intensity corrected 2',
+                         'Reporter intensity corrected 3',
+                         'Reporter intensity corrected 4',
+                         'Reporter intensity corrected 5',
+                         'Reporter intensity corrected 6',
+                         'Reporter intensity corrected 7',
+                         'Reporter intensity corrected 8',
+                         'Reporter intensity corrected 9',
+                         'Reporter intensity corrected 10',
+                         'Reporter intensity corrected 11']]
         
         df_qc3.index = pd.RangeIndex(len(df_qc3.index))
         
         df_qc3_mod = df_qc3.groupby(['Sequence'], as_index=False).agg({'Calibrated retention time': [np.nanmean],
-                                                                       'Reporter intensity corrected 1 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 2 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 3 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 4 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 5 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 6 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 7 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 8 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 9 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 10 Standard-QC__SA_MS2': [np.nansum],
-                                                                       'Reporter intensity corrected 11 Standard-QC__SA_MS2': [np.nansum]})
+                                                                       'Reporter intensity corrected 1': [np.nansum],
+                                                                       'Reporter intensity corrected 2': [np.nansum],
+                                                                       'Reporter intensity corrected 3': [np.nansum],
+                                                                       'Reporter intensity corrected 4': [np.nansum],
+                                                                       'Reporter intensity corrected 5': [np.nansum],
+                                                                       'Reporter intensity corrected 6': [np.nansum],
+                                                                       'Reporter intensity corrected 7': [np.nansum],
+                                                                       'Reporter intensity corrected 8': [np.nansum],
+                                                                       'Reporter intensity corrected 9': [np.nansum],
+                                                                       'Reporter intensity corrected 10': [np.nansum],
+                                                                       'Reporter intensity corrected 11': [np.nansum]})
         df_qc3_mod.columns = df_qc3_mod.columns.droplevel(1)
         no_of_pept = len(df_qc3_mod)
         df_qc3_mod.loc["Row_Total"] = df_qc3_mod.iloc[:, 2:].sum(numeric_only=True)
