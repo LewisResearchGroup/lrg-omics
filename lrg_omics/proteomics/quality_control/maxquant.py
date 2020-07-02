@@ -376,8 +376,7 @@ def maxquant_qc_evidence(txt_path):
                                                                        'Reporter intensity corrected 11': [np.nansum]})
         df_qc3_mod.columns = df_qc3_mod.columns.droplevel(1)
         no_of_pept = len(df_qc3_mod)
-        df_qc3_mod.loc["Row_Total"] = df_qc3_mod.iloc[:, 2:].sum(numeric_only=True)
-        df_qc3_mod.loc["Row_Total"] = df_qc3_mod.loc["Row_Total"].replace(0, 1)
+        df_qc3_mod.loc["Row_Total"] = df_qc3_mod.iloc[:, 2:].sum(numeric_only=True).replace(0, 1)
         df_qc3_mod.loc["Row_Log2_Total"] = [np.log2(x) for x in df_qc3_mod.loc["Row_Total"].to_list()]
 
         dict_evidence_qc3.update({"N_of_BSA_pepts": no_of_pept,
