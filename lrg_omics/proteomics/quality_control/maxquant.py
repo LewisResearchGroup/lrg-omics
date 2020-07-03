@@ -181,14 +181,14 @@ def maxquant_qc_evidence(txt_path):
 
             dict_evidence_qc1.update(
                 {
-                    f"{i}_QC1|Peptide1_charge_+{int(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Charge']])}":
+                    f"{i}_QC1|Peptide1_charge_+{float(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Charge']])}":
                         [reporter_intensity_corrected_qc1_values,
                          qc_peptides_from_evidence_table['QC1|Peptide1_index'][i],
-                         int(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Charge']]),
+                         float(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Charge']]),
                          float(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], [
                              'Calibrated retention time']]),
                          float(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Retention length']]),
-                         int(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Number of scans']])
+                         float(df.loc[qc_peptides_from_evidence_table['QC1|Peptide1_index'][i], ['Number of scans']])
                          ]})
 
             # qc1_key_with_higher_ave = list(dict_evidence_qc1.keys())[
@@ -240,7 +240,7 @@ def maxquant_qc_evidence(txt_path):
     else:
 
         dict_info_qc1 = {
-            "qc1_peptide_charge": "not detected",
+            "qc1_peptide_charges": "not detected",
             "N_qc1_missing_values": "not detected",
             "reporter_intensity_corrected_qc1_ave": "not detected",
             "reporter_intensity_corrected_qc1_sd": "not detected",
@@ -272,14 +272,14 @@ def maxquant_qc_evidence(txt_path):
 
             dict_evidence_qc2.update(
                 {
-                    f"{i}_QC2|Peptide2_charge_+{int(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Charge']])}":
+                    f"{i}_QC2|Peptide2_charge_+{float(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Charge']])}":
                         [reporter_intensity_corrected_qc2_values,
                          qc_peptides_from_evidence_table['QC2|Peptide2_index'][i],
-                         int(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Charge']]),
+                         float(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Charge']]),
                          float(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], [
                              'Calibrated retention time']]),
                          float(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Retention length']]),
-                         int(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Number of scans']])
+                         float(df.loc[qc_peptides_from_evidence_table['QC2|Peptide2_index'][i], ['Number of scans']])
                          ]})
 
             # qc2_key_with_higher_ave = list(dict_evidence_qc2.keys())[
@@ -331,7 +331,7 @@ def maxquant_qc_evidence(txt_path):
     else:
 
         dict_info_qc2 = {
-            "qc2_peptide_charge": "not detected",
+            "qc2_peptide_charges": "not detected",
             "N_qc2_missing_values": "not detected",
             "reporter_intensity_corrected_qc2_ave": "not detected",
             "reporter_intensity_corrected_qc2_sd": "not detected",
@@ -376,6 +376,11 @@ def maxquant_qc_evidence(txt_path):
                                                                        'Reporter intensity corrected 11': [np.nansum]})
         df_qc3_mod.columns = df_qc3_mod.columns.droplevel(1)
         no_of_pept = len(df_qc3_mod)
+
+        for i in ['ATEEQLK', 'AEFVEVTK', 'QTALVELL', 'TVMENFVAFVDK']:
+            if i not in df_qc3_mod.Sequence.to_list():
+                df_qc3_mod.loc[len(df_qc3_mod)] = [i] + [np.nan]*(len(df_qc3_mod.columns) - 1)
+
         df_qc3_mod.loc["Row_Total"] = df_qc3_mod.iloc[:, 2:].sum(numeric_only=True).replace(0, 1)
         df_qc3_mod.loc["Row_Log2_Total"] = [np.log2(x) for x in df_qc3_mod.loc["Row_Total"].to_list()]
 
@@ -410,13 +415,13 @@ def maxquant_qc_evidence(txt_path):
                                                                               np.nan, False)].iloc[:, 2:].mean(
                                       skipna=True,
                                       axis=1)),
-                                  'RT_for_QTALVELL':
+                                  'RT_for_QTALVELLK':
                                       float(df_qc3_mod[
-                                                df_qc3_mod['Sequence'].str.contains('QTALVELL').replace(np.nan, False)][
+                                                df_qc3_mod['Sequence'].str.contains('QTALVELLK').replace(np.nan, False)][
                                                 'Calibrated retention time']),
-                                  'Ave_Intensity_for_QTALVELL': float(df_qc3_mod[
+                                  'Ave_Intensity_for_QTALVELLK': float(df_qc3_mod[
                                                                           df_qc3_mod['Sequence'].str.contains(
-                                                                              'QTALVELL').replace(
+                                                                              'QTALVELLK').replace(
                                                                               np.nan, False)].iloc[:, 2:].mean(
                                       skipna=True,
                                       axis=1)),
@@ -444,8 +449,8 @@ def maxquant_qc_evidence(txt_path):
                                   'Ave_Intensity_for_ATEEQLK': "not detected",
                                   'RT_for_AEFVEVTK': "not detected",
                                   'Ave_Intensity_for_AEFVEVTK': "not detected",
-                                  'RT_for_QTALVELL': "not detected",
-                                  'Ave_Intensity_for_QTALVELL': "not detected",
+                                  'RT_for_QTALVELLK': "not detected",
+                                  'Ave_Intensity_for_QTALVELLK': "not detected",
                                   'RT_for_TVMENFVAFVDK': "not detected",
                                   'Ave_Intensity_for_TVMENFVAFVDK': "not detected"
                                   })
