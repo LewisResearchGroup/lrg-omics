@@ -1,12 +1,9 @@
 import plotly.express as px
 from .template import *
 
-
-
-
-colors = ['rgba(80, 80, 200, 0.5)', 
-          'rgba(80, 150, 150, 0.5)',
-          'rgba(150, 150, 80, 0.5)']
+colors = ['rgba(100, 0, 0, 0.5)', 
+          'rgba(0, 100, 0, 0.5)',
+          'rgba(0, 0, 100, 0.5)']
 
 
 def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
@@ -30,6 +27,7 @@ def filltime(rawtools_matrix, title=None):
     cols = ['Ms1FillTime', 'Ms2FillTime', 'DutyCycle(s)']
     return lines_plot(rawtools_matrix, cols=cols, title=title)
 
+
 def median_intensity(rawtools_matrix, title=None):
     cols = ['PeakParentScanIntensity', 
             'Ms1MedianIntensity', 
@@ -39,6 +37,7 @@ def median_intensity(rawtools_matrix, title=None):
     fig = lines_plot(rawtools_matrix, cols=cols, title=title)
     fig.update_layout(yaxis_type="log")
     return fig 
+
 
 def histograms(rawtools_matrix, cols=['ParentIonMass'], title=None):
     fig = px.histogram(rawtools_matrix[cols[0]])
