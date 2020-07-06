@@ -39,19 +39,22 @@ def median_intensity(rawtools_matrix, title=None):
     return fig 
 
 
-def histograms(rawtools_matrix, cols=['ParentIonMass'], title=None):
-    fig = px.histogram(rawtools_matrix[cols[0]])
+def histograms(rawtools_matrix, cols=['ParentIonMass'], 
+               title=None, colors=colors):
+    fig = go.Figure()
     if len(cols) == 1:
         fig.update_layout(title=cols[0])
         fig.update_layout(showlegend=False)
-    for col in cols[1:]:
+    for i, col in enumerate( cols ) :
         fig.add_trace(
                 go.Histogram(
                         x=rawtools_matrix[col], 
-                        visible = 'legendonly', 
-                        name=col,
-                        title=title))
+                        visible = 'legendonly' if i>0 else None, 
+                        name=col, 
+                        marker_color=colors[i]
+                        ))
     fig.update_layout(legend_title_text='')
     fig.update_layout(barmode='overlay')
     fig.update_traces(opacity=0.75)
+    fig.update_layout(title=title)
     return fig
