@@ -84,7 +84,7 @@ def rawtools_cmds(raw, raw_root, output_root=None,
     return commands
 
 
-def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 2 -chro 12TB'):
+def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 -chro 12TB'):
     '''
     Generates command to run rawtools parse to generate
     the RawTools files:
