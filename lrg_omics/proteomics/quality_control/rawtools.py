@@ -84,7 +84,7 @@ def rawtools_cmds(raw, raw_root, output_root=None,
     return commands
 
 
-def rawtools_metrics_cmd(raw, output_dir):
+def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 2 -chro 12TB'):
     '''
     Generates command to run rawtools parse to generate
     the RawTools files:
@@ -94,8 +94,8 @@ def rawtools_metrics_cmd(raw, output_dir):
         *.mgf
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x '
-           f'-u -l -m -r TMT11 2 -chro 12TB 2>rawtools_metrics.err 1>rawtools_metrics.out')
+    cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
+            '{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
     return cmd
 
 
