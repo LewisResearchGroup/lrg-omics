@@ -20,6 +20,7 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
                )
     fig.update_layout(legend_title_text='', 
                       title=title)
+    fig.update_xaxes(title_text=rawtools_matrix.index.name)
     return fig
                                  
                                  
