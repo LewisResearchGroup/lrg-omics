@@ -95,7 +95,7 @@ def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 
     '''
     os.makedirs(output_dir, exist_ok=True)
     cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
-            '{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
+           f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
     return cmd
 
 
