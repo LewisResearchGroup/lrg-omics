@@ -1,13 +1,11 @@
 import os
 import pandas as pd
 
-from os.path import isdir, isfile, basename, dirname, abspath
+from os.path import isdir, isfile, dirname, abspath
 from glob import glob
-from datetime import date
 from pathlib import Path as P
 
-from ..common import maybe_make_dir_and_chdir, maybe_create_folders, \
-    relative_path, maybe_create_symlink, get_all_raws
+from ..common import relative_path, maybe_create_symlink, get_all_raws
 
 
 def collect_rawtools_qc_data(root_path):
@@ -44,7 +42,8 @@ def update_rawtools_qc_data(raw_root, output_root=None, run=False, verbose=False
         return commands
 
 
-def rawtools_cmds(raw, raw_root, output_root=None, force=False, run=False, verbose=False):
+def rawtools_cmds(raw, raw_root, output_root=None, 
+                  force=False, run=False, verbose=False):
     '''
     Returns commands to run, if target folder is not already present.
     Otherwise, an empty list is returned.
@@ -73,7 +72,7 @@ def rawtools_cmds(raw, raw_root, output_root=None, force=False, run=False, verbo
     os.makedirs(output_dir, exist_ok=True)
     maybe_create_symlink(abspath(raw), output_dir/P(os.path.basename(raw)))
     commands = [rawtools_qc_cmd(output_dir, output_dir), 
-                rawtools_mgf_cmd(output_raw, output_dir)]
+                rawtools_metrics_cmd(output_raw, output_dir)]
     if verbose:
         for cmd in commands:
             print(f' CMD: {cmd}')
@@ -85,7 +84,7 @@ def rawtools_cmds(raw, raw_root, output_root=None, force=False, run=False, verbo
     return commands
 
 
-def rawtools_mgf_cmd(raw, output_dir):
+def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 -chro 12TB'):
     '''
     Generates command to run rawtools parse to generate
     the RawTools files:
@@ -95,7 +94,8 @@ def rawtools_mgf_cmd(raw, output_dir):
         *.mgf
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" -p -q -x -r TMT11 2 --chro 2T'
+    cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
+           f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
     return cmd
 
 
@@ -105,7 +105,8 @@ def rawtools_qc_cmd(input_dir, output_dir):
     generate the file QcDataTable.csv.
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = f'cd {output_dir}; rawtools.sh -d "{input_dir}" -qc "{output_dir}"'
+    cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
+           f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
     return cmd
 
 
@@ -119,7 +120,6 @@ def rawtools_output_files_exist(path):
     '''
     raw_files = glob(str(path)+'/*.raw')
     assert len(raw_files) > 0
-    filenames = []
     for raw_file in raw_files:
         mgf = raw_file + '.mgf'
         matrix = raw_file + '_Matrix.txt'

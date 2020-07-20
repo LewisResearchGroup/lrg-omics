@@ -1,19 +1,35 @@
-# A skeleton for python modules. 
+# LRG codebase for omics integration 
 
-A skeleton for python modules using versioneer to automatically add version numbers.
-
-# Get ready
-
-First remove the .git directory. Then initiate a new repository.
-Change the occurences of NAME to the name of your project.
-Finally, run `versioneer install` to initiate versioneer. 
+Lewis Research Group (LRG) codebase for omics data generation, processing, quality control and integration. 
 
 
-Commands:
+# Create the environment
 
-    rm -rf .git
-    git init
-    git add --all
-    git commit -am 'first commit'
-    versioneer install
+    conda create -n lrg_omics -c bioconda -c conda-forge -c plotly jupyterlab matplotlib pandas scikit-learn seaborn tqdm rawtools dash pytest "notebook>=5.3" "ipywidgets>=7.2" plotly=4.8.1 nodejs
+
+    conda activate lrg_omics
+    
+    pip install versioneer pyteomics pymzml
+    
+    jupyter labextension install jupyterlab-plotly@4.8.1
+    
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1
+    
+
+
+##  Download and install from source
+
+    git clone ...
+    cd lrg_omics
+    pip install -e . 
+
+
+## Install new kernel into JupyterLab
+
+    conda activate lrg_omics
+    ipython kernel install --name "LRG" --user
+
+    
+
+
 

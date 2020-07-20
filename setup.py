@@ -15,7 +15,7 @@ config = {
     'author_email': 'swacker@ucalgary.ca',
     'version': versioneer.get_version(),
     'cmdclass': versioneer.get_cmdclass(),
-    'install_requires': [],
+    'install_requires': ['pandas'],
     'packages': [f'{NAME}'],
     'scripts': [],
     'name': f'{NAME}'

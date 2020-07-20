@@ -1,20 +1,18 @@
+# lrg_omics.proteomics.pipelines.maxquant
 import os
-from os.path import isdir, isfile, basename
-import proteomics_tools
+import lrg_omics
+
+from os.path import isfile, basename, join, abspath, dirname
 from datetime import date
 from pathlib import Path as P
-from ..common import maybe_make_dir_and_chdir, maybe_create_folders, get_all_raws, relative_path, maybe_create_symlink
-from glob import glob
-from multiprocessing import Process, Queue, Pool
-import shutil
-import itertools
-import re
+from ..common import maybe_make_dir_and_chdir, maybe_create_symlink
 
-FAKEPATH = '/home/swacker/workspace/django_proteomics_quality_control/proteomics_tools/tests/data/maxquant_examples/0b65c4b1c6b57c448b8256e223ab3f0f/txt'
+FAKEPATH = abspath( 'tests/data/maxquant/tmt11/txt' )
+
 
 def run_maxquant(raw, fasta, mqpar, pipename, force=False, submit=False, 
-             run_root=None, raw_root=None, fasta_root=None, mqpar_root=None,
-             run_path=None, maxquantbin=None, fake=False):
+                 run_root=None, raw_root=None, fasta_root=None, mqpar_root=None,
+                 run_path=None, maxquantbin=None, fake=False, execute=True):
     '''
     Uses a combination of a raw-file, fasta-file and mqpar-template to 
     create folder structure, commands and batch files to start 
@@ -35,11 +33,24 @@ def run_maxquant(raw, fasta, mqpar, pipename, force=False, submit=False,
             - whether or not to submit the generated batch file to 
               the queue system (supported SLURM)
     '''
+    
+    if maxquantbin is None:
+        maxquantbin = os.getenv('MAXQUANTBIN')
+        assert isfile(maxquantbin)
+    
+    if raw_root is None:
+        raw_root = dirname( raw )
+    if fasta_root is None:
+        fasta_root = dirname( fasta )    
+    if mqpar_root is None:
+        mqpar_root = dirname( mqpar )
+    
     if run_path is None:
         run_path = get_run_path(raw=raw, fasta=fasta, mqpar=mqpar, run_root=run_root,
-                                raw_root=raw_root, fasta_root=fasta_root, mqpar_root=mqpar_root,
-                                fake_it=False)
-    if os.path.isdir(os.path.join(run_path, 'combined')) and not force:
+                                raw_root=raw_root, fasta_root=fasta_root, 
+                                mqpar_root=mqpar_root)
+        
+    if os.path.isdir(join(run_path, 'combined')) and not force:
         return []
     
     maybe_make_dir_and_chdir(run_path)
@@ -62,12 +73,17 @@ def run_maxquant(raw, fasta, mqpar, pipename, force=False, submit=False,
         
     gen_sbatch(commands=[cmd], jobname=run_path, submit=submit)
     
+    if execute:
+        os.system(cmd)       
+    
     return [cmd]
+
 
 def gen_maxquant_cmd(run_path, maxquantbin):
     mqpar_cmd = f'(mono {maxquantbin} mqpar.xml && touch DONE) 1>maxquant_out.log 2>maxquant_error.log'
     cmd = 'cd {};\n({}; \n) > run.log'.format(run_path, mqpar_cmd)
     return cmd
+
 
 def get_run_path(raw, fasta, mqpar, run_root, 
                  raw_root, fasta_root, mqpar_root):
@@ -85,7 +101,8 @@ def get_run_path(raw, fasta, mqpar, run_root,
         str(fasta).replace(str(fasta_root), '').split('.')[0], 
         str(mqpar).replace(str(mqpar_root), '').split('.')[0])
     return P(name)
-              
+
+
 def create_mqpar(mqpar_temp, raw, fasta, label, outfilename='mqpar.xml'):
     with open(mqpar_temp, 'r') as file:
         string = file.read()\
@@ -95,12 +112,13 @@ def create_mqpar(mqpar_temp, raw, fasta, label, outfilename='mqpar.xml'):
     with open(outfilename, 'w') as file:
         file.write(string)
     assert os.path.isfile(outfilename)
+
     
 def write_meta_json(raw, fasta, mqpar_temp, pipename, maxquantbin):
     today = str(date.today())
     json = f"""{{
     "Date": "{today}",
-    "proteomics_tools version": "{proteomics_tools.__version__}",
+    "LRG_omics version": "{lrg_omics.__version__}",
     "PIPENAME": "{pipename}",
     "MAXQUANTBIN": "{maxquantbin}",
     "RAW_file": "{raw}",
@@ -109,6 +127,7 @@ def write_meta_json(raw, fasta, mqpar_temp, pipename, maxquantbin):
     """.strip()
     with open('meta.json', 'w') as file:
         file.write(json+'\n')
+
 
 def gen_sbatch(commands, jobname, submit=False):
     cmds_txt = '\n\n'.join(commands)
