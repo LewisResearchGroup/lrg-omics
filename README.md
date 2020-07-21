@@ -11,7 +11,7 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
     
     jupyter labextension install jupyterlab-plotly@4.8.2
     
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.12
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.2
     
 
 
