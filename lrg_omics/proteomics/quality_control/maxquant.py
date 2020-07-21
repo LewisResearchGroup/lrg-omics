@@ -88,12 +88,20 @@ def maxquant_qc_protein_groups(txt_path):
 
     m_v = df1.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()
 
-    tmt = ['TMT1', 'TMT2', 'TMT3', 'TMT4', 'TMT5', 'TMT6', 'TMT7', 'TMT8', 'TMT9', 'TMT10', 'TMT11']
-
     result = {
         "N_protein_groups": len(df),
         "N_protein_true_hits": n_true_hits,
-        "N_missing_values": list(zip(tmt, m_v)),
+        "TMT1_missing_values": m_v[0],
+        "TMT2_missing_values": m_v[1],
+        "TMT3_missing_values": m_v[2],
+        "TMT4_missing_values": m_v[3],
+        "TMT5_missing_values": m_v[4],
+        "TMT6_missing_values": m_v[5],
+        "TMT7_missing_values": m_v[6],
+        "TMT8_missing_values": m_v[7],
+        "TMT9_missing_values": m_v[8],
+        "TMT10_missing_values": m_v[9],
+        "TMT11_missing_values": m_v[10],
         "N_protein_potential_contaminants": n_contaminants,
         "N_protein_reverse_seq": n_reverse,
         "Protein_mean_seq_cov [%]": mean_sequence_coverage
@@ -230,7 +238,7 @@ def maxquant_qc_evidence(txt_path):
             "reporter_intensity_corrected_qc1_sd": np.nanstd(np.array(log_intensities_sum), ddof=0),
             "reporter_intensity_corrected_qc1_cv": (np.nanstd(np.array(log_intensities_sum), ddof=0) / np.nanmean(
                 np.array(log_intensities_sum))) * 100,
-            "calibrated_retention time_qc1": np.nanmean(np.array(rts)),
+            "calibrated_retention_time_qc1": np.nanmean(np.array(rts)),
             "retention_length_qc1": np.nanmean(np.array(rls)),
             "N_of_scans_qc1": no_scans
         }
@@ -245,7 +253,7 @@ def maxquant_qc_evidence(txt_path):
             "reporter_intensity_corrected_qc1_ave": "not detected",
             "reporter_intensity_corrected_qc1_sd": "not detected",
             "reporter_intensity_corrected_qc1_cv": "not detected",
-            'calibrated_retention time_qc1': 'not detected',
+            'calibrated_retention_time_qc1': 'not detected',
             'retention_length_qc1': 'not detected',
             "N_of_scans_qc1": 'not detected'
         }
@@ -321,7 +329,7 @@ def maxquant_qc_evidence(txt_path):
             "reporter_intensity_corrected_qc2_sd": np.nanstd(np.array(log_intensities_sum), ddof=0),
             "reporter_intensity_corrected_qc2_cv": (np.nanstd(np.array(log_intensities_sum), ddof=0) / np.nanmean(
                 np.array(log_intensities_sum))) * 100,
-            "calibrated_retention time_qc2": np.nanmean(np.array(rts)),
+            "calibrated_retention_time_qc2": np.nanmean(np.array(rts)),
             "retention_length_qc2": np.nanmean(np.array(rls)),
             "N_of_scans_qc2": no_scans
         }
@@ -336,7 +344,7 @@ def maxquant_qc_evidence(txt_path):
             "reporter_intensity_corrected_qc2_ave": "not detected",
             "reporter_intensity_corrected_qc2_sd": "not detected",
             "reporter_intensity_corrected_qc2_cv": "not detected",
-            'calibrated_retention time_qc2': 'not detected',
+            'calibrated_retention_time_qc2': 'not detected',
             'retention_length_qc2': 'not detected',
             "N_of_scans_qc2": 'not detected'
         }
@@ -377,7 +385,7 @@ def maxquant_qc_evidence(txt_path):
         df_qc3_mod.columns = df_qc3_mod.columns.droplevel(1)
         no_of_pept = len(df_qc3_mod)
 
-        for i in ['ATEEQLK', 'AEFVEVTK', 'QTALVELL', 'TVMENFVAFVDK']:
+        for i in ['ATEEQLK', 'AEFVEVTK', 'QTALVELLK', 'TVMENFVAFVDK']:
             if i not in df_qc3_mod.Sequence.to_list():
                 df_qc3_mod.loc[len(df_qc3_mod)] = [i] + [np.nan]*(len(df_qc3_mod.columns) - 1)
 
