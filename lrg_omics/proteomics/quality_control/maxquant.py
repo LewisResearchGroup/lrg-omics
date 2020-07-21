@@ -88,6 +88,8 @@ def maxquant_qc_protein_groups(txt_path):
 
     m_v = df1.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()
 
+    tmt = ['TMT1', 'TMT2', 'TMT3', 'TMT4', 'TMT5', 'TMT6', 'TMT7', 'TMT8', 'TMT9', 'TMT10', 'TMT11']
+
     result = {
         "N_protein_groups": len(df),
         "N_protein_true_hits": n_true_hits,
