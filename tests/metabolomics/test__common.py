@@ -1,6 +1,6 @@
 import pandas as pd
 
-from lrg_omics.metabolomics.common import read_worklist, metadata_from_filename
+from lrg_omics.metabolomics.common import metadata_from_worklist, metadata_from_filename
 
 
 class Test_metadata_from_filename():
@@ -15,3 +15,9 @@ class Test_metadata_from_filename():
                 'MS_MODE': 'Neg'}
         expected = pd.DataFrame(data, index=[0])
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
+
+    def test__file_with_standard(self):
+        assert False
+    
+    def test__file_with_qc_sample(self):
+        assert False
