@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-def get_maxquant_txt(raw_file, txt='proteinGroups.txt', 
-                     pipename='Standard-QC__SA_MS2'):
-=======
 import pandas as pd
 import numpy as np
 from os.path import isfile
@@ -9,44 +5,12 @@ from os.path import isfile
 
 def get_maxquant_txt(path, txt='proteinGroups.txt', mq_run_name=None,
                      pipename=None):
->>>>>>> 9ccb24aada0a6dae9d8c718238bac60d07c267ef
     '''
     Graps a MaxQuant txt based on the name of the
     .RAW file and the name of the pipeline. raw_file
     and pipename are added to all rows. Pipename is
     removed from all column names.
     '''
-<<<<<<< HEAD
-    try:
-        path = RAWTOOLS.loc[RAWTOOLS.RawFile == raw_file, 'RawFilePath'].values[0]
-    except:
-        print(f'Could not find path for {raw_file}' )
-        print(RAWTOOLS.loc[RAWTOOLS.RawFile == raw_file, 'RawFilePath'])
-        return pd.DataFrame()
-    full_path = f'{path}/maxquant/{pipename}/{raw_file}/txt/{txt}'
-    if isfile(full_path):
-        df = pd.read_table(full_path)
-    else:
-        print(f'File not found: {full_path}')
-        return pd.DataFrame()
-    df['RawFile'] = raw_file
-    df['PipeName'] = pipename
-    df = df.set_index('RawFile').reset_index()
-    df.columns = [i.replace(pipename, '').strip() for i in df.columns]
-    return df
-
-def melt_protein_quant(df, protein_col='Protein IDs'):
-    output = df.melt(id_vars=['RawFile', protein_col], var_name='TMT', value_name='RepInt')
-    output['TMT'] = output['TMT'].str.replace('Reporter intensity corrected ', '').astype(int)
-    output = output.set_index(['RawFile', 'TMT'])\
-                   .reset_index()
-    return output
-
-def get_protein_quant(raw_file, melt=False, normed=None, take_log=False,
-                      divide_by_column_mean=False, mean_centering_per_plex=False,
-                      drop_zero_q=False, data_cols=['RawFile'],
-                      protein_col='Protein IDs'):
-=======
     full_path = f'{path}/{txt}'
     if isfile(full_path):
         df = pd.read_table(full_path)
@@ -69,8 +33,7 @@ def melt_protein_quant(df, id_vars=None, var_name='TMT'):
 def get_protein_quant(path, melt=False, normed=None, take_log=False,
                       divide_by_column_mean=False, mean_centering_per_plex=False,
                       drop_zero_q=False, data_cols=['MaxQuantRun', 'PipeName'],
-                      protein_col='Protein IDs', pipename=None, mq_run_name=None):
->>>>>>> 9ccb24aada0a6dae9d8c718238bac60d07c267ef
+                      protein_col='Protein IDs', pipename=None):
     '''
     Gets the proteinGroups file based on the .RAW name 
     and the pipename. Records starting with REV or CON 
@@ -90,12 +53,8 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
         - drop_zero_q
         - melt: Return a melted DataFrame
     '''
-<<<<<<< HEAD
-    df = get_maxquant_txt(raw_file, txt='proteinGroups.txt')
-=======
-    df = get_maxquant_txt(path, txt='proteinGroups.txt', 
-                          pipename=pipename, mq_run_name=mq_run_name)
->>>>>>> 9ccb24aada0a6dae9d8c718238bac60d07c267ef
+    df = get_maxquant_txt(path, txt='proteinGroups.txt', pipename=pipename)
+
     if len(df) == 0:
         return None
     df = df[~( df['Protein IDs'].str.startswith('REV_') | 
@@ -132,49 +91,50 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
         row_means = a.mean(axis=1)
         a = a.subtract(row_means, axis=0)
         reporter_intensity.loc[:, cols] = a
-            
+
+def protein_quant_from_paths(paths, pipename, protein_col='Protein IDs'):            
     # Combine data with reporter int    
-    output = pd.concat([data, reporter_intensity], axis=1)
-    if melt:
-        output = melt_protein_quant(output)      
-    return output
-<<<<<<< HEAD
+    dfs = []
+    for path in paths:
+        df = get_protein_quant(path, 
+                pipename=pipename, 
+                normed='diff_to_ref', take_log=True,
+                divide_by_column_mean=True, 
+                mean_centering_per_plex=True,
+                drop_zero_q=False)
+        dfs.append(df)
 
-def well_col_from_raw_fn(rawfile):
-    try:
-        xs = re.findall('-[ABCDEFGH]-', rawfile)[0][1]
-        return xs 
-    except:
-        print('Could not extract row-id from file:', rawfile)
-        if rawfile.startswith('SA009-R1-C'):
-            print('Assigning row C')
-            return 'C'
-        return None
+    protein_quant = pd.concat(dfs)
+    protein_quant = melt_protein_quant(protein_quant)
+    protein_quant = protein_quant.pivot_table(values='ReporterIntensity', 
+                                              columns=['MaxQuantRun', 'TMT'],
+                                              index=protein_col)
+    protein_quant = pivoted.T.reset_index()
+    protein_quant = protein_quant.reset_index(drop=True).set_index(['MaxQuantRun','TMT'])
+    protein_quant.index = ['-'.join([str(i) for i in ndx]) for ndx in protein_quant.index]
+    return protein_quant
 
 
-def get_protein_data(raw_files, divide_by_column_mean=True, take_log=True, normed='diff_to_ref', 
-                     mean_centering_per_plex=False, protein_col='Protein IDs'):
-    data = pd.concat([get_protein_quant(i, normed=normed, take_log=take_log,
-                                        divide_by_column_mean=divide_by_column_mean, 
-                                        mean_centering_per_plex=mean_centering_per_plex, 
-                                        melt=False) 
-                      for i in raw_files])
-    melted = melt_protein_quant(data, protein_col=protein_col)
-    melted[protein_col] = 'QUANT|' + melted[protein_col]
-    
-    pivoted = melted.pivot_table(values='RepInt', columns=['RawFile', 'TMT'],
-                                 index=protein_col)
-    proteins = pivoted.T.reset_index()
-    proteins = proteins.reset_index(drop=True)
-    proteins = proteins.set_index(['RawFile', 'TMT'])#.fillna(0).astype(int)
-    proteins = proteins.reset_index()
-    proteins.columns.name = None    
-    proteins['PLATE'] = proteins.RawFile.apply(lambda x: x.split('-')[0])
-    proteins['WELL_ROW'] = proteins.RawFile.apply(well_col_from_raw_fn)
-    proteins['WELL_COL'] = 12 - proteins.TMT
-    proteins = proteins.set_index(['RawFile', 'PLATE', 'WELL_ROW', 'WELL_COL', 'TMT']).reset_index()
-    proteins['TMT'] = proteins['TMT'].apply(lambda x: f'{int(x):02.0f}')
-    #del proteins['n_batch']
-    return proteins
-=======
->>>>>>> 9ccb24aada0a6dae9d8c718238bac60d07c267ef
+def plotly_heatmap_from_df(df, as_div=False, title='', x=None, y=None):
+    if x is None:
+        x = df.columns
+    if y is None:
+        y = df.index
+
+    fig = go.Figure(data=go.Heatmap(
+                    z=df,
+                    y=y,
+                    x=x,
+                    hoverongaps=False))
+
+    fig.update_layout(
+        title=title,
+        )
+
+    fig.update_yaxes(automargin=True)
+    fig.update_xaxes(automargin=True)
+
+    if as_div:
+        return opy.plot(fig, auto_open=False, output_type='div')
+    else:
+        return fig
