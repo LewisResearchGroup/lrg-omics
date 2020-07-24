@@ -1,5 +1,5 @@
 import plotly.express as px
-from .template import *
+from ....plotly import set_template
 
 colors = ['rgba(100, 0, 0, 0.5)', 
           'rgba(0, 100, 0, 0.5)',
