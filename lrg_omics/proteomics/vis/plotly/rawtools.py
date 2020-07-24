@@ -1,5 +1,6 @@
 import plotly.express as px
 from ....plotly import set_template
+import plotly.graph_objects as go
 
 colors = ['rgba(100, 0, 0, 0.5)', 
           'rgba(0, 100, 0, 0.5)',
