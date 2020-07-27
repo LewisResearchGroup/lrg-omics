@@ -16,5 +16,12 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
     ipython kernel install --name "LRG" --user
 
 
+## Test data
 
+You can download test data from https://soerendip.com/dl/lrg_omics_test_data
 
+E.g. with `wget`:
+
+    wget -R https://soerendip.com/dl/lrg_omics_test_data
+    
+    
