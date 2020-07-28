@@ -1,7 +1,7 @@
 #lrg_omics/metabolomics/common.py
 
 import pandas as pd
-
+import os
 
 
 def metadata_from_worklist(fn: str):
@@ -10,7 +10,7 @@ def metadata_from_worklist(fn: str):
 
 
 def metadata_from_filename(fn: str):
-    file_name = fn[:-6]
+    file_name = os.path.basename(fn)[:-6]
     bi_nbr = None
     if 'BI_' in file_name:
         bi_nbr = 'BI'+file_name.split('BI')[-1]
@@ -27,7 +27,9 @@ def metadata_from_filename(fn: str):
     if 'MH-pool' in file_name: sample_type = 'MH'  # MH-pool samples
     if 'QC' in file_name: sample_type = 'QC'       # QC samples
     mode = file_name.split('HILIC')[-1][:3]
-    plate_id = 'SA0'+file_name.split('SA0')[-1][:3]
+    
+    plate_id = 'SA0'+file_name.split('SA0')[-1][:2]
+    
     data = {'BI_NBR': bi_nbr, 
             'DATE': date, 
             'RPT': rpt, 
