@@ -27,7 +27,7 @@ def metadata_from_filename(fn: str):
     if 'MH-pool' in file_name: sample_type = 'MH'  # MH-pool samples
     if 'QC' in file_name: sample_type = 'QC'       # QC samples
     mode = file_name.split('HILIC')[-1][:3]
-    plate_id = 'SA'+file_name.split('SA')[-1][:3]
+    plate_id = 'SA0'+file_name.split('SA0')[-1][:3]
     data = {'BI_NBR': bi_nbr, 
             'DATE': date, 
             'RPT': rpt, 
