@@ -1,7 +1,11 @@
 import pandas as pd
 import numpy as np
-from os.path import isfile
 
+from os.path import isfile
+from glob import glob
+
+import plotly.graph_objects as go
+import plotly.offline as opy
 
 def get_maxquant_txt(path, txt='proteinGroups.txt', mq_run_name=None,
                      pipename=None):
@@ -11,6 +15,8 @@ def get_maxquant_txt(path, txt='proteinGroups.txt', mq_run_name=None,
     and pipename are added to all rows. Pipename is
     removed from all column names.
     '''
+    if mq_run_name is None:
+        mq_run_name = path
     full_path = f'{path}/{txt}'
     if isfile(full_path):
         df = pd.read_table(full_path)
@@ -33,7 +39,7 @@ def melt_protein_quant(df, id_vars=None, var_name='TMT'):
 def get_protein_quant(path, melt=False, normed=None, take_log=False,
                       divide_by_column_mean=False, mean_centering_per_plex=False,
                       drop_zero_q=False, data_cols=['MaxQuantRun', 'PipeName'],
-                      protein_col='Protein IDs', pipename=None):
+                      protein_col='Protein IDs', pipename=None, mq_run_name=None):
     '''
     Gets the proteinGroups file based on the .RAW name 
     and the pipename. Records starting with REV or CON 
@@ -53,7 +59,8 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
         - drop_zero_q
         - melt: Return a melted DataFrame
     '''
-    df = get_maxquant_txt(path, txt='proteinGroups.txt', pipename=pipename)
+    df = get_maxquant_txt(path, txt='proteinGroups.txt', 
+                          pipename=pipename, mq_run_name=mq_run_name)
 
     if len(df) == 0:
         return None
@@ -91,13 +98,26 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
         row_means = a.mean(axis=1)
         a = a.subtract(row_means, axis=0)
         reporter_intensity.loc[:, cols] = a
-
-def protein_quant_from_paths(paths, pipename, protein_col='Protein IDs'):            
     # Combine data with reporter int    
+    output = pd.concat([data, reporter_intensity], axis=1)
+    if melt:
+        output = melt_protein_quant(output)      
+    return output    
+
+
+def protein_quant_from_paths(paths, pipename, protein_col='Protein IDs', 
+                             mq_run_names=None):            
+    # Combine data with reporter int    
+    
+    if mq_run_names is None:
+        mq_run_names = paths
+
     dfs = []
-    for path in paths:
+    for path, name in zip(paths, mq_run_names):
+        print(path, name)
         df = get_protein_quant(path, 
-                pipename=pipename, 
+                pipename=pipename,
+                mq_run_name=name,
                 normed='diff_to_ref', take_log=True,
                 divide_by_column_mean=True, 
                 mean_centering_per_plex=True,
@@ -109,23 +129,22 @@ def protein_quant_from_paths(paths, pipename, protein_col='Protein IDs'):
     protein_quant = protein_quant.pivot_table(values='ReporterIntensity', 
                                               columns=['MaxQuantRun', 'TMT'],
                                               index=protein_col)
-    protein_quant = pivoted.T.reset_index()
+    protein_quant = protein_quant.T.reset_index()
+    protein_quant['TMT'] = protein_quant['TMT'].apply(lambda x: f'{x:02.0f}') 
     protein_quant = protein_quant.reset_index(drop=True).set_index(['MaxQuantRun','TMT'])
-    protein_quant.index = ['-'.join([str(i) for i in ndx]) for ndx in protein_quant.index]
     return protein_quant
 
 
-def plotly_heatmap_from_df(df, as_div=False, title='', x=None, y=None):
+def plotly_heatmap(df: pd.DataFrame(), x=None, y=None, title=None):
+    '''
+    Creates a heatmap from pandas.DataFrame().
+    '''
     if x is None:
         x = df.columns
     if y is None:
-        y = df.index
+        y = ['_'.join([str(i) for i in ndx]) for ndx in df.index]
 
-    fig = go.Figure(data=go.Heatmap(
-                    z=df,
-                    y=y,
-                    x=x,
-                    hoverongaps=False))
+    fig = go.Figure(data=go.Heatmap(z=df, y=y, x=x, hoverongaps=False))
 
     fig.update_layout(
         title=title,
@@ -134,7 +153,13 @@ def plotly_heatmap_from_df(df, as_div=False, title='', x=None, y=None):
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)
 
-    if as_div:
-        return opy.plot(fig, auto_open=False, output_type='div')
-    else:
-        return fig
+    return fig
+
+
+def plotly_dendrogram(df: pd.DataFrame()):
+    fig = ff.create_dendrogram(df, color_threshold=1.5)
+    return fig
+
+
+def plotly_fig_to_div(fig):
+    return opy.plot(fig, auto_open=False, output_type='div')
