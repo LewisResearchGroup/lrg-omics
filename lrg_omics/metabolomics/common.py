@@ -10,7 +10,16 @@ def metadata_from_worklist(fn: str):
 
 
 def metadata_from_filename(fn: str):
-    file_name = str(os.path.basename(fn)[:-6])
+    '''
+    this function extracts the metadata from the file name and returns a dataframe
+    '''
+    file_name = str(os.path.basename(fn))
+    if('.mzXML' in file_name):
+        file_name = file_name[:-6]
+    if('.raw' in file_name):
+        file_name = file_name[:-4]
+        
+        
     bi_nbr = None
     if 'BI_' in file_name:
         bi_nbr = 'BI'+file_name.split('BI')[-1]
@@ -24,15 +33,15 @@ def metadata_from_filename(fn: str):
     sample_type = 'BI'                             # BI samples
     if 'Standard' in file_name: sample_type = 'ST' # standard samples
     if 'Blank' in file_name: sample_type = 'BL'    # Blank samples
-    if 'SA-pool' in file_name: sample_type = 'SA'  # SA-pool samples
-    if 'MH-pool' in file_name: sample_type = 'MH'  # MH-pool samples
+    if ( 'SA-pool' in file_name ) or ( 'SA-Pool' in file_name ): sample_type = 'PO-SA'  # SA-pool samples
+    if ('MH-pool' in file_name) or ('MH-Pool' in file_name): sample_type = 'PO-MH'      # MH-pool samples
     if 'QC' in file_name: sample_type = 'QC'       # QC samples
     mode = file_name.split('HILIC')[-1][:3]
     
     plate_id = 'SA0'+file_name.split('SA0')[-1][:2]
     
     data = {
-            'MS_FILE':file_name,
+            'MS_FILE':str(os.path.basename(fn)),
             'BI_NBR': bi_nbr, 
             'DATE': date, 
             'RPT': rpt, 
@@ -43,6 +52,7 @@ def metadata_from_filename(fn: str):
     
     df = pd.DataFrame(data, index=[0])
     return df 
+
 
 
 def read_plate(filenames, worklist):
