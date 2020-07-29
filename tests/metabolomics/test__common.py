@@ -14,6 +14,7 @@ class Test_metadata_from_filename():
                 'RPT': 1, 
                 'PLATE_ID': 'SA001',
                 'SAMPLE_TYPE': 'BI',
+                'STD_CONC': None,
                 'MS_MODE': 'Pos'
         }
         expected = pd.DataFrame(data, index=[0])
@@ -28,8 +29,11 @@ class Test_metadata_from_filename():
                 'RPT': 1, 
                 'PLATE_ID': 'SA001',
                 'SAMPLE_TYPE': 'ST',
+                'STD_CONC': 5000.,
                 'MS_MODE': 'Pos'}
         expected = pd.DataFrame(data, index=[0])
+#         print(expected.STD_CONC)
+        print(actual.STD_CONC)
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__file_with_qc01_sample(self):
@@ -41,6 +45,7 @@ class Test_metadata_from_filename():
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'QC',
+                'STD_CONC': None,
                 'MS_MODE': 'Neg'}
         expected = pd.DataFrame(data, index=[0])
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
@@ -54,6 +59,7 @@ class Test_metadata_from_filename():
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'QC',
+                'STD_CONC': None,
                 'MS_MODE': 'Neg'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)
@@ -68,6 +74,7 @@ class Test_metadata_from_filename():
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'PO-SA',
+                'STD_CONC': None,
                 'MS_MODE': 'Pos'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)
@@ -82,6 +89,7 @@ class Test_metadata_from_filename():
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'PO-MH',
+                'STD_CONC': None,
                 'MS_MODE': 'Neg'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)
@@ -96,6 +104,7 @@ class Test_metadata_from_filename():
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'BL',
+                'STD_CONC': None,
                 'MS_MODE': 'Neg'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)

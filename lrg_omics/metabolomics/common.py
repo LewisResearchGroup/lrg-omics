@@ -30,10 +30,14 @@ def metadata_from_filename(fn: str):
     if 'RPT' in file_name:
         rpt = int(file_name.split('RPT')[-1][:3])
         
+    conc = None
+        
     sample_type = 'BI'                             # BI samples
-    if 'Standard' in file_name: sample_type = 'ST' # standard samples
+    if 'Standard' in file_name: 
+        sample_type = 'ST'                         # standard samples
+        conc = float(file_name.split('Standard-')[-1][:-2])
     if 'Blank' in file_name: sample_type = 'BL'    # Blank samples
-    if ( 'SA-pool' in file_name ) or ( 'SA-Pool' in file_name ): sample_type = 'PO-SA'  # SA-pool samples
+    if ('SA-pool' in file_name) or ('SA-Pool' in file_name): sample_type = 'PO-SA'  # SA-pool samples
     if ('MH-pool' in file_name) or ('MH-Pool' in file_name): sample_type = 'PO-MH'      # MH-pool samples
     if 'QC' in file_name: sample_type = 'QC'       # QC samples
     mode = file_name.split('HILIC')[-1][:3]
@@ -47,6 +51,7 @@ def metadata_from_filename(fn: str):
             'RPT': rpt, 
             'PLATE_ID': plate_id,
             'SAMPLE_TYPE': sample_type,
+            'STD_CONC': conc,
             'MS_MODE': mode
             }
     
