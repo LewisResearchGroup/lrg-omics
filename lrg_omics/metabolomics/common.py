@@ -2,6 +2,8 @@
 
 import pandas as pd
 import os
+import glob
+import numpy as np
 
 
 def metadata_from_worklist(fn: str):
@@ -60,6 +62,24 @@ def metadata_from_filename(fn: str):
 
 
 
-def read_plate(filenames, worklist):
+def read_plate(path, worklist):
+    filenames = [os.path.basename(x) for x in glob.glob(path + '/*.mzXML')]
+    frames = []
+    for files in filenames:
+        frames.append(metadata_from_filename(files))
+    output = pd.concat(frames).reset_index().drop(['index'], axis = 1)
     
-    return pd.DataFrame()
+    sizes = [os.path.getsize(path+'/'+filenames[k]) for k in range(len(filenames))]
+    output['FILE_SIZE'] = sizes
+    output = output.sort_values(by =['MS_FILE']).reset_index().drop(['index'],axis =1 )
+    
+    wl = pd.read_csv(path +'/' + worklist, skiprows=1)
+    wl['File Name'] += '.mzXML'
+    isin = [wl['File Name'][k] in filenames for k in range(len(wl))]
+    wl = wl[ isin ].sort_values(by=['File Name']).reset_index().drop(['index'],axis = 1)
+    output['WELL_ROW'] = wl.Position.str.split(':').apply(lambda x: x[-1][0])
+    output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
+    
+    
+    
+    return output
