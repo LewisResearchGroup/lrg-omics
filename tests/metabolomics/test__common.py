@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 
 from lrg_omics.metabolomics.common import metadata_from_worklist, metadata_from_filename, read_plate
-
+from lrg_omics import LRG_TEST_DATA
 
 class Test_metadata_from_filename():
     def test__file_with_bi_nbr(self):
@@ -112,6 +113,7 @@ class Test_metadata_from_filename():
     
     def test__read_plate(self):
         path = '/media/luis/WORK/metabolomics/QC_pipeline/lrg_omics/sample_files'
+
         worklist = 'LSARP-Full-May2020-Worklist.csv'
         actual = read_plate(path, worklist)
         names = ['2020_05_13RG_HILICNeg15S_Col002_LSARP_SA002_RPT001_BI_16_0227.mzXML',
