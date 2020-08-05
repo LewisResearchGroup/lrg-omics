@@ -84,7 +84,7 @@ def rawtools_cmds(raw, raw_root, output_root=None,
     return commands
 
 
-def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 -chro 12TB'):
+def rawtools_metrics_cmd(raw, output_dir, rerun=False, arguments='-p -q -x -u -l -m -r TMT11 -chro 12TB'):
     '''
     Generates command to run rawtools parse to generate
     the RawTools files:
@@ -94,19 +94,23 @@ def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 
         *.mgf
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
-           f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
+    if not isfile(join(output_dir, raw, '_Matrix.txt')) or rerun:
+        cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
+            f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
+    else: cmd = None
     return cmd
 
 
-def rawtools_qc_cmd(input_dir, output_dir):
+def rawtools_qc_cmd(input_dir, output_dir, rerun=False):
     '''
     Generates command to run rawtools quality control to 
     generate the file QcDataTable.csv.
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
-           f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
+    if not isfile(join(output_dir, 'QcDataTable.csv')) or rerun:
+        cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
+            f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
+    else: cmd = None
     return cmd
 
 
