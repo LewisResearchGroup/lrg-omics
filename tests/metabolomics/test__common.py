@@ -112,12 +112,7 @@ class Test_metadata_from_filename():
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__read_plate(self):
-<<<<<<< HEAD
-        # path = '/media/luis/WORK/metabolomics/QC_pipeline/lrg_omics/sample_files'
-        path = os.path.join(LRG_TEST_DATA, 'metabolomics', '2020_05_06RG_SA005')
-=======
         path = '/media/luis/WORK/metabolomics/QC_pipeline/lrg_omics/sample_files'
->>>>>>> e23b69b8cddfa2e64753839ebce0ab9f188b23b1
 
         worklist = 'LSARP-Full-May2020-Worklist.csv'
         actual = read_plate(path, worklist)
