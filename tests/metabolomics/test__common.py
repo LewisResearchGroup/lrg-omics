@@ -112,7 +112,8 @@ class Test_metadata_from_filename():
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__read_plate(self):
-        path = '/media/luis/WORK/metabolomics/QC_pipeline/lrg_omics/sample_files'
+        # path = '/media/luis/WORK/metabolomics/QC_pipeline/lrg_omics/sample_files'
+        path = os.path.join(LRG_TEST_DATA, 'metabolomics', '2020_05_06RG_SA005')
 
         worklist = 'LSARP-Full-May2020-Worklist.csv'
         actual = read_plate(path, worklist)
@@ -129,7 +130,7 @@ class Test_metadata_from_filename():
         plate_id = ['SA002','SA002','SA002']
         std_conc = [None,None,None]
         ms_mode = ['Neg','Neg','Neg']
-        file_size = [22931245, 22927568, 22896208]
+        # file_size = [22931245, 22927568, 22896208]
         data = {
                 'MS_FILE': names,
                 'BI_NBR': bi_nbrs, 
@@ -139,7 +140,7 @@ class Test_metadata_from_filename():
                 'SAMPLE_TYPE': sample_type,
                 'STD_CONC': None,
                 'MS_MODE': 'Neg',
-                'FILE_SIZE': file_size,
+                # 'FILE_SIZE': file_size,
                 'WELL_ROW': well_row,
                 'WELL_COL': well_col
                }
