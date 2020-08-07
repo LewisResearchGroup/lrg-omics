@@ -4,8 +4,6 @@ import numpy as np
 from os.path import isfile
 from glob import glob
 
-import plotly.graph_objects as go
-import plotly.offline as opy
 
 def get_maxquant_txt(path, txt='proteinGroups.txt', mq_run_name=None,
                      pipename=None):
@@ -135,31 +133,3 @@ def protein_quant_from_paths(paths, pipename, protein_col='Protein IDs',
     return protein_quant
 
 
-def plotly_heatmap(df: pd.DataFrame(), x=None, y=None, title=None):
-    '''
-    Creates a heatmap from pandas.DataFrame().
-    '''
-    if x is None:
-        x = df.columns
-    if y is None:
-        y = ['_'.join([str(i) for i in ndx]) for ndx in df.index]
-
-    fig = go.Figure(data=go.Heatmap(z=df, y=y, x=x, hoverongaps=False))
-
-    fig.update_layout(
-        title=title,
-        )
-
-    fig.update_yaxes(automargin=True)
-    fig.update_xaxes(automargin=True)
-
-    return fig
-
-
-def plotly_dendrogram(df: pd.DataFrame()):
-    fig = ff.create_dendrogram(df, color_threshold=1.5)
-    return fig
-
-
-def plotly_fig_to_div(fig):
-    return opy.plot(fig, auto_open=False, output_type='div')

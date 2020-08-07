@@ -15,20 +15,41 @@ def set_template():
     pio.templates.default = "draft"
 
 
-def plotly_heatmap(df: pd.DataFrame(), x=None, y=None, title=None):
+def plotly_heatmap(df: pd.DataFrame(), x=None, y=None, title=None, max_label_length=None):
     '''
     Creates a heatmap from pandas.DataFrame().
     '''
+
+    df = df.copy()
+
+    if isinstance(df.index, pd.MultiIndex):
+        df.index = ['_'.join([str(i) for i in ndx]) for ndx in df.index]
+
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = ['_'.join([str(i) for i in ndx]) for ndx in df.columns]
+
+    if isinstance(max_label_length, int):
+        df.columns = [str(i)[:max_label_length] for i in df.columns]
+        df.index = [str(i)[:max_label_length] for i in df.index]
+
     if x is None:
         x = df.columns
     if y is None:
-        y = ['_'.join([str(i) for i in ndx]) for ndx in df.index]
+        y = df.index.to_list()
 
     fig = go.Figure(data=go.Heatmap(z=df, y=y, x=x, hoverongaps=False))
 
     fig.update_layout(
         title=title,
         )
+
+    fig.update_layout(
+        title={
+            'text': title,
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'})
 
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)

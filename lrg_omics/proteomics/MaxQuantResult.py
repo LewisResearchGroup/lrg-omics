@@ -60,7 +60,6 @@ class MaxQuantResult():
                 spectra.append(spectrum)
             return pd.concat(spectra)
     
-    
 
 def spectrum_to_df(spectrum):
     rt_entry_to_float_minutes = lambda x: float(x)/60
