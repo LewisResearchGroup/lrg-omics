@@ -6,6 +6,7 @@ colors = ['rgba(100, 0, 0, 0.5)',
           'rgba(0, 100, 0, 0.5)',
           'rgba(0, 0, 100, 0.5)']
 
+set_template()
 
 def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
     fig = go.Figure()
