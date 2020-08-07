@@ -129,7 +129,7 @@ class Test_metadata_from_filename():
         plate_id = ['SA002','SA002','SA002']
         std_conc = [None,None,None]
         ms_mode = ['Neg','Neg','Neg']
-        file_size = [22931245, 22927568, 22896208]
+        # file_size = [22931245, 22927568, 22896208]
         data = {
                 'MS_FILE': names,
                 'BI_NBR': bi_nbrs, 
@@ -139,7 +139,7 @@ class Test_metadata_from_filename():
                 'SAMPLE_TYPE': sample_type,
                 'STD_CONC': None,
                 'MS_MODE': 'Neg',
-                'FILE_SIZE': file_size,
+                # 'FILE_SIZE': file_size,
                 'WELL_ROW': well_row,
                 'WELL_COL': well_col
                }
