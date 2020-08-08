@@ -1,118 +1,138 @@
 import os
 import pandas as pd
+import datetime
 
 from lrg_omics.metabolomics.common import metadata_from_worklist, metadata_from_filename, read_plate
 from lrg_omics import LRG_TEST_DATA
 
 class Test_metadata_from_filename():
     def test__file_with_bi_nbr(self):
-        fn = 'example-01/2020_05_11RG_SA001_RPT001/2020_05_11RG_HILICPos15S_Col001_LSARP_SA001_RPT001_BI_16_0028.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_05_11RG_HILICPos15S_Col001_LSARP_SA001_RPT001_BI_16_0028.mzXML')
         actual = metadata_from_filename(fn)
         data = {
                 'MS_FILE': '2020_05_11RG_HILICPos15S_Col001_LSARP_SA001_RPT001_BI_16_0028.mzXML',
                 'BI_NBR': 'BI_16_0028', 
-                'DATE': '2020-05-11', 
+                'DATE': datetime.datetime.strptime('2020_05_11', '%Y_%m_%d'), 
                 'RPT': 1, 
                 'PLATE_ID': 'SA001',
                 'SAMPLE_TYPE': 'BI',
                 'STD_CONC': None,
-                'MS_MODE': 'Pos'
+                'MS_MODE': 'Pos',
+                'COL':'Col001'
         }
         expected = pd.DataFrame(data, index=[0])
+#         for col in expected.columns:
+#             print(col + ': ')
+#             print(actual[col] == expected[col])
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
 
     def test__file_with_standard(self):
-        fn = 'example-01/2020_05_11RG_SA001_RPT001/2020_05_11RG_HILICPos15S_Col001_LSARP_SA001_RPT001_Standard-5000nm.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_05_11RG_HILICPos15S_Col001_LSARP_SA001_RPT001_Standard-5000nm.mzXML')
         actual = metadata_from_filename(fn)
         data = {'MS_FILE': '2020_05_11RG_HILICPos15S_Col001_LSARP_SA001_RPT001_Standard-5000nm.mzXML',
                 'BI_NBR': None, 
-                'DATE': '2020-05-11', 
+                'DATE': datetime.datetime.strptime('2020_05_11', '%Y_%m_%d'), 
                 'RPT': 1, 
                 'PLATE_ID': 'SA001',
                 'SAMPLE_TYPE': 'ST',
                 'STD_CONC': 5000.,
-                'MS_MODE': 'Pos'}
+                'MS_MODE': 'Pos',
+                'COL':'Col001'}
         expected = pd.DataFrame(data, index=[0])
 #         print(expected.STD_CONC)
         print(actual.STD_CONC)
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__file_with_qc01_sample(self):
-        fn = '/media/luis/WORK/metabolomics/SA_data/data/f1/2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_QC01_SA008.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_QC01_SA008.mzXML')
         actual = metadata_from_filename(fn)
         data = {'MS_FILE': '2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_QC01_SA008.mzXML',
                 'BI_NBR': None, 
-                'DATE': '2020-04-20', 
+                'DATE': datetime.datetime.strptime('2020_04_20', '%Y_%m_%d'), 
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'QC',
                 'STD_CONC': None,
-                'MS_MODE': 'Neg'}
+                'MS_MODE': 'Neg',
+                'COL': 'Col002'}
         expected = pd.DataFrame(data, index=[0])
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
         
     def test__file_with_qc02_sample(self):
-        fn = '/media/luis/WORK/metabolomics/SA_data/data/f1/2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_QC02_SA008.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_QC02_SA008.mzXML')
         actual = metadata_from_filename(fn)
         data = {'MS_FILE':'2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_QC02_SA008.mzXML',
                 'BI_NBR': None, 
-                'DATE': '2020-04-20', 
+                'DATE': datetime.datetime.strptime('2020_04_20', '%Y_%m_%d'), 
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'QC',
                 'STD_CONC': None,
-                'MS_MODE': 'Neg'}
+                'MS_MODE': 'Neg',
+                'COL':'Col002'}
         expected = pd.DataFrame(data, index=[0])
-#         print(actual.BI_NBR == expected.BI_NBR)
+        for col in expected.columns:
+            print(col + ': ')
+            print(actual[col] == expected[col])
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__file_with_SA_pool_sample(self):
-        fn = '/media/luis/WORK/metabolomics/SA_data/data/f1/2020_04_20RG_HILICPos15S_Col001_LSARP_SA008_SA-Pool-4.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_04_20RG_HILICPos15S_Col001_LSARP_SA008_SA-Pool-4.mzXML')
         actual = metadata_from_filename(fn)
         data = {'MS_FILE':'2020_04_20RG_HILICPos15S_Col001_LSARP_SA008_SA-Pool-4.mzXML',
                 'BI_NBR': None, 
-                'DATE': '2020-04-20', 
+                'DATE': datetime.datetime.strptime('2020_04_20', '%Y_%m_%d'), 
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'PO-SA',
                 'STD_CONC': None,
-                'MS_MODE': 'Pos'}
+                'MS_MODE': 'Pos',
+                'COL':'Col001'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__file_with_MH_pool_sample(self):
-        fn = '/media/luis/WORK/metabolomics/SA_data/data/f1/2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_MH-Pool-1.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_MH-Pool-1.mzXML')
         actual = metadata_from_filename(fn)
         data = {'MS_FILE':'2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_MH-Pool-1.mzXML',
                 'BI_NBR': None, 
-                'DATE': '2020-04-20', 
+                'DATE': datetime.datetime.strptime('2020_04_20', '%Y_%m_%d'), 
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'PO-MH',
                 'STD_CONC': None,
-                'MS_MODE': 'Neg'}
+                'MS_MODE': 'Neg',
+                'COL':'Col002'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__file_with_Blank_sample(self):
-        fn = '/media/luis/WORK/metabolomics/SA_data/data/f1/2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_Blank2.mzXML'
+        fn = os.path.join(LRG_TEST_DATA, 
+                         '2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_Blank2.mzXML')
         actual = metadata_from_filename(fn)
         data = {'MS_FILE':'2020_04_20RG_HILICNeg15S_Col002_LSARP_SA008_Blank2.mzXML',
                 'BI_NBR': None, 
-                'DATE': '2020-04-20', 
+                'DATE': datetime.datetime.strptime('2020_04_20', '%Y_%m_%d'), 
                 'RPT': 0, 
                 'PLATE_ID': 'SA008',
                 'SAMPLE_TYPE': 'BL',
                 'STD_CONC': None,
-                'MS_MODE': 'Neg'}
+                'MS_MODE': 'Neg',
+                'COL': 'Col002'}
         expected = pd.DataFrame(data, index=[0])
 #         print(actual.BI_NBR == expected.BI_NBR)
         assert actual.equals(expected), f'\nExpected:\n {expected}\nReceived:\n {actual}'
     
     def test__read_plate(self):
-        path = '/media/luis/WORK/metabolomics/QC_pipeline/lrg_omics/sample_files'
+        path = os.path.join(LRG_TEST_DATA, 'metabolomics_sample_0')
 
         worklist = 'LSARP-Full-May2020-Worklist.csv'
         actual = read_plate(path, worklist)
@@ -123,13 +143,15 @@ class Test_metadata_from_filename():
         well_col = [2,3,4]
         
         bi_nbrs = ['BI_16_0227', 'BI_16_0253', 'BI_16_0371']
-        dates = ['2020-05-13','2020-05-13','2020-05-13']
+        dates = [datetime.datetime.strptime('2020_05_13', '%Y_%m_%d'),
+                 datetime.datetime.strptime('2020_05_13', '%Y_%m_%d'),
+                 datetime.datetime.strptime('2020_05_13', '%Y_%m_%d')]
         rpt = [1,1,1]
         sample_type = ['BI','BI','BI']
         plate_id = ['SA002','SA002','SA002']
         std_conc = [None,None,None]
         ms_mode = ['Neg','Neg','Neg']
-        file_size = [22931245, 22927568, 22896208]
+        cols = ['Col002', 'Col002', 'Col002']
         data = {
                 'MS_FILE': names,
                 'BI_NBR': bi_nbrs, 
@@ -139,7 +161,7 @@ class Test_metadata_from_filename():
                 'SAMPLE_TYPE': sample_type,
                 'STD_CONC': None,
                 'MS_MODE': 'Neg',
-                'FILE_SIZE': file_size,
+                'COL': cols,
                 'WELL_ROW': well_row,
                 'WELL_COL': well_col
                }
