@@ -11,62 +11,8 @@ def metadata_from_worklist(fn: str):
     worklist = pd.read_csv(fn)
     return worklist
 
-
-# def metadata_from_filename(fn: str):
-#     '''
-#     this function extracts the metadata from the file name and returns a dataframe
-#     '''
-#     file_name = str(os.path.basename(fn))
-#     if file_name.endswith('.mzXML'):
-#         file_name, extention = os.path.splitext(file_name)
-#     if file_name.endswith('.raw'):
-#         file_name, extention = os.path.splitext(file_name)
-        
-        
-#     if('.raw' in file_name):
-#         file_name = file_name[:-4]
-        
-        
-#     bi_nbr = None
-#     if 'BI_' in file_name:
-#         bi_nbr = 'BI'+file_name.split('BI')[-1]
-        
-#     date = file_name.split('RG')[0].replace('_','-')
-    
-#     rpt = 0
-#     if 'RPT' in file_name:
-#         rpt = int(file_name.split('RPT')[-1][:3])
-        
-#     conc = None
-        
-#     sample_type = 'BI'                             # BI samples
-#     if 'Standard' in file_name: 
-#         sample_type = 'ST'                         # standard samples
-#         conc = float(file_name.split('Standard-')[-1][:-2])
-#     if 'Blank' in file_name: sample_type = 'BL'    # Blank samples
-#     if ('SA-pool' in file_name) or ('SA-Pool' in file_name): sample_type = 'PO-SA'  # SA-pool samples
-#     if ('MH-pool' in file_name) or ('MH-Pool' in file_name): sample_type = 'PO-MH'      # MH-pool samples
-#     if 'QC' in file_name: sample_type = 'QC'       # QC samples
-#     mode = file_name.split('HILIC')[-1][:3]
-    
-#     plate_id = 'SA0'+file_name.split('SA0')[-1][:2]
-    
-#     data = {
-#             'MS_FILE':str(os.path.basename(fn)),
-#             'BI_NBR': bi_nbr, 
-#             'DATE': date, 
-#             'RPT': rpt, 
-#             'PLATE_ID': plate_id,
-#             'SAMPLE_TYPE': sample_type,
-#             'STD_CONC': conc,
-#             'MS_MODE': mode
-#             }
-    
-#     df = pd.DataFrame(data, index=[0])
-#     return df 
-
 def metadata_from_filename(filename):
-    
+    """function to extract the information contained in the file names"""
     
     base = os.path.basename(filename)
 
@@ -121,6 +67,7 @@ def metadata_from_filename(filename):
     return pd.DataFrame(results,index = [0])
 
 def read_plate(path, worklist):
+    """function to read the files in a plate and organize them as a dataframe"""
     filenames = [os.path.basename(x) for x in glob.glob(path + '/*.mzXML')]
     frames = []
     for files in filenames:
@@ -137,7 +84,46 @@ def read_plate(path, worklist):
     wl = wl[ isin ].sort_values(by=['File Name']).reset_index().drop(['index'],axis = 1)
     output['WELL_ROW'] = wl.Position.str.split(':').apply(lambda x: x[-1][0])
     output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
-    
-    
-    
     return output
+    
+    
+def classic_lstsqr(x_list, y_list):
+    """ Computes the least-squares solution to a linear matrix equation by fixing the slope to 1 """ 
+    """ its suitable to work on the log-scale  """ 
+    
+    N = len(x_list)
+    x_avg = sum(x_list)/N
+    y_avg = sum(y_list)/N
+    var_x, cov_xy = 0, 0
+    for x,y in zip(x_list, y_list):
+        temp = x - x_avg
+        var_x += temp**2
+        cov_xy += temp * (y - y_avg)
+#     slope = cov_xy / var_x
+    slope = 1.0
+    y_interc = y_avg - slope * x_avg
+    
+    y_hat = y_interc + slope * x_list
+    
+    residual = sum((y_list - y_hat)**2)/N
+    r_ini = (y_list[0] - y_hat[0])**2
+    r_last = (y_list[-1] - y_hat[-1])**2
+    
+    return (slope, y_interc, residual, r_ini, r_last )
+
+def linear_range_finder(x , y , th):
+    
+    """ this algorith searches the range of x values in which the data behaves linearly with slope 1"""
+    """ suitable to work on the log-scale """
+    x_c = x
+    y_c = y
+    _, _, res, r_ini, r_last = classic_lstsqr(x_c, y_c)
+    while res > th and len(x_c) > 3:
+        if r_ini > r_last:
+            x_c = x_c[1:]
+            y_c = y_c[1:]
+        else:
+            x_c = x_c[:-1]
+            y_c = y_c[:-1]
+        _, _, res, r_ini, r_last = classic_lstsqr(x_c, y_c)
+    return (x_c, y_c)
