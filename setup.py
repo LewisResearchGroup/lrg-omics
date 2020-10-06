@@ -1,11 +1,15 @@
 import versioneer
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 NAME = 'lrg_omics'
+
+install_requires = [
+    'pandas',
+    'streamlit',
+    'matplotlib',
+    'scikit-learn',
+]
 
 config = {
     'description': 'LRG multi-omics toolkit',
@@ -16,7 +20,7 @@ config = {
     'version': versioneer.get_version(),
     'cmdclass': versioneer.get_cmdclass(),
     'install_requires': ['pandas'],
-    'packages': [f'{NAME}'],
+    'packages': [find_packages()],
     'scripts': [],
     'name': f'{NAME}'
 }
