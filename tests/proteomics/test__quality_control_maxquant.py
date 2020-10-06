@@ -2,8 +2,9 @@
 import os
 import pandas as pd
 
-
 from lrg_omics.proteomics.quality_control.maxquant import maxquant_qc
+
+
 
 PATH = os.path.join( 'tests', 'data', 'maxquant', 'tmt11', 'txt')
 
@@ -14,7 +15,7 @@ class TestClass:
         assert isinstance(out, pd.DataFrame), type(out)
     
     def test__maxquant_qc_columns(self):
-        result = maxquant_qc(PATH).columns.to_list()
+        result = list(maxquant_qc(PATH).columns)
         expected = ['MS', 'MS/MS', 'MS3', 'MS/MS Submitted', 'MS/MS Identified', 'MS/MS Identified [%]',
         'Peptide Sequences Identified', 'Av. Absolute Mass Deviation [mDa]', 'Mass Standard Deviation [mDa]', 
         'N_protein_groups', 'N_protein_true_hits', 'N_missing_values', 'N_protein_potential_contaminants', 
@@ -38,5 +39,4 @@ class TestClass:
             if expect != actual:
                 print(f'MISSMATCH ({n}): {expect} != {actual}')
 
-        print(result)
-        assert result == expected, ('Got these columns', result.to_list())
+        assert result == expected, ('Got these columns', result)
