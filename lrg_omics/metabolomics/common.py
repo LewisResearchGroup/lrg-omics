@@ -7,7 +7,10 @@ import numpy as np
 
 
 def metadata_from_worklist(fn: str):
-    worklist = pd.read_csv(fn)
+    worklist = pd.read_csv(fn, skiprows=1, usecols=[1,3, 4, 7])
+    worklist['MS_FILE'] = worklist['File Name']+'.mzXML'
+    worklist['PLATE_ROW'] = worklist.Position.apply(lambda x: x.split(':')[1][0])
+    worklist['PLATE_COL'] = worklist.Position.apply(lambda x: x.split(':')[1][1:]).astype(int)
     return worklist
 
 
