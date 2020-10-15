@@ -98,6 +98,14 @@ def plotly_bar(df, x, y, title=None, width=None, height=None):
     return fig
 
 
+def plotly_histogram(df,width=None, height=None, **kwargs):
+    fig = px.histogram(df, **kwargs)
+    fig.update_layout(width=width, height=height)
+    fig.update_yaxes(automargin=True)
+    fig.update_xaxes(automargin=True)
+    return fig
+
+
 def plotly_table(df):
     return dt.DataTable(
         id='table',
