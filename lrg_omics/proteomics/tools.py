@@ -5,7 +5,7 @@ from .quality_control.rawtools import collect_rawtools_qc_data
 from .quality_control.maxquant import collect_maxquant_qc_data
 from .pipelines.MQparser import MQparser
 
-def formated_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
+def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     df = collect_rawtools_qc_data(path) #.drop_duplicates()
     df.index = df.iloc[::-1].index
     df.reset_index(inplace=True)
@@ -37,6 +37,7 @@ def formated_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     df['Day'] = df['Year'] + '-' + df['Day']
     return df
     
+formated_rawtools_data_from = load_rawtools_data_from  
     
 def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
     assert os.path.isdir(path)

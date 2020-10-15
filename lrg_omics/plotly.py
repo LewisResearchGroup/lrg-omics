@@ -5,6 +5,8 @@ import plotly.offline as opy
 import plotly.figure_factory as ff
 
 import plotly.io as pio
+import plotly.express as px
+import dash_table as dt
 
 
 def set_template():
@@ -86,3 +88,31 @@ def plotly_dendrogram(df: pd.DataFrame(), labels=None,
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)
     return fig
+
+
+def plotly_bar(df, x, y, title=None, width=None, height=None):
+    fig = px.bar(df, x=x, y=y, title=title)
+    fig.update_layout(width=width, height=height)
+    return fig
+
+
+def plotly_table(df):
+    return dt.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in df.columns],
+        data=df.iloc[::-1].to_dict('records'),
+        sort_action="native",
+        sort_mode="single",
+        row_selectable="multi",
+        row_deletable=True,
+        selected_rows=[],
+        filter_action='native',
+        page_action="native",
+        page_current=0,
+        page_size=16,
+        style_table={'overflowX': 'scroll'},
+        export_format='xlsx',
+        export_headers='display',
+        merge_duplicate_headers=True,
+        style_cell={'font_size': '10px', 'padding-left': '1em', 'padding-right': '1em'}      
+        )
