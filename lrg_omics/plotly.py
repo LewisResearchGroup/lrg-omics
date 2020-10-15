@@ -93,6 +93,8 @@ def plotly_dendrogram(df: pd.DataFrame(), labels=None,
 def plotly_bar(df, x, y, title=None, width=None, height=None):
     fig = px.bar(df, x=x, y=y, title=title)
     fig.update_layout(width=width, height=height)
+    fig.update_yaxes(automargin=True)
+    fig.update_xaxes(automargin=True)    
     return fig
 
 
