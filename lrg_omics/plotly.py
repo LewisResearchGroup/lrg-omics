@@ -90,17 +90,15 @@ def plotly_dendrogram(df: pd.DataFrame(), labels=None,
     return fig
 
 
-def plotly_bar(df, width=None, height=None, **kwargs):
+def plotly_bar(df, **kwargs):
     fig = px.bar(df, **kwargs)
-    fig.update_layout(width=width, height=height)
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)    
     return fig
 
 
-def plotly_histogram(df, width=None, height=None, **kwargs):
+def plotly_histogram(df, **kwargs):
     fig = px.histogram(df, **kwargs)
-    fig.update_layout(width=width, height=height)
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)
     return fig
