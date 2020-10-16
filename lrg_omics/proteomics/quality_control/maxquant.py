@@ -1,4 +1,4 @@
-# lgr_omics.proteomics.quality_control.maxquant
+# lrg_omics.proteomics.quality_control.maxquant
 import pandas as pd
 import numpy as np
 

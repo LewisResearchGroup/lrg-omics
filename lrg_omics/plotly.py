@@ -90,15 +90,15 @@ def plotly_dendrogram(df: pd.DataFrame(), labels=None,
     return fig
 
 
-def plotly_bar(df, x, y, title=None, width=None, height=None):
-    fig = px.bar(df, x=x, y=y, title=title)
+def plotly_bar(df, width=None, height=None, **kwargs):
+    fig = px.bar(df, **kwargs)
     fig.update_layout(width=width, height=height)
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)    
     return fig
 
 
-def plotly_histogram(df,width=None, height=None, **kwargs):
+def plotly_histogram(df, width=None, height=None, **kwargs):
     fig = px.histogram(df, **kwargs)
     fig.update_layout(width=width, height=height)
     fig.update_yaxes(automargin=True)
@@ -126,3 +126,6 @@ def plotly_table(df):
         merge_duplicate_headers=True,
         style_cell={'font_size': '10px', 'padding-left': '1em', 'padding-right': '1em'}      
         )
+
+
+
