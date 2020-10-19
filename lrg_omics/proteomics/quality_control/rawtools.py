@@ -97,7 +97,7 @@ def rawtools_metrics_cmd(raw, output_dir, rerun=False,
     os.makedirs(output_dir, exist_ok=True)
     if not isfile(join(output_dir, raw, '_Matrix.txt')) or rerun:
         cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
-            f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
+               f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
     else: cmd = None
     return cmd
 
@@ -110,7 +110,7 @@ def rawtools_qc_cmd(input_dir, output_dir, rerun=False):
     os.makedirs(output_dir, exist_ok=True)
     if not isfile(join(output_dir, 'QcDataTable.csv')) or rerun:
         cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
-            f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
+               f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
     else: cmd = None
     return cmd
 
