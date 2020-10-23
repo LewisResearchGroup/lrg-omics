@@ -11,7 +11,7 @@ def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     df.reset_index(inplace=True)
     df['RawFilePath'] = df['RawFile'].apply(os.path.dirname)
     df['RawFile'] = df['RawFile'].apply(os.path.basename)
-    for col in ['Instrument', 
+    for col in [ 
                 'Ms1Analyzer', 
                 'Ms2Analyzer', 
                 'Ms3Analyzer', 
@@ -46,11 +46,13 @@ def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
     df.reset_index(inplace=True)
     df.rename(columns={
         'index': 'Index',
-        'PIPENAME': 'Pipename', 
+        'PIPENAME': 'Pipeline', 
         'RAW_file': 'RawFile', 
         'FASTA_file': 'FastaFile', 
         'MQPAR_TEMP_file': 'MaxQuantPar'}, inplace=True)
+
     df['Missed Cleavages [%]'] = (100-df['N_missed_cleavages_eq_0 [%]'])
+
     for col in ['MAXQUANTBIN', 'proteomics_tools version', 'RUNDIR', 'Date']:
         try:
             del df[col]
