@@ -11,7 +11,8 @@ import dash_table as dt
 
 def set_template():
     pio.templates["draft"] = go.layout.Template(
-        layout=dict(font={'size': 10}),
+        layout=dict(font={'size': 10},
+                    margin=dict(l=50, r=0, t=100, b=100))
     )
 
     pio.templates.default = "draft"
@@ -71,6 +72,7 @@ def plotly_fig_to_div(fig):
 def plotly_dendrogram(df: pd.DataFrame(), labels=None, 
                       orientation='left', color_threshold=1,
                       height=None, width=None, max_label_lenght=None):
+
     if labels is None:
         labels = df.index
     
@@ -119,7 +121,7 @@ def plotly_table(df):
         page_current=0,
         page_size=16,
         style_table={'overflowX': 'scroll'},
-        export_format='xlsx',
+        export_format='csv',
         export_headers='display',
         merge_duplicate_headers=True,
         style_cell={'font_size': '10px', 'padding-left': '1em', 'padding-right': '1em'}      
