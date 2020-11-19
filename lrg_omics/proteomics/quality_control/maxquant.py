@@ -48,12 +48,15 @@ def maxquant_qc(txt_path):
     if isfile(meta_json):
         meta = pd.read_json(meta_json, typ='series')
         dfs.append(meta)
-    for df in [maxquant_qc_summary(txt_path),
+    try:
+        for df in [maxquant_qc_summary(txt_path),
                maxquant_qc_protein_groups(txt_path),
                maxquant_qc_peptides(txt_path),
                maxquant_qc_msmScans(txt_path),
                maxquant_qc_evidence(txt_path)]:
-        dfs.append(df)
+            dfs.append(df)
+    except:
+        pass
     df = pd.concat(dfs, sort=False).to_frame().T
     df['RUNDIR'] = str(txt_path)
     return df
