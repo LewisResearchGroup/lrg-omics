@@ -20,10 +20,12 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
                 line=dict(width=0.5, color=colors[i]),  
                 **kwargs),
                )
+               
     fig.update_layout(legend_title_text='',
                       title=title, 
                       legend=dict( orientation="h" )
                       )
+
     fig.update_xaxes(title_text=rawtools_matrix.index.name)
     
     return fig
