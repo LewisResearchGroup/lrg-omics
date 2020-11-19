@@ -20,27 +20,16 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
                 line=dict(width=0.5, color=colors[i]),  
                 **kwargs),
                )
-    fig.update_layout(legend_title_text='', 
-                      title=title)
+               
+    fig.update_layout(legend_title_text='',
+                      title=title, 
+                      legend=dict( orientation="h" )
+                      )
+
     fig.update_xaxes(title_text=rawtools_matrix.index.name)
+    
     return fig
                                  
-                                 
-def filltime(rawtools_matrix, title=None):
-    cols = ['Ms1FillTime', 'Ms2FillTime', 'DutyCycle(s)']
-    return lines_plot(rawtools_matrix, cols=cols, title=title)
-
-
-def median_intensity(rawtools_matrix, title=None):
-    cols = ['PeakParentScanIntensity', 
-            'Ms1MedianIntensity', 
-            'Ms2MedianIntensity']
-    if title is None:
-        title = 'Intensity'
-    fig = lines_plot(rawtools_matrix, cols=cols, title=title)
-    fig.update_layout(yaxis_type="log")
-    return fig 
-
 
 def histograms(rawtools_matrix, cols=['ParentIonMass'], 
                title=None, colors=colors):
