@@ -12,7 +12,8 @@ import dash_table as dt
 def set_template():
     pio.templates["draft"] = go.layout.Template(
         layout=dict(font={'size': 10},
-                    margin=dict(l=50, r=0, t=100, b=100))
+                    margin=dict(l=50, r=0, t=100, b=100)
+                    )
     )
 
     pio.templates.default = "draft"
@@ -85,7 +86,8 @@ def plotly_dendrogram(df: pd.DataFrame(), labels=None,
                                labels=labels, orientation=orientation)
     
     fig.update_layout(width=width, height=height, font_family="Monospace")
-    fig.update_layout(xaxis_showgrid=True, yaxis_showgrid=True)
+    fig.update_layout(xaxis_showgrid=True, 
+                      yaxis_showgrid=True)
     
     fig.update_yaxes(automargin=True)
     fig.update_xaxes(automargin=True)
