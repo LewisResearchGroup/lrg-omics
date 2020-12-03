@@ -21,7 +21,7 @@ config = {
     'cmdclass': versioneer.get_cmdclass(),
     'install_requires': ['pandas'],
     'packages': find_packages(),
-    'scripts': [],
+    'scripts': ['scripts/lrg_run_maxquant.py'],
     'name': f'{NAME}'
 }
 

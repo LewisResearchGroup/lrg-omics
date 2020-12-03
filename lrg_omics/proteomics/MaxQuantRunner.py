@@ -6,16 +6,17 @@ from uuid import uuid1
 from .common import maybe_create_symlink
 
 
-class MaxQuantRunnner():
+class MaxQuantRunner():
     def __init__(self, fasta_file, mqpar_file, maxquantcmd='maxquant', 
                  run_dir=None, target_dir=None, add_raw_name_to_dir=True,
-                 sbatch_cmds=''):
+                 sbatch_cmds=None):
         self._fasta = abspath(fasta_file)
         self._mqpar = abspath(mqpar_file)
         self._mqcmd = maxquantcmd
         self._run_dir = run_dir
         self._tar_dir = target_dir
         self._add_raw_name_to_dir = add_raw_name_to_dir
+        if sbatch_cmds is None: sbatch_cmds = ''
         self._sbatch_cmds = [i.strip() for i in sbatch_cmds.split(';')]
         
     def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=False):
@@ -25,11 +26,11 @@ class MaxQuantRunnner():
         else :
             raw_label = basename(raw_file)   
         if self._run_dir is None:
-            run_dir = join( abspath( dirname(raw_file), 'run' ) )
+            run_dir = join( abspath( dirname(raw_file) ), 'run' )
         else:
             run_dir = self._run_dir
         if self._tar_dir is None:
-            tar_dir = join( abspath( dirname(raw_file) ), 'result')
+            tar_dir = join( abspath( dirname(raw_file) ), 'result' )
         else:
             tar_dir = self._tar_dir
         
