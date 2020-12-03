@@ -28,8 +28,9 @@ def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
                 'SearchParameters']:
         del df[col]
     df.rename(columns={'index': 'Index'}, inplace=True)
+    df['Date'] =  df.DateAcquired.dt.date.astype(str)
     df['Day'] = df.DateAcquired.dt.dayofyear.astype(str)
-    df['Week'] = df.DateAcquired.dt.week.astype(str)
+    df['Week'] = df.DateAcquired.dt.isocalendar().week.astype(str)
     df['Month'] = df.DateAcquired.dt.month.astype(str)
     df['Year'] = df.DateAcquired.dt.year.astype(str)
     df['Month'] = df['Year'] + '-' + df['Month']

@@ -6,7 +6,7 @@ colors = ['rgba(100, 0, 0, 0.5)',
           'rgba(0, 100, 0, 0.5)',
           'rgba(0, 0, 100, 0.5)']
 
-set_template()
+#set_template()
 
 def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
     fig = go.Figure()
@@ -21,13 +21,17 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
                 **kwargs),
                )
                
-    fig.update_layout(legend_title_text='',
-                      title=title, 
-                      legend=dict( orientation="h" )
-                      )
+    fig.update_layout(
+        legend_title_text='',
+        autosize=True,
+        title=title, 
+        legend=dict( orientation="h" )
+        )
 
     fig.update_xaxes(title_text=rawtools_matrix.index.name)
-    
+    fig.update_yaxes(automargin=True)
+    fig.update_xaxes(automargin=True)
+
     return fig
                                  
 

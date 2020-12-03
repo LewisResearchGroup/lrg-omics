@@ -129,7 +129,7 @@ def write_meta_json(raw, fasta, mqpar_temp, pipename, maxquantbin):
         file.write(json+'\n')
 
 
-def gen_sbatch(commands, jobname, submit=False):
+def gen_sbatch(commands, jobname, submit=False, fn='run.sbatch'):
     cmds_txt = '\n\n'.join(commands)
     txt = f"""#!/bin/bash
 #SBATCH --time=100:00:00
