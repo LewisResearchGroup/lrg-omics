@@ -1,201 +1,191 @@
 name: omics
 channels:
-  - bioconda
   - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1
-  - _openmp_mutex=4.5
-  - amqp=2.5.2
-  - asgiref=3.2.7
-  - attrs=19.3.0
+  - amqp=2.6.1
+  - argon2-cffi=20.1.0
+  - asgiref=3.3.1
+  - async_generator=1.10
+  - attrs=20.3.0
   - backcall=0.2.0
-  - backports=1.0
-  - backports.functools_lru_cache=1.6.1
   - billiard=3.6.3.0
-  - biopython=1.77
   - blas=1.0
-  - bleach=3.1.5
+  - bleach=3.2.1
+  - brotli-python=1.0.9
   - brotlipy=0.7.0
-  - ca-certificates=2020.6.24
-  - celery=4.4.0
-  - certifi=2020.6.20
-  - cffi=1.14.0
-  - chardet=3.0.4
-  - cryptography=2.9.2
-  - cycler=0.10.0
-  - dbus=1.13.16
+  - ca-certificates=2020.12.5
+  - celery=5.0.5
+  - certifi=2020.12.5
+  - cffi=1.14.4
+  - chardet=4.0.0
+  - click=7.1.2
+  - click-didyoumean=0.0.3
+  - click-plugins=1.1.1
+  - click-repl=0.1.6
+  - cryptography=3.3.1
+  - dash=1.18.1
+  - dbus=1.13.18
   - decorator=4.4.2
   - defusedxml=0.6.0
-  - django=3.0.3
-  - django-extensions=2.2.9
+  - django=3.1.5
   - entrypoints=0.3
-  - expat=2.2.9
+  - expat=2.2.10
   - flask=1.1.2
+  - flask-compress=1.8.0
   - fontconfig=2.13.0
-  - freetype=2.10.2
+  - freetype=2.10.4
   - future=0.18.2
   - gettext=0.19.8.1
-  - glib=2.63.1
-  - gmp=6.1.2
+  - glib=2.66.1
   - gst-plugins-base=1.14.0
   - gstreamer=1.14.0
   - icu=58.2
   - idna=2.10
-  - importlib-metadata=1.7.0
-  - importlib_metadata=1.7.0
-  - ipykernel=5.3.0
-  - ipython=7.16.1
+  - importlib-metadata=2.0.0
+  - importlib_metadata=2.0.0
+  - intel-openmp=2020.2
+  - ipykernel=5.3.4
+  - ipython=7.19.0
   - ipython_genutils=0.2.0
-  - ipywidgets=7.5.1
+  - ipywidgets=7.6.3
   - itsdangerous=1.1.0
-  - jedi=0.17.1
+  - jedi=0.18.0
   - jinja2=2.11.2
-  - joblib=0.15.1
+  - joblib=1.0.0
   - jpeg=9b
-  - json5=0.9.5
   - jsonschema=3.2.0
-  - jupyter_client=6.1.3
-  - jupyter_core=4.6.3
-  - jupyterlab=2.1.5
-  - jupyterlab_server=1.1.5
-  - kiwisolver=1.2.0
-  - kombu=4.6.8
-  - krb5=1.16.4
+  - jupyter=1.0.0
+  - jupyter_client=6.1.7
+  - jupyter_console=6.2.0
+  - jupyter_core=4.7.0
+  - jupyterlab_pygments=0.1.2
+  - jupyterlab_widgets=1.0.0
+  - kombu=4.6.11
+  - krb5=1.17.1
   - ld_impl_linux-64=2.33.1
-  - libblas=3.8.0
-  - libcblas=3.8.0
   - libedit=3.1.20191231
-  - libffi=3.2.1
-  - libgcc-ng=9.2.0
+  - libffi=3.3
+  - libgcc-ng=9.1.0
   - libgfortran-ng=7.3.0
-  - liblapack=3.8.0
-  - libopenblas=0.3.9
   - libpng=1.6.37
-  - libpq=11.2
+  - libpq=12.2
   - libsodium=1.0.18
   - libstdcxx-ng=9.1.0
   - libuuid=1.0.3
   - libxcb=1.14
   - libxml2=2.9.10
-  - llvm-openmp=10.0.0
   - markupsafe=1.1.1
-  - matplotlib=3.2.2
-  - matplotlib-base=3.2.2
-  - maxquant=1.6.10.43
   - mistune=0.8.4
+  - mkl=2020.2
+  - mkl-service=2.3.0
+  - mkl_fft=1.2.0
+  - mkl_random=1.1.1
   - mono=5.14.0.177
-  - more-itertools=8.4.0
-  - nbconvert=5.6.1
-  - nbformat=5.0.7
+  - nbclient=0.5.1
+  - nbconvert=6.0.7
+  - nbformat=5.0.8
   - ncurses=6.2
-  - nodejs=10.13.0
-  - notebook=6.0.3
-  - numpy=1.18.5
-  - numpy-base=1.18.5
-  - openblas=0.3.9
-  - openssl=1.1.1g
-  - packaging=20.4
-  - pandas=1.0.5
-  - pandocfilters=1.4.2
+  - nest-asyncio=1.4.3
+  - notebook=6.1.6
+  - numpy=1.19.2
+  - numpy-base=1.19.2
+  - openssl=1.1.1i
+  - packaging=20.8
+  - pandas=1.2.0
+  - pandoc=2.11
+  - pandocfilters=1.4.3
   - parso=0.7.0
-  - patsy=0.5.1
   - pcre=8.44
   - pexpect=4.8.0
   - pickleshare=0.7.5
-  - pip=20.1.1
-  - plotly=4.8.2
-  - plotly_express=0.4.1
-  - pluggy=0.13.1
-  - prometheus_client=0.8.0
-  - prompt-toolkit=3.0.5
-  - prompt_toolkit=3.0.5
-  - psycopg2=2.8.4
-  - ptyprocess=0.6.0
-  - py=1.9.0
+  - pip=20.3.3
+  - plotly=4.14.1
+  - prometheus_client=0.9.0
+  - prompt-toolkit=3.0.8
+  - prompt_toolkit=3.0.8
+  - psycopg2=2.8.5
+  - ptyprocess=0.7.0
   - pycparser=2.20
-  - pygments=2.6.1
-  - pyopenssl=19.1.0
+  - pygments=2.7.3
+  - pyopenssl=20.0.1
   - pyparsing=2.4.7
   - pyqt=5.9.2
-  - pyrsistent=0.16.0
+  - pyrsistent=0.17.3
   - pysocks=1.7.1
-  - pytest=5.4.3
-  - python=3.6.10
+  - python=3.8.5
   - python-dateutil=2.8.1
-  - python_abi=3.6
-  - pytz=2020.1
+  - python_abi=3.8
+  - pytz=2020.5
   - pyyaml=5.3.1
-  - pyzmq=19.0.1
+  - pyzmq=20.0.0
   - qt=5.9.7
-  - rawtools=2.0.2
-  - readline=7.0
-  - redis-py=3.5.3
-  - requests=2.24.0
+  - qtconsole=4.7.7
+  - qtpy=1.9.0
+  - readline=8.0
+  - requests=2.25.1
   - retrying=1.3.3
-  - scikit-learn=0.23.1
-  - seaborn=0.10.1
-  - seaborn-base=0.10.1
+  - scikit-learn=0.23.2
+  - scipy=1.5.2
   - send2trash=1.5.0
-  - setuptools=47.3.1
-  - sip=4.19.8
+  - setuptools=51.1.2
+  - sip=4.19.13
   - six=1.15.0
-  - sqlalchemy=1.3.18
-  - sqlite=3.32.3
-  - sqlparse=0.3.1
-  - statsmodels=0.11.1
-  - terminado=0.8.3
+  - sqlalchemy=1.3.21
+  - sqlite=3.33.0
+  - sqlparse=0.4.1
+  - terminado=0.9.2
   - testpath=0.4.4
   - threadpoolctl=2.1.0
   - tk=8.6.10
-  - tornado=6.0.4
-  - tqdm=4.47.0
-  - traitlets=4.3.3
-  - typing=3.7.4.1
-  - urllib3=1.25.9
+  - tornado=6.1
+  - tqdm=4.55.1
+  - traitlets=5.0.5
+  - urllib3=1.26.2
   - vine=1.3.0
-  - waitress=1.4.4
   - wcwidth=0.2.5
   - webencodings=0.5.1
   - werkzeug=1.0.1
-  - wheel=0.34.2
+  - wheel=0.36.2
   - widgetsnbextension=3.5.1
   - xz=5.2.5
   - yaml=0.2.5
-  - zeromq=4.3.2
-  - zipp=3.1.0
+  - zeromq=4.3.3
+  - zipp=3.4.0
   - zlib=1.2.11
   - pip:
-    - click==7.1.1
+    - beautifulsoup4==4.9.3
+    - bootstrap4==0.1.0
     - colorlover==0.3.0
-    - dash==1.10.0
-    - dash-bootstrap-components==0.10.3
-    - dash-core-components==1.9.0
-    - dash-html-components==1.0.3
-    - dash-renderer==1.3.0
-    - dash-table==4.6.2
-    - dash-table-experiments==0.6.0
-    - django-admin-index==1.3.0
+    - dash-bootstrap-components==0.11.1
+    - dash-core-components==1.14.1
+    - dash-html-components==1.1.1
+    - dash-renderer==1.8.3
+    - dash-table==4.11.1
+    - django-admin-index==1.4.0
+    - django-bootstrap4==2.3.1
+    - django-cache-memoize==0.1.7
+    - django-classy-tags==2.0.0
+    - django-cookie-law==2.0.4
+    - django-filter==2.4.0
     - django-ordered-model==3.4.1
-    - django-plotly-dash==1.3.1
+    - django-plotly-dash==1.5.0
+    - django-rest-framework==0.1.0
+    - djangorestframework==3.12.2
     - dpd-components==0.1.0
-    - et-xmlfile==1.0.1
-    - flake8==3.8.3
-    - flask-compress==1.4.0
-    - jdcal==1.4.1
-    - lxml==4.5.2
-    - mccabe==0.6.1
-    - openpyxl==3.0.4
-    - pandoc==1.0.2
-    - ply==3.11
-    - pycodestyle==2.6.0
-    - pyflakes==2.2.0
-    - pymzml==2.4.7
-    - pyopenms==2.5.0
-    - pyteomics==4.3.2
-    - regex==2020.7.14
-    - scipy==1.4.0
-    - versioneer==0.18
-    - xlrd==1.2.0
-prefix: /home/swacker/miniconda3/envs/omics
+    - dpd-static-support==0.0.5
+    - flask-caching==1.9.0
+    - iniconfig==1.1.1
+    - pluggy==0.13.1
+    - py==1.10.0
+    - pyqt5==5.15.2
+    - pyqt5-sip==12.8.1
+    - pyqtgraph==0.11.1
+    - pytest==6.2.1
+    - pytest-runner==5.2
+    - soupsieve==2.1
+    - sysmon==1.0.1
+    - toml==0.10.2
+prefix: /home/ubuntu/miniconda3/envs/new-omics
 
