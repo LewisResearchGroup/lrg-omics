@@ -11,6 +11,12 @@ install_requires = [
     'scikit-learn',
 ]
 
+
+scripts = [
+    'scripts/lrg_run_maxquant.py',
+    'scripts/lrg_metabolomics_metadata_from_worklist.py'
+]
+
 config = {
     'description': 'LRG multi-omics toolkit',
     'author': 'Soren Wacker',
@@ -19,9 +25,9 @@ config = {
     'author_email': 'swacker@ucalgary.ca',
     'version': versioneer.get_version(),
     'cmdclass': versioneer.get_cmdclass(),
-    'install_requires': ['pandas'],
+    'install_requires': install_requires,
     'packages': find_packages(),
-    'scripts': ['scripts/lrg_run_maxquant.py'],
+    'scripts': scripts,
     'name': f'{NAME}'
 }
 
