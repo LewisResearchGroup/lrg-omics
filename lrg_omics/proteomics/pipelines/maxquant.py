@@ -53,7 +53,7 @@ def run_maxquant(raw, fasta, mqpar, pipename, force=False, submit=False,
     if os.path.isdir(join(run_path, 'combined')) and not force:
         return []
     
-    maybe_make_dir_and_chdir(run_path)
+    maybe_make_dir_and_chdir( run_path )
     maybe_create_symlink(raw, basename(raw))
     
     create_mqpar(mqpar_temp=mqpar, 
@@ -61,8 +61,10 @@ def run_maxquant(raw, fasta, mqpar, pipename, force=False, submit=False,
                  fasta=fasta,
                  label=pipename)
     
-    write_meta_json(raw, fasta, mqpar, pipename, maxquantbin)
-    
+    fn_meta = join(run_path, 'meta.json')
+    write_meta_json(raw=raw, fasta=fasta, mqpar=mqpar, pipename=pipename, maxquantbin=maxquantbin, filename=fn_meta)
+    assert isfile( fn_meta )
+
     cmd = gen_maxquant_cmd(run_path, maxquantbin)  
     
     if fake:
@@ -114,7 +116,8 @@ def create_mqpar(mqpar_temp, raw, fasta, label, outfilename='mqpar.xml'):
     assert os.path.isfile(outfilename)
 
     
-def write_meta_json(raw, fasta, mqpar_temp, pipename, maxquantbin):
+def write_meta_json(raw, fasta, mqpar, pipename, 
+        maxquantbin, filename='meta.json'):
     today = str(date.today())
     json = f"""{{
     "Date": "{today}",
@@ -123,9 +126,9 @@ def write_meta_json(raw, fasta, mqpar_temp, pipename, maxquantbin):
     "MAXQUANTBIN": "{maxquantbin}",
     "RAW_file": "{raw}",
     "FASTA_file": "{fasta}",
-    "MQPAR_TEMP_file": "{mqpar_temp}"\n}}
+    "MQPAR_TEMP_file": "{mqpar}"\n}}
     """.strip()
-    with open('meta.json', 'w') as file:
+    with open(filename, 'w') as file:
         file.write(json+'\n')
 
 

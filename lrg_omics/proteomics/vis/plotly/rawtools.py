@@ -6,7 +6,7 @@ colors = ['rgba(100, 0, 0, 0.5)',
           'rgba(0, 100, 0, 0.5)',
           'rgba(0, 0, 100, 0.5)']
 
-#set_template()
+set_template()
 
 def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
     fig = go.Figure()
@@ -25,13 +25,12 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
         legend_title_text='',
         autosize=True,
         title=title, 
-        legend=dict( orientation="h" )
+        legend=dict( orientation="h" ),
+        margin=dict( l=50, r=10, b=50, t=50, pad=0 ),
         )
 
     fig.update_xaxes(title_text=rawtools_matrix.index.name)
-    fig.update_yaxes(automargin=True)
-    fig.update_xaxes(automargin=True)
-
+    
     return fig
                                  
 
@@ -53,4 +52,13 @@ def histograms(rawtools_matrix, cols=['ParentIonMass'],
     fig.update_layout(barmode='overlay')
     fig.update_traces(opacity=0.75)
     fig.update_layout(title=title)
+
+    fig.update_layout(
+        legend_title_text='',
+        autosize=True,
+        title=title, 
+        legend=dict( orientation="h" ),
+        margin=dict( l=50, r=10, b=50, t=50, pad=0 ),
+        )
+    
     return fig
