@@ -1,3 +1,5 @@
+#!/usr/bin/env python 
+
 import versioneer
 
 from setuptools import setup, find_packages
