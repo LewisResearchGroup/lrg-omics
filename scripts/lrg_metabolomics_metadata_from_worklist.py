@@ -12,7 +12,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     fn_inp = args.fn_inp
-    fn_out = args.fn_out
+    fn_out = args.fn_out        
 
     assert fn_inp.lower().endswith('.csv')
     assert fn_out.lower().endswith('.csv')
