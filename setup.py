@@ -11,6 +11,9 @@ install_requires = [
     'streamlit',
     'matplotlib',
     'scikit-learn',
+    'tables',
+    'xlrd',
+    'openpyxl'
 ]
 
 
