@@ -3,7 +3,7 @@
 import argparse
 import pandas as pd
 from pathlib import Path as P
-
+import logging
 
 if __name__ == '__main__':
 
@@ -29,10 +29,14 @@ if __name__ == '__main__':
         df = pd.read_csv(fn_inp, sep=args.sep or '\t')
     elif fn_inp.suffix.lower() in ['.xlsx']:
         df = pd.read_excel(fn_inp, sheet_name=args.sheet_name)
+    elif fn_inp.suffix.lower() == '.txt':
+        df = pd.read_csv(fn_inp, sep=args.sep or '\t')
     elif fn_inp.suffix.lower() in ['.parquet']:
         df = pd.read_parquet(fn_inp)
     elif fn_inp.suffix.lower() in ['.hdf', '.hdf5']:
         df = pd.read_hdf(fn_inp, key=args.hdf_key)
+    else:
+        logging.error('Input format not supported.')
 
     if fn_out.suffix.lower() == '.parquet':
         df.to_parquet(fn_out)
@@ -44,5 +48,6 @@ if __name__ == '__main__':
         df.to_excel(fn_out, sheet_name=args.sheet_name)
     elif fn_out.suffix.lower() in ['.hdf', '.hdf5']:
         df.to_hdf(fn_out, key=args.hdf_key)
-
+    else:
+        logging.error('Output format not supported.')
 
