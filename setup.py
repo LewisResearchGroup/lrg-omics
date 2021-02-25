@@ -11,12 +11,16 @@ install_requires = [
     'streamlit',
     'matplotlib',
     'scikit-learn',
+    'tables',
+    'xlrd',
+    'openpyxl'
 ]
 
 
 scripts = [
     'scripts/lrg_run_maxquant.py',
-    'scripts/lrg_metabolomics_metadata_from_worklist.py'
+    'scripts/lrg_metabolomics_metadata_from_worklist.py',
+    'scripts/lrg_pd_convert.py'
 ]
 
 config = {

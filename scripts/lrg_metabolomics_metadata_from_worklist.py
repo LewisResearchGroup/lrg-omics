@@ -6,7 +6,7 @@ from lrg_omics.metabolomics.worklists import read_worklist, get_metadata_from_wo
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Read ThermoFisher worklist and extract data.')
-    parser.add_argument('-i', dest='fn_inp', help='Input ThermoFisher workist file (csv format)')
+    parser.add_argument('-f', dest='fn_inp', help='Input ThermoFisher workist file (csv format)')
     parser.add_argument('-o', dest='fn_out', help='Output file name', default='metadata.csv')
     parser.add_argument('--groupby')
     args = parser.parse_args()
@@ -16,7 +16,6 @@ if __name__ == '__main__':
 
     assert fn_inp.lower().endswith('.csv')
     assert fn_out.lower().endswith('.csv')
-
 
     worklist = read_worklist(fn_inp)
     metadata = get_metadata_from_worklist(worklist)
