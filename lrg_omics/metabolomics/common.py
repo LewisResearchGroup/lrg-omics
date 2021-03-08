@@ -8,11 +8,12 @@ import re
 import datetime
 
 def metadata_from_worklist(fn: str):
-    worklist = pd.read_csv(fn, skiprows=1, usecols=[1,3, 4, 7])
-    worklist['MS_FILE'] = worklist['File Name']+'.mzXML'
-    worklist['PLATE_ROW'] = worklist.Position.apply(lambda x: x.split(':')[1][0])
-    worklist['PLATE_COL'] = worklist.Position.apply(lambda x: x.split(':')[1][1:]).astype(int)
+    worklist = pd.read_csv(fn)
     return worklist
+def mode_to_none(value):
+    if value == 'Neg': return 'Neg'
+    if value == 'Pos': return 'Pos'
+    return None
 
 def metadata_from_filename(filename):
     """function to extract the information contained in the file names"""
@@ -35,6 +36,7 @@ def metadata_from_filename(filename):
 #         base, extention = os.path.splitext(base)
 #     if base.endswith('.raw'):
 #         base, extention = os.path.splitext(base)
+
     results['MS_FILE'] = base
     
     for name, pattern in patterns.items():
@@ -56,9 +58,10 @@ def metadata_from_filename(filename):
         results['DATE'] = datetime.datetime.strptime(results['DATE'], '%Y_%m_%d')
     if results['STD_CONC'] is not None:
         results['STD_CONC'] = results['STD_CONC'].replace('Standard-', '')
-        results['STD_CONC'] = float(results['STD_CONC'].replace('nm', ''))
+        results['STD_CONC'] = results['STD_CONC'].apply(lambda x: float(x.split('nm')[0]))
     if results['MS_MODE'] is not None:
         results['MS_MODE'] = results['MS_MODE'].replace('HILIC', '')
+    results.MS_MODE = results.MS_MODE.apply(lambda x: mode_to_none(x))
         
     sample_type = 'BI'                                                        # BI samples
     if 'Standard' in base: sample_type = 'ST'                                 # standard samples
@@ -71,11 +74,14 @@ def metadata_from_filename(filename):
 
 def read_plate(path, worklist):
     """function to read the files in a plate and organize them as a dataframe"""
+    
     filenames = [os.path.basename(x) for x in glob.glob(path + '/*.mzXML')]
+    filedirs = [x for x in glob.glob(path + '/*.mzXML')]
     frames = []
     for files in filenames:
         frames.append(metadata_from_filename(files))
     output = pd.concat(frames).reset_index().drop(['index'], axis = 1)
+#     output['FILE_DIR'] = path + filedirs
     
 #     sizes = [os.path.getsize(path+'/'+filenames[k]) for k in range(len(filenames))]
 #     output['FILE_SIZE'] = sizes
@@ -88,7 +94,32 @@ def read_plate(path, worklist):
     output['WELL_ROW'] = wl.Position.str.split(':').apply(lambda x: x[-1][0])
     output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
     return output
+
+def read_plate_2(plate, path, worklist):
+    """function to read the files in a plate and organize them as a dataframe"""
     
+    filedirs = [x for x in glob.glob(path + '/*.mzXML')]
+    filenames = [os.path.basename(x) for x in glob.glob(path + '/*' + plate + '*.mzXML')]
+
+    frames = []
+    for files in filenames:
+        frames.append(metadata_from_filename(files))
+    output = pd.concat(frames).reset_index().drop(['index'], axis = 1)
+    output['FILE_DIR'] = filenames
+    output.FILE_DIR = output.FILE_DIR.apply(lambda x: path + '/' + x)
+    
+#     sizes = [os.path.getsize(path+'/'+filenames[k]) for k in range(len(filenames))]
+#     output['FILE_SIZE'] = sizes
+    output = output.sort_values(by =['MS_FILE']).reset_index().drop(['index'],axis =1 )
+    
+    wl = pd.read_csv(path +'/' + worklist, skiprows=1)
+    wl['File Name'] += '.mzXML'
+    isin = [wl['File Name'][k] in filenames for k in range(len(wl))]
+    wl = wl[ isin ].sort_values(by=['File Name']).reset_index().drop(['index'],axis = 1)
+    output['WELL_ROW'] = wl.Position.str.split(':').apply(lambda x: x[-1][0])
+    output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
+    return output    
+
     
 def classic_lstsqr(x_list, y_list):
     """ Computes the least-squares solution to a linear matrix equation by fixing the slope to 1 """ 
@@ -112,7 +143,8 @@ def classic_lstsqr(x_list, y_list):
     r_ini = (y_list[0] - y_hat[0])**2
     r_last = (y_list[-1] - y_hat[-1])**2
     
-    return (slope, y_interc, residual, r_ini, r_last )
+    return (y_interc, residual, r_ini, r_last )
+
 
 def linear_range_finder(x , y , th):
     
@@ -120,7 +152,8 @@ def linear_range_finder(x , y , th):
     """ suitable to work on the log-scale """
     x_c = x
     y_c = y
-    _, _, res, r_ini, r_last = classic_lstsqr(x_c, y_c)
+    y_intercept, res, r_ini, r_last = classic_lstsqr(x_c, y_c)
+
     while res > th and len(x_c) > 3:
         if r_ini > r_last:
             x_c = x_c[1:]
@@ -128,5 +161,6 @@ def linear_range_finder(x , y , th):
         else:
             x_c = x_c[:-1]
             y_c = y_c[:-1]
-        _, _, res, r_ini, r_last = classic_lstsqr(x_c, y_c)
-    return (x_c, y_c)
+        y_intercept , res, r_ini, r_last = classic_lstsqr(x_c, y_c)
+    return (y_intercept, x_c, y_c)
+
