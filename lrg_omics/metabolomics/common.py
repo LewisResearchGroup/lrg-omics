@@ -36,7 +36,7 @@ def metadata_from_filename(filename):
 #         base, extention = os.path.splitext(base)
 #     if base.endswith('.raw'):
 #         base, extention = os.path.splitext(base)
-
+    #results['FILE'] = filename
     results['MS_FILE'] = base
     
     for name, pattern in patterns.items():
@@ -58,10 +58,10 @@ def metadata_from_filename(filename):
         results['DATE'] = datetime.datetime.strptime(results['DATE'], '%Y_%m_%d')
     if results['STD_CONC'] is not None:
         results['STD_CONC'] = results['STD_CONC'].replace('Standard-', '')
-        results['STD_CONC'] = results['STD_CONC'].apply(lambda x: float(x.split('nm')[0]))
+        results['STD_CONC'] = float(results['STD_CONC'].split('nm')[0])
     if results['MS_MODE'] is not None:
         results['MS_MODE'] = results['MS_MODE'].replace('HILIC', '')
-    results.MS_MODE = results.MS_MODE.apply(lambda x: mode_to_none(x))
+    results['MS_MODE'] = mode_to_none(results['MS_MODE'])
         
     sample_type = 'BI'                                                        # BI samples
     if 'Standard' in base: sample_type = 'ST'                                 # standard samples
@@ -100,7 +100,6 @@ def read_plate_2(plate, path, worklist):
     
     filedirs = [x for x in glob.glob(path + '/*.mzXML')]
     filenames = [os.path.basename(x) for x in glob.glob(path + '/*' + plate + '*.mzXML')]
-
     frames = []
     for files in filenames:
         frames.append(metadata_from_filename(files))
@@ -119,7 +118,6 @@ def read_plate_2(plate, path, worklist):
     output['WELL_ROW'] = wl.Position.str.split(':').apply(lambda x: x[-1][0])
     output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
     return output    
-
     
 def classic_lstsqr(x_list, y_list):
     """ Computes the least-squares solution to a linear matrix equation by fixing the slope to 1 """ 
@@ -145,7 +143,6 @@ def classic_lstsqr(x_list, y_list):
     
     return (y_interc, residual, r_ini, r_last )
 
-
 def linear_range_finder(x , y , th):
     
     """ this algorith searches the range of x values in which the data behaves linearly with slope 1"""
@@ -153,7 +150,6 @@ def linear_range_finder(x , y , th):
     x_c = x
     y_c = y
     y_intercept, res, r_ini, r_last = classic_lstsqr(x_c, y_c)
-
     while res > th and len(x_c) > 3:
         if r_ini > r_last:
             x_c = x_c[1:]
@@ -163,4 +159,3 @@ def linear_range_finder(x , y , th):
             y_c = y_c[:-1]
         y_intercept , res, r_ini, r_last = classic_lstsqr(x_c, y_c)
     return (y_intercept, x_c, y_c)
-
