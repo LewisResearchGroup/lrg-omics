@@ -16,12 +16,10 @@ if __name__ == '__main__':
         help='MaxQuant parameter template file (mqpar.xml).',)
     parser.add_argument('--run-dir', 
         help='Temporary directory to perform the calculation.')
-    parser.add_argument('--target-dir', 
+    parser.add_argument('--output-dir', 
         help='Location of the final results.')
     parser.add_argument('--cold-run', action='store_true', default=False,
         help='Just simulate run and show the actions.')
-    parser.add_argument('--run', action='store_true', default=False,
-        help='Start the run in immediately terminal.')
     parser.add_argument('--rerun', action='store_true', default=False,
         help='Start the run even if results already exist.')
     parser.add_argument('--submit', action='store_true', default=False,
@@ -32,19 +30,19 @@ if __name__ == '__main__':
     parser.add_argument('--maxquantcmd', required=True, 
         help='Command to start MaxQuant e.g. "mono MaxQuantCmd.exe".',)
     parser.add_argument('--dont-add-raw-name', default=True, action='store_false',
-        help='Do not create sub-directory with name of raw file in target directory.')
+        help='Do not create sub-directory with name of raw file in output directory.')
     parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
 
     mq = MaxQuantRunner(fasta_file=args.fasta, 
                         mqpar_file=args.mqpar, 
                         run_dir=args.run_dir, 
-                        target_dir=args.target_dir, 
+                        output_dir=args.output_dir, 
                         sbatch_cmds=args.batch_cmd,
                         maxquantcmd=args.maxquantcmd)
 
     for raw_file in args.raw[0]:
         if isfile(raw_file):
-            mq.run(raw_file, cold_run=args.cold_run, rerun=args.rerun, submit=args.submit, run=args.run)
+            mq.run(raw_file, cold_run=args.cold_run, rerun=args.rerun, submit=args.submit)
         else:
             print('W (file not found):', raw_file)
