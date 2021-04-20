@@ -74,7 +74,7 @@ class MaxQuantRunner():
             os.makedirs(tgt_dir, exist_ok=True)            
             maybe_create_symlink( raw_file, run_raw_ref )
         
-        if self.verbose or cold_run:
+        if self._verbose or cold_run:
             print(f'Create run directory: {run_dir}')
             print(f'Create target directory: {tgt_dir}')
             print(f'Create link:', raw_file, run_raw_ref )

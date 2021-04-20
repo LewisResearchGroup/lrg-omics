@@ -15,6 +15,7 @@ def collect_rawtools_qc_data(root_path):
     '''
     paths = glob(f'{root_path}/**/QcDataTable.csv', recursive=True)
     dfs = [pd.read_csv(p) for p in paths]
+    if len(dfs) == 0: return None
     df = pd.concat(dfs, sort=False)
     df.DateAcquired = pd.to_datetime(df.DateAcquired)
     df.sort_values('DateAcquired', inplace=True, ascending=False)
@@ -69,6 +70,7 @@ def rawtools_cmds(raw, raw_root, output_root=None,
         and not force):
         if verbose: print('Skipping:', output_dir)
         return []
+
     os.makedirs(output_dir, exist_ok=True)
     maybe_create_symlink(abspath(raw), output_dir/P(os.path.basename(raw)))
     commands = [rawtools_qc_cmd(output_dir, output_dir), 

@@ -14,6 +14,7 @@ def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):
     '''
     paths = [abspath(dirname(i)) for i in glob(f'{root_path}/**/summary.txt',
                                                recursive=True)]
+    if len(paths) == 0: return None
     if from_csvs:
         dfs = [maxquant_qc_csv(path, force_update=force_update) for path in paths]
     else:

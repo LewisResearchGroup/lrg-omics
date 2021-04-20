@@ -7,6 +7,7 @@ from .pipelines.MQparser import MQparser
 
 def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     df = collect_rawtools_qc_data(path)
+    if df is None: return None
     df.index = df.iloc[::-1].index
     df.reset_index(inplace=True)
     df['RawFilePath'] = df['RawFile'].apply(os.path.dirname)
@@ -43,6 +44,7 @@ formated_rawtools_data_from = load_rawtools_data_from
 def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
     assert os.path.isdir(path)
     df = collect_maxquant_qc_data(path)
+    if df is None: return None
     df.index = df.iloc[::-1].index
     df.reset_index(inplace=True)
     df.rename(columns={
