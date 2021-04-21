@@ -7,9 +7,12 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
     git clone https://github.com/LSARP/lrg-omics
     
     cd lrg-omics
-    conda env create -y -f environment.yml
-    conda activate omics
+    conda create -n lrg
+    conda activate lrg
     pip install -e . 
+
+
+## Install LRG kernel in JupyterLab
 
     jupyter labextension install jupyterlab-plotly@4.8.2
     jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.2
