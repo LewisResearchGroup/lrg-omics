@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from os.path import isdir, isfile, dirname, abspath
+from os.path import isdir, isfile, dirname, abspath, join
 from glob import glob
 from pathlib import Path as P
 
@@ -15,6 +15,7 @@ def collect_rawtools_qc_data(root_path):
     '''
     paths = glob(f'{root_path}/**/QcDataTable.csv', recursive=True)
     dfs = [pd.read_csv(p) for p in paths]
+    if len(dfs) == 0: return None
     df = pd.concat(dfs, sort=False)
     df.DateAcquired = pd.to_datetime(df.DateAcquired)
     df.sort_values('DateAcquired', inplace=True, ascending=False)
@@ -69,6 +70,7 @@ def rawtools_cmds(raw, raw_root, output_root=None,
         and not force):
         if verbose: print('Skipping:', output_dir)
         return []
+
     os.makedirs(output_dir, exist_ok=True)
     maybe_create_symlink(abspath(raw), output_dir/P(os.path.basename(raw)))
     commands = [rawtools_qc_cmd(output_dir, output_dir), 
@@ -84,7 +86,8 @@ def rawtools_cmds(raw, raw_root, output_root=None,
     return commands
 
 
-def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 -chro 12TB'):
+def rawtools_metrics_cmd(raw, output_dir, rerun=False, 
+        arguments='-p -q -x -u -l -m -r TMT11 -chro 12TB'):
     '''
     Generates command to run rawtools parse to generate
     the RawTools files:
@@ -94,19 +97,23 @@ def rawtools_metrics_cmd(raw, output_dir, arguments='-p -q -x -u -l -m -r TMT11 
         *.mgf
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
-           f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
+    if not isfile(join(output_dir, raw, '_Matrix.txt')) or rerun:
+        cmd = (f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
+               f'{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out')
+    else: cmd = None
     return cmd
 
 
-def rawtools_qc_cmd(input_dir, output_dir):
+def rawtools_qc_cmd(input_dir, output_dir, rerun=False):
     '''
     Generates command to run rawtools quality control to 
     generate the file QcDataTable.csv.
     '''
     os.makedirs(output_dir, exist_ok=True)
-    cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
-           f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
+    if not isfile(join(output_dir, 'QcDataTable.csv')) or rerun:
+        cmd = (f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
+               f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out')
+    else: cmd = None
     return cmd
 
 

@@ -1,4 +1,4 @@
-# lgr_omics.proteomics.quality_control.maxquant
+# lrg_omics.proteomics.quality_control.maxquant
 import pandas as pd
 import numpy as np
 
@@ -14,6 +14,7 @@ def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):
     '''
     paths = [abspath(dirname(i)) for i in glob(f'{root_path}/**/summary.txt',
                                                recursive=True)]
+    if len(paths) == 0: return None
     if from_csvs:
         dfs = [maxquant_qc_csv(path, force_update=force_update) for path in paths]
     else:
@@ -48,12 +49,15 @@ def maxquant_qc(txt_path):
     if isfile(meta_json):
         meta = pd.read_json(meta_json, typ='series')
         dfs.append(meta)
-    for df in [maxquant_qc_summary(txt_path),
+    try:
+        for df in [maxquant_qc_summary(txt_path),
                maxquant_qc_protein_groups(txt_path),
                maxquant_qc_peptides(txt_path),
                maxquant_qc_msmScans(txt_path),
                maxquant_qc_evidence(txt_path)]:
-        dfs.append(df)
+            dfs.append(df)
+    except:
+        pass
     df = pd.concat(dfs, sort=False).to_frame().T
     df['RUNDIR'] = str(txt_path)
     return df
