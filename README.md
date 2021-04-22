@@ -4,24 +4,16 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 
 ##  Download and install from source
 
-    git clone https://github.com/LSARP/lrg_omics
-    cd lrg_omics
+    git clone https://github.com/LSARP/lrg-omics
     
-    conda env create -y -f environment.yml
-    conda activate omics
+    cd lrg-omics
+    conda create -n lrg
+    conda activate lrg
     pip install -e . 
+
+
+## Install LRG kernel in JupyterLab
 
     jupyter labextension install jupyterlab-plotly@4.8.2
     jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.2
     ipython kernel install --name "LRG" --user
-
-
-## Test data
-
-You can download test data from https://soerendip.com/dl/lrg_omics_test_data
-
-E.g. with `wget`:
-
-    wget -R https://soerendip.com/dl/lrg_omics_test_data
-    
-    
