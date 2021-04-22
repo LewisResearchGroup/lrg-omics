@@ -42,7 +42,9 @@ def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
 formated_rawtools_data_from = load_rawtools_data_from  
     
 def load_maxquant_data_from(path='/var/www/html/proteomics/files/'):
-    assert os.path.isdir(path)
+    if not os.path.isdir(path):
+        logging.warning(f'FileNotFound: {path}')
+        return None
     df = collect_maxquant_qc_data(path)
     if df is None: return None
     df.index = df.iloc[::-1].index
