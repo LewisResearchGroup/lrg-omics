@@ -4,17 +4,11 @@ import versioneer
 
 from setuptools import setup, find_packages
 
+
 NAME = 'lrg_omics'
 
-install_requires = [
-    'pandas',
-    'streamlit',
-    'matplotlib',
-    'scikit-learn',
-    'tables',
-    'xlrd',
-    'openpyxl'
-]
+
+install_requires =[]
 
 
 scripts = [
