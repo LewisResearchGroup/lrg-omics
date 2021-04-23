@@ -61,13 +61,14 @@ MAXQUANT_STANDARDS = {
 
 class MaxQuantReader():
 
-    def __init__(self, standardize=True):
+    def __init__(self, standardize=True, remove_contaminants=True, remove_reverse=True):
         self.standards = MAXQUANT_STANDARDS
         self.standardize = standardize
+        self.remove_con = remove_contaminants
+        self.remove_rev = remove_reverse
    
 
     def read(self, fn):
-        print('MaxQuantReader:', fn)
         assert P(fn).is_file(), fn
         path = P(fn).parent
         name = P(fn).name
@@ -80,15 +81,13 @@ class MaxQuantReader():
         
         try:
             df = pd.read_csv(fn, sep='\t', usecols=usecols, low_memory=False, na_filter=None)
+            if self.remove_con: df = df[~df['Majority protein IDs'].str.contains('CON__')]
+            if self.remove_rev: df = df[~df['Majority protein IDs'].str.contains('REV__')]
+
         except Exception as e:
             logging.warning(e)
             return None
 
-        if columns is not None:
-
-            for old_col, new_col in zip(df.columns, columns):
-                print(old_col, '-->', new_col)
-                
+        if columns is not None:               
             df.columns = columns
-            
         return df
