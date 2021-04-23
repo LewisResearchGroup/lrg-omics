@@ -73,11 +73,12 @@ class MaxQuantReader():
             std_data = self.standards[name]
             usecols = std_data['usecols']
             columns = std_data['column_names']
-    
-        df = pd.read_csv(fn, sep='\t', usecols=usecols, low_memory=False, na_filter=None)
-        # leads to Usecols do not match columns, columns expected but not found: [0, 1, 2, 3, 4,...
-        #df = pd.read_csv(fn, sep='\t', low_memory=False, na_filter=None).iloc[:, usecols]
-
+        
+        try:
+            df = pd.read_csv(fn, sep='\t', usecols=usecols, low_memory=False, na_filter=None)
+        except Exception as e:
+            logging.warning(e)
+            return None
 
         if columns is not None:
 
