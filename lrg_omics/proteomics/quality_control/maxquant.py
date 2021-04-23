@@ -58,6 +58,7 @@ def maxquant_qc(txt_path):
             dfs.append(df)
     except:
         pass
+    if len(dfs) == 0: return None
     df = pd.concat(dfs, sort=False).to_frame().T
     df['RUNDIR'] = str(txt_path)
     return df
