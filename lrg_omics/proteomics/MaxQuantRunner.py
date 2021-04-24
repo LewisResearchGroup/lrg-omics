@@ -34,11 +34,11 @@ class MaxQuantRunner():
         if self._run_dir is None:
             run_dir = join( abspath( dirname(raw_file) ), 'run' )
         else:
-            run_dir = self._run_dir
+            run_dir = abspath( self._run_dir )
         if self._tgt_dir is None:
             tgt_dir = join( abspath( dirname(raw_file) ), 'result' )
         else:
-            tgt_dir = self._tgt_dir
+            tgt_dir = abspath( self._tgt_dir ) 
         
         if self._add_raw_name_to_dir: run_dir = join(run_dir, raw_label )
         if self._add_raw_name_to_dir: tgt_dir = join(tgt_dir, raw_label )
@@ -65,10 +65,11 @@ class MaxQuantRunner():
         
         cmds = [
             f'cd {run_dir}',
-            f'{self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
+            f'/usr/bin/time -o {run_dir}/time.txt -f "%E" {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
+            f'mv time.txt {run_dir}/combined/txt/',
             f'mv {run_dir}/combined/txt/* {tgt_dir}', 
             f'rm -r {run_dir}']
-                        
+
         if not cold_run:
             os.makedirs(run_dir, exist_ok=True)
             os.makedirs(tgt_dir, exist_ok=True)            
