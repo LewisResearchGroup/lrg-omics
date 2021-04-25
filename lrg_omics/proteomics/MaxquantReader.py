@@ -78,14 +78,10 @@ class MaxQuantReader():
             std_data = self.standards[name]
             usecols = std_data['usecols']
             columns = std_data['column_names']
-        
         try:
             df = pd.read_csv(fn, sep='\t', usecols=usecols, low_memory=False, na_filter=None)
-            if self.remove_con: df = df[~df['Majority protein IDs'].str.contains('CON__')]
-            if self.remove_rev: df = df[~df['Majority protein IDs'].str.contains('REV__')]
-
         except Exception as e:
-            logging.warning(e)
+            logging.warning(f'MaxQuantReader: {e}')
             return None
 
         if columns is not None:               
