@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import logging
 
 from .quality_control.rawtools import collect_rawtools_qc_data
 from .quality_control.maxquant import collect_maxquant_qc_data

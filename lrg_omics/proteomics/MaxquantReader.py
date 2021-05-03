@@ -1,5 +1,9 @@
 import pandas as pd
+import logging
 from pathlib import Path as P
+
+
+
 
 MAXQUANT_STANDARDS = {
     'proteinGroups.txt': {
@@ -57,13 +61,14 @@ MAXQUANT_STANDARDS = {
 
 class MaxQuantReader():
 
-    def __init__(self, standardize=True):
+    def __init__(self, standardize=True, remove_contaminants=True, remove_reverse=True):
         self.standards = MAXQUANT_STANDARDS
         self.standardize = standardize
+        self.remove_con = remove_contaminants
+        self.remove_rev = remove_reverse
    
 
     def read(self, fn):
-        print('MaxQuantReader:', fn)
         assert P(fn).is_file(), fn
         path = P(fn).parent
         name = P(fn).name
@@ -73,17 +78,12 @@ class MaxQuantReader():
             std_data = self.standards[name]
             usecols = std_data['usecols']
             columns = std_data['column_names']
-    
-        df = pd.read_csv(fn, sep='\t', usecols=usecols, low_memory=False, na_filter=None)
-        # leads to Usecols do not match columns, columns expected but not found: [0, 1, 2, 3, 4,...
-        #df = pd.read_csv(fn, sep='\t', low_memory=False, na_filter=None).iloc[:, usecols]
+        try:
+            df = pd.read_csv(fn, sep='\t', usecols=usecols, low_memory=False, na_filter=None)
+        except Exception as e:
+            logging.warning(f'MaxQuantReader: {e}')
+            return None
 
-
-        if columns is not None:
-
-            for old_col, new_col in zip(df.columns, columns):
-                print(old_col, '-->', new_col)
-                
+        if columns is not None:               
             df.columns = columns
-            
         return df
