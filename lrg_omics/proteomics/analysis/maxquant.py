@@ -7,8 +7,7 @@ from os.path import isfile
 from glob import glob
 
 
-def get_maxquant_txt(path, txt='proteinGroups.txt', mq_run_name=None,
-                     pipename=None):
+def get_maxquant_txt(path, txt='proteinGroups.txt', raw_file=None):
     '''
     Graps a MaxQuant txt based on the name of the
     .RAW file and the name of the pipeline. raw_file
@@ -23,23 +22,29 @@ def get_maxquant_txt(path, txt='proteinGroups.txt', mq_run_name=None,
     else:   
         print(f'File not found: {full_path}')
         return pd.DataFrame()
-    df['MaxQuantRun'] = mq_run_name
-    df['PipeName'] = pipename
-    df = df.set_index(['MaxQuantRun', 'PipeName']).reset_index()
+    if 'RawFile' not in df.columns and raw_file is not None:
+        df['RawFile'] = raw_file
+        df = df.set_index('RawFile').reset_index()
     df.columns = [i.replace(pipename, '').strip() for i in df.columns]
     return df
 
+
 def melt_protein_quant(df, id_vars=None, var_name='TMT'):
     if id_vars is None:
-        id_vars=['MaxQuantRun', 'PipeName' ,'Protein IDs', 'Score']
+        id_vars = df.filter(regex='^(?!.*Reporter.*)').columns
     output = df.melt(id_vars=id_vars, var_name=var_name, value_name='ReporterIntensity')
     output['TMT'] = output['TMT'].str.replace('Reporter intensity corrected ', '').astype(int)
     return output
 
+
+def log2p1(x):
+    return np.log2(x+1)
+
+
 def get_protein_quant(path, melt=False, normed=None, take_log=False,
                       divide_by_column_mean=False, mean_centering_per_plex=False,
-                      drop_zero_q=False, data_cols=['MaxQuantRun', 'PipeName'],
-                      protein_col='Protein IDs', pipename=None, mq_run_name=None):
+                      drop_zero_q=False, data_cols=['RawFile'],
+                      protein_col='Majority protein IDs', pipename=None, mq_run_name=None):
     '''
     Gets the proteinGroups file based on the .RAW name 
     and the pipename. Records starting with REV or CON 
@@ -49,7 +54,7 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
     Args:
         - divide_by_column_mean: bool
             * divide intensities by column-wise mean
-        - take_log: apply log1p transformation, devide_by_mean 
+        - take_log: apply log2p1 transformation, devide_by_mean 
             is applied before log-transformation if set to True.
         - normed:
             * None: Don't apply further normalization
@@ -78,13 +83,13 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
     reporter_intensity = df.iloc[:,list(range(22, 33))]
     # Replace 0 with NaN
     reporter_intensity = reporter_intensity.replace(0, np.NaN)
-    assert normed in [None, 'fold_change', 'diff_to_ref']
+    assert normed in [None, 'fold_change', 'diff_to_ref'], "Normed should be from [None, 'fold_change', 'diff_to_ref']"
     if divide_by_column_mean is True:
         # Devide by the mean column-wise
         reporter_intensity = ( reporter_intensity / reporter_intensity.mean() )
     if take_log is True:
         # Apply log(x+1) transformation
-        reporter_intensity = reporter_intensity.apply(np.log1p)
+        reporter_intensity = reporter_intensity.apply(log2p1)
     if normed == 'diff_to_ref':
         # Substract reference strain (TMT-channel 1) intensity
         reporter_intensity = reporter_intensity.add(-reporter_intensity['Reporter intensity corrected 1'], axis=0)
@@ -138,7 +143,7 @@ def protein_quant_from_paths(paths, pipename, protein_col='Protein IDs',
 
 def extract_protein_quant(df, melt=False, normed=None, take_log=False,
                           divide_by_column_mean=False, mean_centering_per_plex=False,
-                          drop_zero_q=False, protein_col='Protein IDs'):
+                          drop_zero_q=False, protein_col='Majority protein IDs'):
     '''
     Gets the proteinGroups file based on the .RAW name 
     and the pipename. Records starting with REV or CON 

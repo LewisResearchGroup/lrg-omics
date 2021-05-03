@@ -1,6 +1,6 @@
 import os
+import shutil 
 from os.path import isfile, basename, join, abspath, dirname, isdir
-from shutil import rmtree
 from uuid import uuid1
 
 from .common import maybe_create_symlink
@@ -51,13 +51,13 @@ class MaxQuantRunner():
             if not rerun:
                 return None
             else:
-                rmtree(run_dir)
+                shutil.rmtree(run_dir)
         
         if isdir(tgt_dir):
             if not rerun:
                 return None
             else:
-                rmtree(tgt_dir)
+                shutil.rmtree(tgt_dir)
         
         run_raw_ref = join(run_dir, basename(raw_file))
         run_mqpar = join(run_dir, basename(self._mqpar))
