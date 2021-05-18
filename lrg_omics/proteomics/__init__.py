@@ -1,1 +1,2 @@
 
+from .MaxQuantRunner import MaxQuantRunner

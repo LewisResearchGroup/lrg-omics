@@ -6,3 +6,5 @@ tables
 xlrd
 openpyxl
 pyarrow
+seaborn
+tqdm

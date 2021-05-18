@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 NAME = 'lrg_omics'
 
 
-install_requires =[]
+install_requires = []
 
 
 scripts = [

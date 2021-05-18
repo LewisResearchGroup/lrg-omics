@@ -7,9 +7,10 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
     git clone https://github.com/LSARP/lrg-omics
     
     cd lrg-omics
-    conda create -n lrg
+    conda create -n lrg -c conda-forge -c bioconda maxquant mono=5.14
     conda activate lrg
-    pip install -e . 
+    pip install -r requirements.txt
+    pip install -e .
 
 
 ## Install LRG kernel in JupyterLab

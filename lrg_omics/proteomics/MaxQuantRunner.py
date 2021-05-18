@@ -3,6 +3,9 @@ import shutil
 from os.path import isfile, basename, join, abspath, dirname, isdir
 from uuid import uuid1
 
+from pathlib import Path as P
+import logging
+
 from .common import maybe_create_symlink
 
 
@@ -21,40 +24,48 @@ class MaxQuantRunner():
         self._sbatch_cmds = [i.strip() for i in sbatch_cmds.split(';')]
         self._clean_up = clean_up
         self._verbose = verbose
+
         assert isfile( self._fasta ), self._fasta
-        assert isfile( self._mqpar ), self._mqpar 
+        assert isfile( self._mqpar ), self._mqpar
+        
+        assert os.system( maxquantcmd ) != 32512, f'Command not found: {maxquantcmd}'
 
 
-    def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True):
+    def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True, 
+            add_uuid=True):
         raw_file = abspath( raw_file)
         if raw_file.lower().endswith('.raw'):
             raw_label = basename(raw_file[:-4])
         else :
             raw_label = basename(raw_file)   
         if self._run_dir is None:
-            run_dir = join( abspath( dirname(raw_file) ), 'run' )
+            run_dir = abspath( join( os.getcwd(), 'run' ) )
         else:
             run_dir = abspath( self._run_dir )
         if self._tgt_dir is None:
-            tgt_dir = join( abspath( dirname(raw_file) ), 'result' )
+            tgt_dir = abspath( join( os.getcwd(), 'out' ) ) 
         else:
             tgt_dir = abspath( self._tgt_dir ) 
         
         if self._add_raw_name_to_dir: run_dir = join(run_dir, raw_label )
         if self._add_raw_name_to_dir: tgt_dir = join(tgt_dir, raw_label )
 
-        run_id = str(uuid1())
-        run_id_short = run_id.split('-')[0]
-        run_dir = join(run_dir, run_id)           
-            
+        run_id = f'{raw_label}'
+        
+        if add_uuid: 
+            str(uuid1())[:8]+f'-{run_id}'
+            run_dir = join(run_dir, run_id)
+
         if isdir(run_dir):
             if not rerun:
+                logging.warning(f'Run directory exists ({run_dir}).')
                 return None
             else:
                 shutil.rmtree(run_dir)
         
         if isdir(tgt_dir):
             if not rerun:
+                logging.warning(f'Output directory exists ({tgt_dir}) omitting raw file: {raw_file}.')
                 return None
             else:
                 shutil.rmtree(tgt_dir)
@@ -68,13 +79,16 @@ class MaxQuantRunner():
             f'/usr/bin/time -o {run_dir}/time.txt -f "%E" {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
             f'mv time.txt {run_dir}/combined/txt/',
             f'mv {run_dir}/combined/txt/* {tgt_dir}', 
-            f'rm -r {run_dir}']
+            ]
+
+        if self._clean_up:
+            cmds.append(f'rm -r {run_dir}')
 
         if not cold_run:
             os.makedirs(run_dir, exist_ok=True)
             os.makedirs(tgt_dir, exist_ok=True)            
             maybe_create_symlink( raw_file, run_raw_ref )
-        
+
         if self._verbose or cold_run:
             print(f'Create run directory: {run_dir}')
             print(f'Create target directory: {tgt_dir}')
@@ -86,7 +100,7 @@ class MaxQuantRunner():
         
         create_mqpar(self._mqpar, run_raw_ref, self._fasta, raw_label, fn=run_mqpar, cold_run=cold_run)
         
-        gen_sbatch_file(self._sbatch_cmds + cmds, run_id_short+run_raw_ref, 
+        gen_sbatch_file(self._sbatch_cmds + cmds, jobname=run_id, 
                         fn=run_sbatch, cold_run=cold_run, submit=submit)
         
         cmds = '; '.join( cmds )
