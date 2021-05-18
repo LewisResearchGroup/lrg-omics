@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 
 from os.path import isfile
-from glob import glob
 
 
 def get_maxquant_txt(path, txt='proteinGroups.txt', raw_file=None):
@@ -14,8 +13,6 @@ def get_maxquant_txt(path, txt='proteinGroups.txt', raw_file=None):
     and pipename are added to all rows. Pipename is
     removed from all column names.
     '''
-    if mq_run_name is None:
-        mq_run_name = path
     full_path = f'{path}/{txt}'
     if isfile(full_path):
         df = pd.read_table(full_path)
@@ -25,7 +22,6 @@ def get_maxquant_txt(path, txt='proteinGroups.txt', raw_file=None):
     if 'RawFile' not in df.columns and raw_file is not None:
         df['RawFile'] = raw_file
         df = df.set_index('RawFile').reset_index()
-    df.columns = [i.replace(pipename, '').strip() for i in df.columns]
     return df
 
 

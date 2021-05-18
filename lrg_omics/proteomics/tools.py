@@ -1,10 +1,8 @@
 import os
-import pandas as pd
 import logging
 
 from .quality_control.rawtools import collect_rawtools_qc_data
 from .quality_control.maxquant import collect_maxquant_qc_data
-from .pipelines.MQparser import MQparser
 
 def load_rawtools_data_from(path='/var/www/html/proteomics/files/raw'):
     df = collect_rawtools_qc_data(path)

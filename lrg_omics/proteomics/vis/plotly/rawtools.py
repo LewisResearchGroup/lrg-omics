@@ -1,4 +1,3 @@
-import plotly.express as px
 from ....plotly import set_template
 import plotly.graph_objects as go
 

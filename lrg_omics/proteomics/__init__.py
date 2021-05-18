@@ -1,2 +1,3 @@
 
-from .MaxQuantRunner import MaxQuantRunner
+from .maxquant.MaxquantRunner import MaxquantRunner
+from .maxquant.MqparParser import MqparParser

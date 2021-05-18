@@ -3,20 +3,24 @@
 import pandas as pd
 import os
 import glob
-import numpy as np
 import re
 import datetime
+
+
 
 def metadata_from_worklist(fn: str):
     worklist = pd.read_csv(fn)
     return worklist
+
+
 def mode_to_none(value):
     if value == 'Neg': return 'Neg'
     if value == 'Pos': return 'Pos'
     return None
 
+
 def metadata_from_filename(filename):
-    """function to extract the information contained in the file names"""
+    """Function to extract the information contained in the file names"""
     
     base = os.path.basename(filename)
 
@@ -29,14 +33,9 @@ def metadata_from_filename(filename):
                     STD_CONC='Standard-[0-9]*nm',
                     MS_MODE = 'HILIC*[A-Z][a-z][a-z]',
                     COL='Col[0-9]*',
-#                     TAG='[A-Za-z0-9-]*.mzXML',
                     )
     results = {}
-#     if base.endswith('.mzXML'):
-#         base, extention = os.path.splitext(base)
-#     if base.endswith('.raw'):
-#         base, extention = os.path.splitext(base)
-    #results['FILE'] = filename
+
     results['MS_FILE'] = base
     
     for name, pattern in patterns.items():
@@ -44,10 +43,7 @@ def metadata_from_filename(filename):
             results[name] = re.search(pattern, base)[0]
         except:
             results[name] = None
-#     if results['BI_NBR'] is not None:
-#         results['TAG'] = None
-#     else:
-#         results['TAG'] = results['TAG'].replace('.mzXML', '')
+
     if results['PLATE_ID'] is not None:
         results['PLATE_ID'] = results['PLATE_ID'].replace('LSARP_', '')
     if results['RPT'] is None:
@@ -72,19 +68,15 @@ def metadata_from_filename(filename):
     results['SAMPLE_TYPE'] = sample_type    
     return pd.DataFrame(results,index = [0])
 
+
 def read_plate(path, worklist):
-    """function to read the files in a plate and organize them as a dataframe"""
+    """Function to read the files in a plate and organize them as a dataframe"""
     
     filenames = [os.path.basename(x) for x in glob.glob(path + '/*.mzXML')]
-    filedirs = [x for x in glob.glob(path + '/*.mzXML')]
     frames = []
     for files in filenames:
         frames.append(metadata_from_filename(files))
     output = pd.concat(frames).reset_index().drop(['index'], axis = 1)
-#     output['FILE_DIR'] = path + filedirs
-    
-#     sizes = [os.path.getsize(path+'/'+filenames[k]) for k in range(len(filenames))]
-#     output['FILE_SIZE'] = sizes
     output = output.sort_values(by =['MS_FILE']).reset_index().drop(['index'],axis =1 )
     
     wl = pd.read_csv(path +'/' + worklist, skiprows=1)
@@ -95,10 +87,10 @@ def read_plate(path, worklist):
     output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
     return output
 
+
 def read_plate_2(plate, path, worklist):
-    """function to read the files in a plate and organize them as a dataframe"""
+    """Function to read the files in a plate and organize them as a dataframe"""
     
-    filedirs = [x for x in glob.glob(path + '/*.mzXML')]
     filenames = [os.path.basename(x) for x in glob.glob(path + '/*' + plate + '*.mzXML')]
     frames = []
     for files in filenames:
@@ -106,9 +98,6 @@ def read_plate_2(plate, path, worklist):
     output = pd.concat(frames).reset_index().drop(['index'], axis = 1)
     output['FILE_DIR'] = filenames
     output.FILE_DIR = output.FILE_DIR.apply(lambda x: path + '/' + x)
-    
-#     sizes = [os.path.getsize(path+'/'+filenames[k]) for k in range(len(filenames))]
-#     output['FILE_SIZE'] = sizes
     output = output.sort_values(by =['MS_FILE']).reset_index().drop(['index'],axis =1 )
     
     wl = pd.read_csv(path +'/' + worklist, skiprows=1)
@@ -119,9 +108,11 @@ def read_plate_2(plate, path, worklist):
     output['WELL_COL'] = wl.Position.str.split(':').apply(lambda x: int(x[-1][1:]))
     return output    
     
+
 def classic_lstsqr(x_list, y_list):
-    """ Computes the least-squares solution to a linear matrix equation by fixing the slope to 1 """ 
-    """ its suitable to work on the log-scale  """ 
+    """ Computes the least-squares solution to a linear matrix equation by fixing the slope to 1
+    its suitable to work on the log-scale.
+    """ 
     
     N = len(x_list)
     x_avg = sum(x_list)/N
@@ -131,7 +122,6 @@ def classic_lstsqr(x_list, y_list):
         temp = x - x_avg
         var_x += temp**2
         cov_xy += temp * (y - y_avg)
-#     slope = cov_xy / var_x
     slope = 1.0
     y_interc = y_avg - slope * x_avg
     
@@ -143,8 +133,8 @@ def classic_lstsqr(x_list, y_list):
     
     return (y_interc, residual, r_ini, r_last )
 
-def linear_range_finder(x , y , th):
-    
+
+def find_linear_range(x , y , th):
     """ this algorith searches the range of x values in which the data behaves linearly with slope 1"""
     """ suitable to work on the log-scale """
     x_c = x
