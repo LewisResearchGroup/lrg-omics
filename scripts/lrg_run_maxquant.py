@@ -16,7 +16,7 @@ if __name__ == '__main__':
         help='MaxQuant parameter template file (mqpar.xml).',)
     parser.add_argument('--run-dir', 
         help='Temporary directory to perform the calculation.')
-    parser.add_argument('--output-dir', 
+    parser.add_argument('--out-dir', 
         help='Location of the final results.')
     parser.add_argument('--cold-run', action='store_true', default=False,
         help='Just simulate run and show the actions.')
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     mq = MaxQuantRunner(fasta_file=args.fasta, 
                         mqpar_file=args.mqpar, 
                         run_dir=args.run_dir, 
-                        output_dir=args.output_dir, 
+                        out_dir=args.out_dir, 
                         sbatch_cmds=args.batch_cmd,
                         maxquantcmd=args.maxquantcmd)
 
