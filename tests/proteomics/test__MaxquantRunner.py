@@ -80,7 +80,8 @@ class TestMaxquantRunner:
                             add_uuid_to_rundir=False,
                             add_raw_name_to_outdir=False,
                             cleanup=False,
-                            verbose=True
+                            verbose=True,
+                            maxquantcmd='lrg_fake_maxquant.sh'
                             )
 
         mq.run(fn_raw, run=True)
