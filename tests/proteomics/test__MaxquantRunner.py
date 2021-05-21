@@ -16,7 +16,7 @@ class TestMaxquantRunner:
         fn_mqp = PATH/'maxquant'/'tmt11'/'mqpar'/'mqpar.xml'
         fn_faa = PATH/'fasta'/'does-not-exist.faa'
         with pytest.raises(Exception):
-            mq = MaxquantRunner(fasta_file=fn_faa, mqpar_file=fn_mqp)
+            mq = MaxquantRunner(fasta_file=fn_faa, mqpar_file=fn_mqp, maxquantcmd='lrg_fake_maxquant.sh')
             del mq
 
     
@@ -24,7 +24,7 @@ class TestMaxquantRunner:
         fn_mqp = PATH/'does-not-exist.xml'
         fn_faa = PATH/'fasta'/'minimal.faa'
         with pytest.raises(Exception):
-            mq = MaxquantRunner(fasta_file=fn_faa, mqpar_file=fn_mqp)
+            mq = MaxquantRunner(fasta_file=fn_faa, mqpar_file=fn_mqp, maxquantcmd='lrg_fake_maxquant.sh')
             del mq
 
     def test_missing_Maxquantcmd_raises_exception(self, tmpdir):
@@ -49,7 +49,8 @@ class TestMaxquantRunner:
                             run_dir=run_dir, 
                             out_dir=out_dir,
                             add_uuid_to_rundir=False,
-                            add_raw_name_to_outdir=False
+                            add_raw_name_to_outdir=False,
+                            maxquantcmd='lrg_fake_maxquant.sh'
                             )
 
         mq.run(fn_raw, run=False)
