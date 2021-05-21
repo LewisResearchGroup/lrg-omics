@@ -148,4 +148,4 @@ def find_linear_range(x , y , th):
             x_c = x_c[:-1]
             y_c = y_c[:-1]
         y_intercept , res, r_ini, r_last = classic_lstsqr(x_c, y_c)
-    return (y_intercept, x_c, y_c)
+    return y_intercept, x_c, y_c

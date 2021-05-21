@@ -2,7 +2,7 @@ import numpy as np
 
 from lrg_omics.metabolomics.common import find_linear_range
 
-def test__find_linear_range(self):
+def test__find_linear_range():
         x = np.array([ 0.,  2.,  3.,  3.,  4.,  6.,  6.,  7.,  8.,  9., 10., 12., 13.,
        13., 14., 15., 17., 18., 18., 19., 20., 21., 22., 24., 24., 25.,
        26., 27., 29., 30., 30., 31., 32., 33., 35., 35., 36., 38., 39.,
@@ -20,6 +20,6 @@ def test__find_linear_range(self):
        42.69074841, 45.12165001, 45.56819066, 48.03020306, 49.50752519])
         
         expected = [12.0, 35.0]
-        x_c , _ = find_linear_range(x, y, 0.75)
+        y_intercept, x_c, y_c = find_linear_range(x, y, 0.75)
         actual = [min(x_c), max(x_c)]
         assert actual == expected, f'\nExpected:\n {expected}\nReceived:\n {actual}'
