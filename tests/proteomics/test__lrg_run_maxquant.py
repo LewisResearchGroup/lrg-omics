@@ -30,6 +30,7 @@ def test__missing_faa_raises_exception(tmpdir):
     print( cmd )
 
     return_value = os.system(cmd)
+    
     assert return_value == 0, f'Could not run: {cmd}'
 
     files_generated = [(out_dir/'maxquant.err').is_file(), 

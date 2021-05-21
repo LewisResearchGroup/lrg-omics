@@ -44,7 +44,10 @@ class MaxquantRunner():
         assert isfile( self._fasta ), self._fasta
         assert isfile( self._mqpar ), self._mqpar
         
-        assert os.system( f'{maxquantcmd} --version' ) != 32512, f'Command not found: {maxquantcmd}'
+        try:
+            assert os.system( f'{maxquantcmd} --version' ) == 256
+        except:
+            logging.warning('maxquantcmd not working', os.system( f'{maxquantcmd} --version') )
 
 
     def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True):
@@ -123,7 +126,7 @@ class MaxquantRunner():
         cmds = '; '.join( cmds )
         
         if run:
-            print(run_id, cmds)
+            print('Running', run_id, run_dir)
             os.system(cmds)
 
         return cmds
