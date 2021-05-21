@@ -90,9 +90,6 @@ class TestMaxquantRunner:
                            (out_dir/'time.txt').is_file(),
                            (run_dir/'combined').is_dir()]
 
-        print(glob(f'{run_dir}/**', recursive=True))
-        print(glob(f'{out_dir}/**', recursive=True))
-
         assert all(files_generated), files_generated
 
 
