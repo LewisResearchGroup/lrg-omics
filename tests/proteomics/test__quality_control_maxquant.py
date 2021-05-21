@@ -126,11 +126,10 @@ class TestClass:
         # check if there is any NaN values in out
         assert ~out.isnull().values.any(), f'NaN value at {out.index[out.isna().any()].tolist()}'
 
-    def test__maxquant_qc(self):
-        out = maxquant_qc(PATH, protein=None, pept_list=None)
+    def test__maxquant_qc_columns(self):
 
-        # check if type(out) is pd.Series
-        assert isinstance(out, pd.DataFrame), f'It is a {type(out)} not a Dataframe'
+        result =  maxquant_qc(PATH, protein=None, pept_list=None)
+        actual_cols = result.columns
 
         # check if the lengths of expected_cols and out are different. Useful to see if new columns were added in
         # maxquant.py but not in the test file
@@ -160,13 +159,10 @@ class TestClass:
                          'reporter_intensity_corrected_Protein_qc_sd', 'reporter_intensity_corrected_Protein_qc_cv',
                          'RUNDIR']
 
-        assert len(expected_cols) - len(out.columns) == 0, f'New columns {out.columns[len(expected_cols):]} in output ' \
-                                                         f'file. Adjust expected_cols variable accordingly'
 
-        # check for mismatches between columns in expected_cols and out
-        assert len(list(set(expected_cols) - set(out.columns))) == 0, list(set(expected_cols) - set(out.columns))
+        assert all(actual_cols == expected_cols), actual_cols
 
-        # check if there is any NaN values in out
-        assert ~out.isnull().values.any(), f'NaN value at {out.columns[out.isna().any()].tolist()}'
+     
+
 
 
