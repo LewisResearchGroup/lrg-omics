@@ -1,3 +1,5 @@
+import numpy as np
+
 from lrg_omics.metabolomics.common import find_linear_range
 
 def test__find_linear_range(self):
