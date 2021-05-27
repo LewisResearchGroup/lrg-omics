@@ -44,11 +44,12 @@ class MaxquantRunner():
         assert isfile( self._fasta ), self._fasta
         assert isfile( self._mqpar ), self._mqpar
         
+        '''
         try:
             assert os.system( f'{maxquantcmd} --version' ) == 256, os.system( f'{maxquantcmd} --version' )
         except:
             logging.warning('maxquantcmd not working', os.system( f'{maxquantcmd} --version') )
-
+        '''
 
     def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True):
         
