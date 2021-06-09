@@ -41,6 +41,9 @@ class MaxquantRunner():
         self._cleanup = cleanup
         self._verbose = verbose
 
+        self.last_run_dir = None
+        self.last_out_dir = None
+        
         assert isfile( self._fasta ), self._fasta
         assert isfile( self._mqpar ), self._mqpar
         
@@ -92,6 +95,9 @@ class MaxquantRunner():
         run_raw_ref = join(run_dir, basename(raw_file))
         run_mqpar = join(run_dir, basename(self._mqpar))
         run_sbatch = join(run_dir, 'run.sbatch')
+        
+        self.last_run_dir = run_dir
+        self.last_out_dir = tgt_dir
         
         cmds = [
             f'cd {run_dir}',
