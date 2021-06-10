@@ -7,6 +7,7 @@ from pathlib import Path as P
 import logging
 
 from ..common import maybe_create_symlink
+from .MqparParser import MqparParser
 
 
 class MaxquantRunner():
@@ -159,8 +160,9 @@ def gen_sbatch_file(commands, jobname, submit=False, fn='run.sbatch', cold_run=F
 
     
 def create_mqpar(mqpar_temp, raw, fasta, label, fn='mqpar.xml', cold_run=False):
-    with open(mqpar_temp, 'r') as file:
-        string = file.read()\
+
+    mqpar = MqparParser()
+    string = mqpar.read(mqpar_temp).as_template()._content\
                      .replace('__RAW__', str(raw))\
                      .replace('__FASTA__', str(fasta))\
                      .replace('__LABEL__', str(label))
