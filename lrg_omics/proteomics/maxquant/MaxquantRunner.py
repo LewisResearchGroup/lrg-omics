@@ -78,7 +78,10 @@ class MaxquantRunner():
         if self._add_uuid_to_rundir: 
             run_id = str(uuid1())[:8]+f'-{run_id}'
             run_dir = join(run_dir, run_id)
-            
+        
+        self.last_run_dir = run_dir
+        self.last_out_dir = tgt_dir
+
         if isdir(run_dir):
             if not rerun:
                 logging.warning(f'Run directory exists ({run_dir}).')
@@ -96,10 +99,7 @@ class MaxquantRunner():
         run_raw_ref = join(run_dir, basename(raw_file))
         run_mqpar = join(run_dir, basename(self._mqpar))
         run_sbatch = join(run_dir, 'run.sbatch')
-        
-        self.last_run_dir = run_dir
-        self.last_out_dir = tgt_dir
-        
+
         cmds = [
             f'cd {run_dir}',
             f'ls -artlh',
