@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 import argparse
 import requests
 
 class ProteomicsRawUploadToQC():
-    def __init__(self, url, pipeline, user, verbose=True):
+    def __init__(self, url, pipeline, user, verbose=False):
         self.url = url
         self.pipeline = pipeline
         self.user = user
@@ -14,10 +16,10 @@ class ProteomicsRawUploadToQC():
         user = self.user
         with open(raw_fn, 'rb') as file:
             files = {'orig_file': file}
-            #headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
             data = {'pipeline': pipeline, 'user': user}
             if self.verbose: print(data, raw_fn)
             r = requests.post(url, files=files, data=data)
+
 
 if __name__ == '__main__':
 
@@ -31,10 +33,10 @@ if __name__ == '__main__':
 
 
     host = args.host
-    #assert ( host.startswith('https://') or host.startswith('http://') ),\
-    #    'Host URL should start with https:// or http://'
+    assert ( host.startswith('https://') or host.startswith('http://') ),\
+        'Host URL should start with https:// or http://'
 
-    url = f'{host}/api/upload-raw'
+    url = f'{host}/api/upload/raw'
     user = args.user
     pipeline = args.pipeline
 
