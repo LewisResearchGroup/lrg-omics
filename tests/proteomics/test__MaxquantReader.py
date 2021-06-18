@@ -21,24 +21,17 @@ class TestMaxquantReader:
         df = reader.read(fn)
         print(df)
         assert isinstance(df, pd.DataFrame)
-    '''
-
-
-    def test__read_tmt11_protein_groups_example0_(self):
-        fn = PATH/'maxquant'/'tmt11'/'example-0'/'proteinGroups.txt'
+    
+    def test__read_tmt11_peptides_example0(self):
+        fn = PATH/'maxquant'/'tmt11'/'example-0'/'peptides.txt'
         reader = MaxquantReader()
-        df = reader.read_protein_groups(fn)
+        df = reader.read(fn)
         print(df)
-        assert isinstance(df, pd.DataFrame)
+        assert isinstance(df, pd.DataFrame), type(df)
 
-
-    def test__read_tmt11_protein_groups_example1_(self):
-        fn = PATH/'maxquant'/'tmt11'/'example-1'/'proteinGroups.txt'
+    def test__read_tmt11_summary_example0(self):
+        fn = PATH/'maxquant'/'tmt11'/'example-0'/'summary.txt'
         reader = MaxquantReader()
-        df = reader.read_protein_groups(fn)
-        df.to_csv('~/test_out.csv')
+        df = reader.read(fn)
         print(df)
-        for c in df.columns: print(c)
-        assert isinstance(df, pd.DataFrame)
-        assert False
-    '''
+        assert isinstance(df, pd.DataFrame), type(df)
