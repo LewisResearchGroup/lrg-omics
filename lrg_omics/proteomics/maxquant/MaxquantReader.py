@@ -82,7 +82,7 @@ class MaxquantReader():
             return None        
 
         if name == 'proteinGroups.txt': return self.process_protein_groups(df)
-        
+
         return df
 
 
