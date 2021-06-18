@@ -84,6 +84,7 @@ class MaxquantReader():
         if name == 'proteinGroups.txt': return self.process_protein_groups(df)
         return f'No valid route for {name}'
 
+
     def process_protein_groups(self, df, remove_contaminants=True, remove_reverse=True):
 
         standard_cols = [
