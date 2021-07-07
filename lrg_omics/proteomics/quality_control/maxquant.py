@@ -27,15 +27,36 @@ expected_columns = ['Date', 'LRG_omics version', 'PIPENAME', 'MAXQUANTBIN', 'RAW
                     'Uncalibrated - Calibrated m/z [ppm] (sd)',
                     'Uncalibrated - Calibrated m/z [Da] (ave)',
                     'Uncalibrated - Calibrated m/z [Da] (sd)', 'Peak Width(ave)',
-                    'Peak Width (std)', 'qc1_peptide_charges', 'N_qc1_missing_values',
+                    'Peak Width (std)', 'qc1_peptide', 'qc1_peptide_charges', 'N_qc1_missing_values',
                     'reporter_intensity_corrected_qc1_ave',
                     'reporter_intensity_corrected_qc1_sd',
                     'reporter_intensity_corrected_qc1_cv', 'calibrated_retention_time_qc1',
-                    'retention_length_qc1', 'N_of_scans_qc1', 'qc2_peptide_charges',
+                    'retention_length_qc1', 'N_of_scans_qc1', 'qc2_peptide', 'qc2_peptide_charges',
                     'N_qc2_missing_values', 'reporter_intensity_corrected_qc2_ave',
                     'reporter_intensity_corrected_qc2_sd',
                     'reporter_intensity_corrected_qc2_cv', 'calibrated_retention_time_qc2',
-                    'retention_length_qc2', 'N_of_scans_qc2', 'N_of_Protein_qc_pepts',
+                    'retention_length_qc2', 'N_of_scans_qc2',
+                    'qc3_peptide', 'qc3_peptide_charges',
+                    'N_qc3_missing_values', 'reporter_intensity_corrected_qc3_ave',
+                    'reporter_intensity_corrected_qc3_sd',
+                    'reporter_intensity_corrected_qc3_cv', 'calibrated_retention_time_qc3',
+                    'retention_length_qc3', 'N_of_scans_qc3',
+                    'qc4_peptide', 'qc4_peptide_charges',
+                    'N_qc4_missing_values', 'reporter_intensity_corrected_qc4_ave',
+                    'reporter_intensity_corrected_qc4_sd',
+                    'reporter_intensity_corrected_qc4_cv', 'calibrated_retention_time_qc4',
+                    'retention_length_qc4', 'N_of_scans_qc4',
+                    'qc5_peptide', 'qc5_peptide_charges',
+                    'N_qc5_missing_values', 'reporter_intensity_corrected_qc5_ave',
+                    'reporter_intensity_corrected_qc5_sd',
+                    'reporter_intensity_corrected_qc5_cv', 'calibrated_retention_time_qc5',
+                    'retention_length_qc5', 'N_of_scans_qc5',
+                    'qc6_peptide', 'qc6_peptide_charges',
+                    'N_qc6_missing_values', 'reporter_intensity_corrected_qc6_ave',
+                    'reporter_intensity_corrected_qc6_sd',
+                    'reporter_intensity_corrected_qc6_cv', 'calibrated_retention_time_qc6',
+                    'retention_length_qc6', 'N_of_scans_qc6',
+                    'Protein_qc', 'N_of_Protein_qc_pepts',
                     'N_Protein_qc_missing_values',
                     'reporter_intensity_corrected_Protein_qc_ave',
                     'reporter_intensity_corrected_Protein_qc_sd',
@@ -63,14 +84,14 @@ def maxquant_qc_csv(txt_path, out_fn='maxquant_quality_control.csv',
     if isfile(abs_path) and not force_update:
         df = pd.read_csv(abs_path)
     else:
-        df = maxquant_qc(txt_path)
+        df = maxquant_qc(txt_path, protein=None, pept_list=None)
         if out_fn is not None:
             df.to_csv(abs_path, index=False)
     df = df.reindex(columns=expected_columns)
     return df
 
 
-def maxquant_qc(txt_path, protein=None, pept_list=None):
+def maxquant_qc(txt_path, protein, pept_list):
     '''
     Runs all MaxQuant quality control functions 
     and returns a concatenated pandas.Series() 
@@ -152,9 +173,9 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
     df_qc3 = df[df['Protein IDs'].str.contains(protein[0], na=False, case=True)]
     if len(df_qc3) != 0:
         dict_info_qc3 = {
-            "N_of_Protein_qc_pepts": df_qc3['Peptide counts (all)'].to_list(),
-            "N_Protein_qc_missing_values": df_qc3.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin(
-                [0]).sum().to_list(),
+            "Protein_qc": protein[0],
+            "N_of_Protein_qc_pepts": ";".join([str(x) for x in df_qc3['Peptide counts (all)'].to_list()]),
+            "N_Protein_qc_missing_values": ";".join([str(x) for x in df_qc3.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()]),
             "reporter_intensity_corrected_Protein_qc_ave": float(
                 df_qc3.filter(regex='Reporter intensity corrected').mean(axis=1)),
             "reporter_intensity_corrected_Protein_qc_sd": float(
@@ -232,21 +253,22 @@ def maxquant_qc_evidence(txt_path, pept_list=None):
     }
 
     if pept_list is None:
-        pept_list = ['HVLTSIGEK', 'LTILEELR']
-    elif len(pept_list) < 2:
-        pept_list = pept_list + (2 - len(pept_list)) * ['dummy_peptide']
-    elif len(pept_list) > 2:
-        pept_list = pept_list[:2]
+        pept_list = ['HVLTSIGEK', 'LTILEELR', 'ATEEQLK', 'AEFVEVTK', 'QTALVELLK', 'TVMENFVAFVDK']
+    elif len(pept_list) < 6:
+        pept_list = pept_list + (6 - len(pept_list)) * ['dummy_peptide']
+    elif len(pept_list) > 6:
+        pept_list = pept_list[:6]
 
     for i in pept_list:
         df_pept = df[df.Sequence == i]
         if not df_pept.empty:
-            charges = df_pept['Charge'].to_list()
+            charges = ";".join([str(x) for x in df_pept['Charge'].to_list()])
             df_pept = df_pept[df.Intensity == df_pept.Intensity.max()]
             dict_info_qc = {
+                f"qc{pept_list.index(i) + 1}_peptide": i,
                 f"qc{pept_list.index(i) + 1}_peptide_charges": charges,
-                f"N_qc{pept_list.index(i) + 1}_missing_values": df_pept.filter(
-                    regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list(),
+                f"N_qc{pept_list.index(i) + 1}_missing_values": ";".join([str(x) for x in df_pept.filter(
+                    regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()]),
                 f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_ave": float(
                     df_pept.filter(regex='Reporter intensity corrected').mean(axis=1)),
                 f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_sd": float(
