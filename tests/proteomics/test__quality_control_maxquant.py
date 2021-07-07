@@ -5,7 +5,7 @@ import os
 from lrg_omics.proteomics.quality_control.maxquant import maxquant_qc, maxquant_qc_summary, \
      maxquant_qc_protein_groups, maxquant_qc_peptides, maxquant_qc_msmScans, maxquant_qc_evidence
 
-PATH = os.path.join('tests', 'data', 'maxquant', 'tmt11', 'txt')
+PATH = os.path.join('tests', 'data', 'maxquant', 'tmt11', 'example-0')
 
 
 class TestClass:

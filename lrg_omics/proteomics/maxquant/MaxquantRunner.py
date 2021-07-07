@@ -7,6 +7,7 @@ from pathlib import Path as P
 import logging
 
 from ..common import maybe_create_symlink
+from .MqparParser import MqparParser
 
 
 class MaxquantRunner():
@@ -41,11 +42,18 @@ class MaxquantRunner():
         self._cleanup = cleanup
         self._verbose = verbose
 
+        self.last_run_dir = None
+        self.last_out_dir = None
+        
         assert isfile( self._fasta ), self._fasta
         assert isfile( self._mqpar ), self._mqpar
         
-        assert os.system( f'{maxquantcmd} --version' ) != 32512, f'Command not found: {maxquantcmd}'
-
+        '''
+        try:
+            assert os.system( f'{maxquantcmd} --version' ) == 256, os.system( f'{maxquantcmd} --version' )
+        except:
+            logging.warning('maxquantcmd not working', os.system( f'{maxquantcmd} --version') )
+        '''
 
     def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True):
         
@@ -70,7 +78,10 @@ class MaxquantRunner():
         if self._add_uuid_to_rundir: 
             run_id = str(uuid1())[:8]+f'-{run_id}'
             run_dir = join(run_dir, run_id)
-            
+        
+        self.last_run_dir = run_dir
+        self.last_out_dir = tgt_dir
+
         if isdir(run_dir):
             if not rerun:
                 logging.warning(f'Run directory exists ({run_dir}).')
@@ -88,7 +99,7 @@ class MaxquantRunner():
         run_raw_ref = join(run_dir, basename(raw_file))
         run_mqpar = join(run_dir, basename(self._mqpar))
         run_sbatch = join(run_dir, 'run.sbatch')
-        
+
         cmds = [
             f'cd {run_dir}',
             f'ls -artlh',
@@ -123,7 +134,7 @@ class MaxquantRunner():
         cmds = '; '.join( cmds )
         
         if run:
-            print(run_id, cmds)
+            print('Running', run_id, run_dir)
             os.system(cmds)
 
         return cmds
@@ -149,8 +160,9 @@ def gen_sbatch_file(commands, jobname, submit=False, fn='run.sbatch', cold_run=F
 
     
 def create_mqpar(mqpar_temp, raw, fasta, label, fn='mqpar.xml', cold_run=False):
-    with open(mqpar_temp, 'r') as file:
-        string = file.read()\
+
+    mqpar = MqparParser()
+    string = mqpar.read(mqpar_temp).as_template()._content\
                      .replace('__RAW__', str(raw))\
                      .replace('__FASTA__', str(fasta))\
                      .replace('__LABEL__', str(label))
