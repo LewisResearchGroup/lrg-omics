@@ -91,7 +91,7 @@ def maxquant_qc_csv(txt_path, out_fn='maxquant_quality_control.csv',
     return df
 
 
-def maxquant_qc(txt_path, protein, pept_list):
+def maxquant_qc(txt_path, protein=None, pept_list=None):
     '''
     Runs all MaxQuant quality control functions 
     and returns a concatenated pandas.Series() 
