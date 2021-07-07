@@ -188,6 +188,7 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
         result.update(dict_info_qc3)
     else:
         dict_info_qc3 = {
+            "Protein_qc": "not detected",
             "N_of_Protein_qc_pepts": "not detected",
             "N_Protein_qc_missing_values": "not detected",
             "reporter_intensity_corrected_Protein_qc_ave": "not detected",
