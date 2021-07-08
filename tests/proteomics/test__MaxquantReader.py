@@ -50,14 +50,6 @@ class TestMaxquantReader:
         assert isinstance(df, pd.DataFrame), type(df)
 
 
-    def test__read_tmt11_parameters_example0(self):
-        fn = PATH/'maxquant'/'tmt11'/'example-0'/'parameters.txt'
-        reader = MaxquantReader()
-        df = reader.read(fn)
-        print(df)
-        assert isinstance(df, pd.DataFrame), type(df)
-
-
     def test__read_tmt11_mzRange_example0(self):
         fn = PATH/'maxquant'/'tmt11'/'example-0'/'mzRange.txt'
         reader = MaxquantReader()

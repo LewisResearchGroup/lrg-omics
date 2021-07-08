@@ -86,7 +86,8 @@ class D3OP:
                     else: print(' failed ([{status_code}])')
             
             
-    def download_maxquant_data( project_slug, pipeline_slug, filename):
-        url = f'{self.host}/api/download'
+    def download_maxquant_data(self, project_slug, pipeline_slug, filename):
+        url = f'{self._host}/api/download'
+        print(url)
         
         

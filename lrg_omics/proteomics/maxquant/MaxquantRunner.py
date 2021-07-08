@@ -102,7 +102,7 @@ class MaxquantRunner():
 
         cmds = [
             f'cd {run_dir}',
-            f'ls -artlh',
+             'ls -artlh',
             f'/usr/bin/time -o {run_dir}/time.txt -f "%E" {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
             f'if [ ! -d {run_dir}/combined ]; then mkdir {run_dir}/combined ; fi',
             f'if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi',

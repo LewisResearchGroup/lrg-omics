@@ -1,48 +1,35 @@
 #!/usr/bin/env python
 
 import argparse
-import requests
 
-class ProteomicsRawUploadToQC():
-    def __init__(self, url, pipeline, user, verbose=False):
-        self.url = url
-        self.pipeline = pipeline
-        self.user = user
-        self.verbose = verbose
-    
-    def submit(self, raw_fn):
-        url = self.url
-        pipeline = self.pipeline
-        user = self.user
-        with open(raw_fn, 'rb') as file:
-            files = {'orig_file': file}
-            data = {'pipeline': pipeline, 'user': user}
-            if self.verbose: print(data, raw_fn)
-            r = requests.post(url, files=files, data=data)
+from lrg_omics.proteomics.D3OP import D3OP
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Submit raw files to proteomics QC pipeline.')
 
-    parser.add_argument('--raw', nargs='*', action='append', required=True, help='RAW files to process.')
-    parser.add_argument('--pipeline', help='UUID of pipeline to submit the raw file to.', required=True)
     parser.add_argument('--host', required=True, default='https://proteomics.resistancedb.org', help='Base URL of the pipeline.',)
-    parser.add_argument('--user', help='User UUID to use for authentification')
+    parser.add_argument('--uid', help='UUID of pipeline to submit the raw file to.', required=True)
+    parser.add_argument('--pid', help='User UUID to use for authentification')
+    parser.add_argument('--raw', nargs='*', action='append', required=True, help='RAW files to process.')
+    parser.add_argument('--verbose', default=False, action='store_true')
     args = parser.parse_args()
-
 
     host = args.host
     assert ( host.startswith('https://') or host.startswith('http://') ),\
         'Host URL should start with https:// or http://'
 
-    url = f'{host}/api/upload/raw'
-    user = args.user
-    pipeline = args.pipeline
+    uid = args.uid
+    pid = args.pid
+    verbose = args.verbose
+    raw_fns = args.raw[0]
 
-    uploader = ProteomicsRawUploadToQC(url=url, user=user, pipeline=pipeline)
+    uploader = D3OP(host=host, uid=uid, pid=pid, verbose=verbose)
 
-    for raw_fn in args.raw[0]:
-        print(raw_fn)
-        uploader.submit(raw_fn)
+    print(raw_fns)
+    
+    uploader.upload_raw(raw_fns)
+    
+    
 

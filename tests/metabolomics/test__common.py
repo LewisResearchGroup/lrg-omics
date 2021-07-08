@@ -1,9 +1,8 @@
 import os
 import pandas as pd
 import datetime
-import numpy as np
 
-from lrg_omics.metabolomics.common import metadata_from_filename, read_plate
+from lrg_omics.metabolomics.common import metadata_from_filename
 from lrg_omics import LRG_TEST_DATA
 
 
