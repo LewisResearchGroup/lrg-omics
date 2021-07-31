@@ -11,5 +11,6 @@ if __name__ == '__main__':
 
     df = load_maxquant_data_from( args.path )
     
-    print(df.shape)
     print(df)
+
+    df.to_csv('QC-maxquant.csv', index=False)

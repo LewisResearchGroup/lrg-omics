@@ -3,7 +3,7 @@
 Lewis Research Group (LRG) codebase for omics data generation, processing, quality control and integration. 
 
 
- [Documentation](https://LSARP.github.io/lrg_omics/)
+ [Documentation](https://LSARP.github.io/lrg-omics/)
 
 
 

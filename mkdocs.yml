@@ -1,3 +1,8 @@
 site_name: LRG-omics
 site_url: https://github.com/LSARP/lrg-omics
 site_author: Soren Wacker
+
+nav:
+  - Home: 'index.md'
+
+theme: readthedocs

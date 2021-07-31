@@ -9,3 +9,4 @@ pyarrow
 seaborn
 tqdm
 requests
+biopython
