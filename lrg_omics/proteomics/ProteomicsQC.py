@@ -53,13 +53,16 @@ class ProteomicsQC:
         r = requests.post(url, data=data, headers=headers).json()
         return pd.DataFrame(r)
 
-    def get_qc_table(self, project_slug, pipeline_slug, columns=None, data_range=30):
+    def get_qc_data(self, project_slug, pipeline_slug, columns=None, data_range=30):
         url = f'{self._host}/api/mq/qc-data'
         headers = {'Content-type': 'application/json'}
-        if columns is None: columns = ['Index', 'Date', 'RawFile',  'DateAcquired', 
-                                       'Use Downstream','Flagged', 'N_protein_groups']
-        data = json.dumps( dict(project=project_slug, pipeline=pipeline_slug, 
-                                columns=columns, data_range=data_range) )
+        #if columns is None: columns = ['Index', 'Date', 'RawFile',  'DateAcquired', 
+        #                               'Use Downstream','Flagged', 'N_protein_groups']
+
+        data_dict =dict(project=project_slug, pipeline=pipeline_slug, data_range=data_range)
+        if columns is not None: data_dict['columns'] = columns
+
+        data = json.dumps(data_dict)
         r = requests.post(url, data=data, headers=headers).json()
         df = pd.DataFrame(r)
         df['DateAcquired'] = pd.to_datetime( df['DateAcquired'] )

@@ -6,8 +6,8 @@ from pathlib import Path as P
 from glob import glob
 from os.path import dirname, isdir, isfile, join, abspath
 
-expected_columns = ['Date', 'LRG_omics version', 'PIPENAME', 'MAXQUANTBIN', 'RAW_file',
-                    'FASTA_file', 'MQPAR_TEMP_file', 'MS', 'MS/MS', 'MS3',
+expected_columns = ['Date',
+                    'MS', 'MS/MS', 'MS3',
                     'MS/MS Submitted', 'MS/MS Identified', 'MS/MS Identified [%]',
                     'Peptide Sequences Identified', 'Av. Absolute Mass Deviation [mDa]',
                     'Mass Standard Deviation [mDa]', 'N_protein_groups',
@@ -39,7 +39,7 @@ expected_columns = ['Date', 'LRG_omics version', 'PIPENAME', 'MAXQUANTBIN', 'RAW
                     'N_Protein_qc_missing_values',
                     'reporter_intensity_corrected_Protein_qc_ave',
                     'reporter_intensity_corrected_Protein_qc_sd',
-                    'reporter_intensity_corrected_Protein_qc_cv', 'RUNDIR']
+                    'reporter_intensity_corrected_Protein_qc_cv']
 
 
 def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):

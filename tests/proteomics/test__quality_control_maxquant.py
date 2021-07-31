@@ -126,38 +126,15 @@ class TestClass:
     def test__maxquant_qc_columns(self):
 
         result =  maxquant_qc(PATH, protein=None, pept_list=None)
-        actual_cols = result.columns
+        actual_cols = result.columns.to_list()
 
         # check if the lengths of expected_cols and out are different. Useful to see if new columns were added in
         # maxquant.py but not in the test file
-        expected_cols = ['Date', 'LRG_omics version', 'PIPENAME', 'MAXQUANTBIN', 'RAW_file', 'FASTA_file',
-                         'MQPAR_TEMP_file', 'MS', 'MS/MS', 'MS3', 'MS/MS Submitted', 'MS/MS Identified',
-                         'MS/MS Identified [%]', 'Peptide Sequences Identified', 'Av. Absolute Mass Deviation [mDa]',
-                         'Mass Standard Deviation [mDa]', 'N_protein_groups', 'N_protein_true_hits',
-                         'N_protein_potential_contaminants', 'N_protein_reverse_seq', 'Protein_mean_seq_cov [%]',
-                         'TMT1_missing_values', 'TMT2_missing_values', 'TMT3_missing_values', 'TMT4_missing_values',
-                         'TMT5_missing_values', 'TMT6_missing_values', 'TMT7_missing_values', 'TMT8_missing_values',
-                         'TMT9_missing_values', 'TMT10_missing_values', 'TMT11_missing_values', 'N_peptides',
-                         'N_peptides_potential_contaminants', 'N_peptides_reverse', 'Oxidations [%]',
-                         'N_missed_cleavages_total', 'N_missed_cleavages_eq_0 [%]', 'N_missed_cleavages_eq_1 [%]',
-                         'N_missed_cleavages_eq_2 [%]', 'N_missed_cleavages_gt_3 [%]',
-                         'N_peptides_last_amino_acid_K [%]', 'N_peptides_last_amino_acid_R [%]',
-                         'N_peptides_last_amino_acid_other [%]', 'Mean_parent_int_frac',
-                         'Uncalibrated - Calibrated m/z [ppm] (ave)', 'Uncalibrated - Calibrated m/z [ppm] (sd)',
-                         'Uncalibrated - Calibrated m/z [Da] (ave)', 'Uncalibrated - Calibrated m/z [Da] (sd)',
-                         'Peak Width(ave)', 'Peak Width (std)', 'qc1_peptide_charges', 'N_qc1_missing_values',
-                         'reporter_intensity_corrected_qc1_ave', 'reporter_intensity_corrected_qc1_sd',
-                         'reporter_intensity_corrected_qc1_cv', 'calibrated_retention_time_qc1',
-                         'retention_length_qc1', 'N_of_scans_qc1', 'qc2_peptide_charges', 'N_qc2_missing_values',
-                         'reporter_intensity_corrected_qc2_ave', 'reporter_intensity_corrected_qc2_sd',
-                         'reporter_intensity_corrected_qc2_cv', 'calibrated_retention_time_qc2',
-                         'retention_length_qc2', 'N_of_scans_qc2', 'N_of_Protein_qc_pepts',
-                         'N_Protein_qc_missing_values', 'reporter_intensity_corrected_Protein_qc_ave',
-                         'reporter_intensity_corrected_Protein_qc_sd', 'reporter_intensity_corrected_Protein_qc_cv',
-                         'RUNDIR']
+        expected_cols = ['Date', 'MS', 'MS/MS', 'MS3', 'MS/MS Submitted', 'MS/MS Identified', 'MS/MS Identified [%]', 'Peptide Sequences Identified', 'Av. Absolute Mass Deviation [mDa]', 'Mass Standard Deviation [mDa]', 'N_protein_groups', 'N_protein_true_hits', 'N_protein_potential_contaminants', 'N_protein_reverse_seq', 'Protein_mean_seq_cov [%]', 'TMT1_missing_values', 'TMT2_missing_values', 'TMT3_missing_values', 'TMT4_missing_values', 'TMT5_missing_values', 'TMT6_missing_values', 'TMT7_missing_values', 'TMT8_missing_values', 'TMT9_missing_values', 'TMT10_missing_values', 'TMT11_missing_values', 'N_peptides', 'N_peptides_potential_contaminants', 'N_peptides_reverse', 'Oxidations [%]', 'N_missed_cleavages_total', 'N_missed_cleavages_eq_0 [%]', 'N_missed_cleavages_eq_1 [%]', 'N_missed_cleavages_eq_2 [%]', 'N_missed_cleavages_gt_3 [%]', 'N_peptides_last_amino_acid_K [%]', 'N_peptides_last_amino_acid_R [%]', 'N_peptides_last_amino_acid_other [%]', 'Mean_parent_int_frac', 'Uncalibrated - Calibrated m/z [ppm] (ave)', 'Uncalibrated - Calibrated m/z [ppm] (sd)', 'Uncalibrated - Calibrated m/z [Da] (ave)', 'Uncalibrated - Calibrated m/z [Da] (sd)', 'Peak Width(ave)', 'Peak Width (std)', 'qc1_peptide_charges', 'N_qc1_missing_values', 'reporter_intensity_corrected_qc1_ave', 'reporter_intensity_corrected_qc1_sd', 'reporter_intensity_corrected_qc1_cv', 'calibrated_retention_time_qc1', 'retention_length_qc1', 'N_of_scans_qc1', 'qc2_peptide_charges', 'N_qc2_missing_values', 'reporter_intensity_corrected_qc2_ave', 'reporter_intensity_corrected_qc2_sd', 'reporter_intensity_corrected_qc2_cv', 'calibrated_retention_time_qc2', 'retention_length_qc2', 'N_of_scans_qc2', 'N_of_Protein_qc_pepts', 'N_Protein_qc_missing_values', 'reporter_intensity_corrected_Protein_qc_ave', 'reporter_intensity_corrected_Protein_qc_sd', 'reporter_intensity_corrected_Protein_qc_cv']
+        
+        print(actual_cols)
 
-
-        assert all(actual_cols == expected_cols), actual_cols
+        assert actual_cols == expected_cols, 'Columns do not match'
 
      
 
