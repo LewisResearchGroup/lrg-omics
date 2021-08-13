@@ -2,7 +2,7 @@
 
 import argparse
 
-from lrg_omics.proteomics.D3OP import D3OP
+from lrg_omics.proteomics.ProteomicsQC import ProteomicsQC
 
 
 if __name__ == '__main__':
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     verbose = args.verbose
     raw_fns = args.raw[0]
 
-    uploader = D3OP(host=host, uid=uid, pid=pid, verbose=verbose)
+    uploader = ProteomicsQC(host=host, uid=uid, pid=pid, verbose=verbose)
 
     print(raw_fns)
     
