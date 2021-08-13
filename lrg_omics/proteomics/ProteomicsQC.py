@@ -4,6 +4,10 @@ import requests
 import json
 import logging
 
+from tqdm import tqdm
+
+
+
 class ProteomicsQC:
     '''
     Python API to interact with the Proteomics QC pipeline.
@@ -77,7 +81,8 @@ class ProteomicsQC:
         if (pipeline is None) or (user is None):
             logging.error('Please, initiate D3PO with user_uuid '\
                           'and pipeline_uuid to submit RAW files.')
-        for fn in fns:
+
+        for fn in tqdm(fns):
             with open(fn, 'rb') as file:
                 files = {'orig_file': file}
                 data = {'pipeline': pipeline, 'user': user}
