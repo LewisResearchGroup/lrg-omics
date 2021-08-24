@@ -90,6 +90,7 @@ class MaxquantReader():
 
         standard_cols = [
             'Majority protein IDs', 
+            'Fasta headers',
             'Number of proteins',
             'Peptides',
             'Razor + unique peptides',
