@@ -1,6 +1,7 @@
 # lrg_omics.proteomics.quality_control.maxquant
 import pandas as pd
 import numpy as np
+import logging
 
 from pathlib import Path as P
 from glob import glob
@@ -94,8 +95,8 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
                maxquant_qc_msmScans(txt_path),
                maxquant_qc_evidence(txt_path, pept_list)]:
             dfs.append(df)
-    except:
-        pass
+    except Exception as e:
+        logging.error(e)
     if len(dfs) == 0: return None
     df = pd.concat(dfs, sort=False).to_frame().T
     df['RUNDIR'] = str(txt_path)
