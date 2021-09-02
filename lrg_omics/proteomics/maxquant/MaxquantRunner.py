@@ -101,7 +101,7 @@ class MaxquantRunner():
         run_sbatch = join(run_dir, 'run.sbatch')
 
         if with_time:
-            time_cmd = f'time -o {run_dir}/time.txt -f "%E" '
+            time_cmd = f'/usr/bin/time -o {run_dir}/time.txt -f "%E" '
         else:
             time_cmd = 'touch time.txt;'
         
