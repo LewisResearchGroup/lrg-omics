@@ -55,7 +55,7 @@ class MaxquantRunner():
             logging.warning('maxquantcmd not working', os.system( f'{maxquantcmd} --version') )
         '''
 
-    def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True):
+    def run(self, raw_file, cold_run=False, rerun=False, submit=False, run=True, with_time=True):
         
         raw_file = abspath( raw_file)
         if raw_file.lower().endswith('.raw'):
@@ -100,10 +100,15 @@ class MaxquantRunner():
         run_mqpar = join(run_dir, basename(self._mqpar))
         run_sbatch = join(run_dir, 'run.sbatch')
 
+        if with_time:
+            time_cmd = 'time -o {run_dir}/time.txt -f "%E" '
+        else:
+            time_cmd = 'touch time.txt;'
+        
         cmds = [
             f'cd {run_dir}',
              'ls -artlh',
-            f'time -o {run_dir}/time.txt -f "%E" {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
+            f'{time_cmd} {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
             f'if [ ! -d {run_dir}/combined ]; then mkdir {run_dir}/combined ; fi',
             f'if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi',
             f'mv time.txt maxquant.err maxquant.out mqpar.xml {run_dir}/combined/txt/',
