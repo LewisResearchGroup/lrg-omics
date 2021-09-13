@@ -111,7 +111,7 @@ class MaxquantRunner():
             f'{time_cmd} {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
             f'if [ ! -d {run_dir}/combined ]; then mkdir {run_dir}/combined ; fi',
             f'if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi',
-            f'mv time.txt maxquant.err maxquant.out mqpar.xml {run_dir}/combined/txt/',
+            f'mv time.txt maxquant.err maxquant.out {run_mqpar} {run_dir}/combined/txt/',
             f'mv {run_dir}/combined/txt/* {tgt_dir}', 
             ]
 
