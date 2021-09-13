@@ -96,7 +96,7 @@ class MaxquantRunner():
             else:
                 shutil.rmtree(tgt_dir)
         
-        run_raw_ref = P(run_dir)/P(self._raw_file).name
+        run_raw_ref = P(run_dir)/P(self.raw_file).name
         run_mqpar = P(run_dir)/P(self._mqpar).name
         run_sbatch = P(run_dir)/'run.sbatch'
 
