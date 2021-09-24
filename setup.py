@@ -18,7 +18,8 @@ scripts = [
     'scripts/lrg_fake_maxquant.sh',
     'scripts/lrg_get_maxquant_qc_data_from_path.py',
     'scripts/lrg_get_rawtools_qc_data_from_path.py',
-    'scripts/lrg_upload_raw_file_to_qc_pipeline.py'
+    'scripts/lrg_upload_raw_file_to_qc_pipeline.py',
+    'scripts/lrg_mzML2mzMLb.py'
 ]
 
 config = {
