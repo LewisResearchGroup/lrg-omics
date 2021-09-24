@@ -96,22 +96,24 @@ class MaxquantRunner():
             else:
                 shutil.rmtree(tgt_dir)
         
-        run_raw_ref = join(run_dir, basename(raw_file))
-        run_mqpar = join(run_dir, basename(self._mqpar))
-        run_sbatch = join(run_dir, 'run.sbatch')
+        run_raw_ref = P(run_dir)/P(raw_file).name
+        run_mqpar = P(run_dir)/P(self._mqpar).name
+        run_sbatch = P(run_dir)/'run.sbatch'
 
         if with_time:
             time_cmd = f'/usr/bin/time -o {run_dir}/time.txt -f "%E" '
         else:
             time_cmd = 'touch time.txt;'
-        
+    
+        # these are just the commands
+        # directories will be created later
         cmds = [
             f'cd {run_dir}',
-             'ls -artlh',
+            'ls -artlh',
             f'{time_cmd} {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
             f'if [ ! -d {run_dir}/combined ]; then mkdir {run_dir}/combined ; fi',
             f'if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi',
-            f'mv time.txt maxquant.err maxquant.out mqpar.xml {run_dir}/combined/txt/',
+            f'cp time.txt maxquant.err maxquant.out {run_mqpar} {run_dir}/combined/txt/',
             f'mv {run_dir}/combined/txt/* {tgt_dir}', 
             ]
 
