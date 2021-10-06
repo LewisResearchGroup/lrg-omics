@@ -15,7 +15,7 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
     
     cd lrg-omics
     conda env create -f dev/conda/environment.yml
-    conda activate lrg
+    conda activate lrg-omics-dev
     pip install -r requirements.txt
     pip install -e .
 
