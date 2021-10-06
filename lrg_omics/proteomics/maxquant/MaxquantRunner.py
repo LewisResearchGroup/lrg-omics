@@ -18,9 +18,9 @@ class MaxquantRunner():
                  run_dir=None, 
                  out_dir=None, 
                  add_raw_name_to_outdir=False,
-                 add_uuid_to_rundir=True,
+                 add_uuid_to_rundir=False,
                  sbatch_cmds=None, 
-                 cleanup=True, 
+                 cleanup=False, 
                  verbose=False, 
                  output_dir=None):
 
