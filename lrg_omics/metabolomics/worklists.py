@@ -14,7 +14,7 @@ def read_worklist(fn):
 
 
 def get_metadata_from_worklist(worklist, parse_func='LSARP'):
-    n_errors = 0
+
     if parse_func == 'LSARP':
         parse_func = metadata_from_filename
 

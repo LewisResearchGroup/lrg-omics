@@ -61,11 +61,6 @@ def plotly_heatmap(df: pd.DataFrame(), x=None, y=None, title=None, max_label_len
     return fig
 
 
-def plotly_dendrogram(df: pd.DataFrame()):
-    fig = ff.create_dendrogram(df, color_threshold=1.5)
-    return fig
-
-
 def plotly_fig_to_div(fig):
     return opy.plot(fig, auto_open=False, output_type='div')
 

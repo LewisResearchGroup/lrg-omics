@@ -1,6 +1,6 @@
 import numpy as np
-from os.path import basename
 from matplotlib import pyplot as plt
+
 
 def plot_metabolomics_hist2d(df, figsize=(10,10), dpi=300, set_dim=True, cmap='binary'):
 
@@ -16,3 +16,5 @@ def plot_metabolomics_hist2d(df, figsize=(10,10), dpi=300, set_dim=True, cmap='b
     plt.ylabel('M/Z')
     plt.yticks(range(0, 1100, 300))
     plt.grid()
+
+    return fig

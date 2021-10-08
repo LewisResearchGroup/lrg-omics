@@ -1,6 +1,6 @@
 import re
 
-class MQparser():
+class MqparParser():
     '''Parser for mqpar.xml files'''
     def __init__(self, filename=None, as_template=False):
         self._content = None
