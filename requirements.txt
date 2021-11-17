@@ -10,3 +10,6 @@ seaborn
 tqdm
 requests
 biopython
+h5py
+hdf5plugin
+psims

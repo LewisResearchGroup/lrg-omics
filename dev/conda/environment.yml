@@ -1,0 +1,27 @@
+name: lrg-omics-dev
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - matplotlib
+  - maxquant=1.6.10.43 
+  - mono=5.14 
+  - pandas
+  - pip
+  - pyarrow
+  - python=3.8
+  - seaborn
+  - scikit-learn
+  - tqdm
+
+  - pip:
+    - lxml
+    - tables
+    - xlrd
+    - openpyxl
+    - requests
+    - biopython
+    - h5py
+    - hdf5plugin
+    - psims

@@ -1,3 +1,8 @@
+![](images/coverage.svg)
+[![Python version](https://img.shields.io/badge/Python-3.8-blue?style=plastic)](https://www.python.org/)
+[![GitHub Actions Status](https://github.com/LSARP/lrg-omics/actions/workflows/python-package.yml/badge.svg?branch=develop)](https://github.com/LSARP/lrg-omics/actions/?query=workflow)
+[![Documentation Status](https://readthedocs.org/projects/lrg-omics/badge?/?version=stable)](https://lsarp.github.io/lrg-omics/?badge=stable)
+
 # LRG codebase for omics integration 
 
 Lewis Research Group (LRG) codebase for omics data generation, processing, quality control and integration. 
@@ -12,9 +17,8 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
     git clone https://github.com/LSARP/lrg-omics
     
     cd lrg-omics
-    conda create -n lrg -c conda-forge -c bioconda python=3.8 maxquant=1.6.10.43 mono=5.14 pip
-    conda activate lrg
-    pip install -r requirements.txt
+    conda env create -f dev/conda/environment.yml
+    conda activate lrg-omics-dev
     pip install -e .
 
 
@@ -30,3 +34,4 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 - Soren Wacker
 - Mario Ernesto-Valdés
 - Luis Ponce Alvares
+- Estefania Barreto-Ojeda (@ojeda-e)
