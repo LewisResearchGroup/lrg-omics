@@ -109,7 +109,7 @@ class MaxquantRunner():
         # directories will be created later
         cmds = [
             f'cd {run_dir}',
-            'ls -artlh',
+            'sleep 10',
             f'{time_cmd} {self._mqcmd} {run_mqpar} 1>maxquant.out 2>maxquant.err',
             f'if [ ! -d {run_dir}/combined ]; then mkdir {run_dir}/combined ; fi',
             f'if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi',
@@ -136,25 +136,34 @@ class MaxquantRunner():
         create_mqpar(self._mqpar, run_raw_ref, self._fasta, raw_label, fn=run_mqpar, cold_run=cold_run)
         
         gen_sbatch_file(self._sbatch_cmds + cmds, jobname=run_id, 
-                        fn=run_sbatch, cold_run=cold_run, submit=submit)
+                        fn=run_sbatch, cold_run=cold_run, submit=submit,
+                        maxquantcmd=self._mqcmd, rundir=run_dir)
         
         cmds = '; '.join( cmds )
         
-        if run:
+        if run and not submit:
             print('Running', run_id, run_dir)
             os.system(cmds)
 
         return cmds
 
 
-def gen_sbatch_file(commands, jobname, submit=False, fn='run.sbatch', cold_run=False):
+def gen_sbatch_file(commands, jobname, submit=False, fn='run.sbatch', cold_run=False, maxquantcmd='maxqant', rundir=None):
     cmds_txt = '\n\n'.join(commands)
     txt = f"""#!/bin/bash
-#SBATCH --time=10:00:00
+#SBATCH --time=5:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --mem=5000
 #SBATCH -J {jobname}
+#SBATCH -e {rundir}/slurm.err
+#SBATCH -o {rundir}/slurm.out
+
+which mono
+mono --version
+
+which {maxquantcmd}
+{maxquantcmd} --version 2>&1
 
 {cmds_txt}
 """
