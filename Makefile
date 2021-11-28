@@ -5,3 +5,5 @@ test:
 docs:
 		mkdocs build && mkdocs gh-deploy
 
+format:
+	black .

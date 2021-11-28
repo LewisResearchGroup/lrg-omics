@@ -13,3 +13,6 @@ biopython
 h5py
 hdf5plugin
 psims
+black
+coverage-badge
+pytest
