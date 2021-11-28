@@ -60,8 +60,7 @@ def get_protein_quant(path, melt=False, normed=None, take_log=False,
         - drop_zero_q
         - melt: Return a melted DataFrame
     '''
-    df = get_maxquant_txt(path, txt='proteinGroups.txt', 
-                          pipename=pipename, mq_run_name=mq_run_name)
+    df = get_maxquant_txt(path, txt='proteinGroups.txt')
 
     if len(df) == 0:
         return None
