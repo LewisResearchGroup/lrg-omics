@@ -9,7 +9,13 @@ from .MaxquantReader import MaxquantReader
 
 
 class MaxquantProteinQuantNormalizer:
-    def __init__(self, paths, map_to_tmt_channel=True):
+    def __init__(
+        self,
+        paths=None,
+        map_to_tmt_channel=True,
+        remove_contaminants=False,
+        remove_reverse=False,
+    ):
         """
         Path is a list of paths towards Maxquant results folders.
         They are expected to contain proteinGroups.txt file.
@@ -30,9 +36,13 @@ class MaxquantProteinQuantNormalizer:
 
         """
 
-        self._df_paths = paths_to_df(paths)
+        self._reader = MaxquantReader(
+            remove_contaminants=remove_contaminants, remove_reverse=remove_reverse
+        )
         self.df_protein_groups = None
-        self._read_protein_groups()
+        if paths is not None:
+            self._df_paths = paths_to_df(paths)
+            self._read_protein_groups()
         self._map_to_tmt_channel = map_to_tmt_channel
         self._tmt_mapping = {
             f"Reporter intensity corrected {i}": f"{i:02.0f}" for i in range(1, 24)
@@ -45,21 +55,32 @@ class MaxquantProteinQuantNormalizer:
             if not fn.is_file():
                 logging.warning(f"FileNotFound: {fn}")
                 continue
-            df = MaxquantReader().read(P(path) / "proteinGroups.txt")
+            df = self._reader.read(P(path) / "proteinGroups.txt")
             df["RawFile"] = rawfile
             data.append(df)
         self.df_protein_groups = pd.concat(data).set_index("RawFile").reset_index()
 
+    @staticmethod
+    def normalize_func(df):
+        df = df.replace(0, np.NaN)
+        df = df.apply(pd.to_numeric, errors='ignore')
+        channels = df.columns.to_list()
+        channels_except_first = channels[1:]
+        # Didvide by column mean
+        df = df / df.mean(skipna=True)
+        # Fold change to reference channel (channel 1)
+        df = df.divide(df["Reporter intensity corrected 1"].values, axis=0)
+        # Log2(x) transformation
+        df = df.applymap(np.log2)
+        # Mean centering except first channel
+        mean_values_by_row = df.loc[:, channels_except_first].mean(axis=1)
+        df.loc[:, channels_except_first] = df.loc[:, channels_except_first].sub(
+            mean_values_by_row, axis=0
+        )
+        return df.values
+
     def normalize(
-        self,
-        fmt="plex",
-        divide_by_column_mean=True,
-        take_log=True,
-        normed="fold_change",
-        mean_centering_per_plex=False,
-        drop_zero_q=False,
-        data_cols=None,
-        protein_col="Fasta headers",
+        self, fmt="plex", protein_col="Majority protein IDs",
     ):
         """
         Applies normalization and returns normalized datafame in specific format.
@@ -76,63 +97,51 @@ class MaxquantProteinQuantNormalizer:
             * fold_change: Divide by reference intensities.
         - drop_zero_q
         - melt: Return a melted DataFrame
-    '''
+    
         """
-        if data_cols is None:
-            data_cols = []
 
-        df = self.df_protein_groups
+        df = self.df_protein_groups.set_index("RawFile").copy()
+
+        intensity_cols = df.filter(
+            regex="Reporter intensity corrected"
+        ).columns.to_list()
+        df = df[[protein_col] + intensity_cols]
         minimum_n_of_values = 3
-        n_of_values = (df.filter(regex="Reporter intensity corrected") != 0).sum(axis=1)
-        df = df[n_of_values >= minimum_n_of_values]
+        n_of_values = (df[intensity_cols] != 0).sum(axis=1)
+        df = df[(df[intensity_cols] > 0).sum(axis=1) >= minimum_n_of_values]
         df = df[df["Reporter intensity corrected 1"] != 0]
 
-        data = df[[protein_col] + data_cols].copy()
-        reporter_intensity = df.filter(regex="RawFile|Reporter intensity corrected")
+        grps = df.groupby("RawFile")
+        for raw_file in tqdm(df.index.unique()):
+            df.loc[raw_file, intensity_cols] = self.normalize_func(
+                df.loc[raw_file, intensity_cols]
+            )
 
-        # Replace 0 with NaN
-        reporter_intensity = reporter_intensity.replace(0, np.NaN)
-
-        self.reporter_intensity = reporter_intensity
-
-        grps = reporter_intensity.groupby("RawFile")
-        grps_normed = []
-
-        for RawFile, grp in tqdm(grps):
-            grp = grp.set_index("RawFile")
-            grp = grp / grp.mean()
-            grp = grp.divide(grp["Reporter intensity corrected 1"].values, axis=0)
-            grp = grp.applymap(log2p1)
-            grp = grp.sub(grp.mean(axis=1, skipna=True).values, axis=0)
-            grps_normed.append(grp)
-
-        reporter_intensity = pd.concat(grps_normed).reset_index()
-        reporter_intensity.index = data.index
-
-        del grps_normed, grps
-
-        # Combine data with reporter int
-
-        output = pd.concat([data, reporter_intensity], axis=1)
-
-        if (
-            output.reset_index().groupby(["RawFile", protein_col]).count().max().max()
-            > 1
-        ):
+        max_occurence_of_raw_file = (
+            df.reset_index().groupby(["RawFile", protein_col]).count().max().max()
+        )
+        if max_occurence_of_raw_file > 1:
             logging.warning(
                 f"Found duplicated index (RawFile, {protein_col}) taking first"
             )
-            output = output.groupby(["RawFile", protein_col]).first()
+            df = (
+                df.groupby(["RawFile", protein_col])
+                .first()
+                .reset_index(level=protein_col)
+            )
+            display(df)
 
-        output = output.rename(columns=self._tmt_mapping)
-        output.columns.name = "TMT_CHANNEL"
+        df = df.set_index(protein_col, append=True)
+        df = df[intensity_cols[1:]]
+        df = df.rename(columns=self._tmt_mapping)
+        df.columns.name = "TMT_CHANNEL"
 
         if fmt == "plex":
-            return output
+            return df
         elif fmt == "sample":
-            return output.unstack(protein_col).stack("TMT_CHANNEL")
+            return df.unstack(protein_col).stack("TMT_CHANNEL")
         elif fmt == "long":
-            return output.reset_index().melt(
+            return df.reset_index().melt(
                 id_vars=["RawFile", protein_col],
                 var_name="TMT_CHANNEL",
                 value_name="PROTEIN_QUANT",

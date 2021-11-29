@@ -121,7 +121,9 @@ class MaxquantReader:
 
         return df
 
-    def process_protein_groups(self, df, remove_contaminants=True, remove_reverse=True):
+    def process_protein_groups(
+        self, df,
+    ):
 
         standard_cols = [
             "Majority protein IDs",
@@ -153,14 +155,16 @@ class MaxquantReader:
             "Oxidation (M) site IDs",
             "Oxidation (M) site positions",
         ]
-
+        
         quant_cols = df.filter(regex="Reporter intensity corrected").columns.to_list()
 
         df = df[standard_cols + quant_cols].rename(
             columns={c: " ".join(i for i in c.split(" ")[:4]) for c in quant_cols}
         )
 
-        if remove_contaminants:
+        if self.remove_con:
             df = df[df["Potential contaminant"] != "+"]
+        if self.remove_rev:
+            df = df[~df["Majority protein IDs"].str.contains("REV_")]
 
         return df
