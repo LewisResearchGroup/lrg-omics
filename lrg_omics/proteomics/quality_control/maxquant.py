@@ -95,7 +95,9 @@ def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):
 
 
 def maxquant_qc_csv(
-    txt_path, out_fn="maxquant_quality_control.csv", force_update=False,
+    txt_path,
+    out_fn="maxquant_quality_control.csv",
+    force_update=False,
 ):
     abs_path = join(txt_path, out_fn)
     if isfile(abs_path) and not force_update:
@@ -110,8 +112,8 @@ def maxquant_qc_csv(
 
 def maxquant_qc(txt_path, protein=None, pept_list=None):
     """
-    Runs all MaxQuant quality control functions 
-    and returns a concatenated pandas.Series() 
+    Runs all MaxQuant quality control functions
+    and returns a concatenated pandas.Series()
     object including meta data.
     Args:
         txt_path: path with MaxQuant txt output.

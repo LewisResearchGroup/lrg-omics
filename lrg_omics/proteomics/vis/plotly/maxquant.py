@@ -6,12 +6,12 @@ def plot_spectrum(
     df: pd.DataFrame, annot_threshold=1e4, threshold=0, show_fig=True, **kwargs
 ):
     """Plots spectral data. df is a pandas.DataFrame() with the columns
-       mz_array
-       intensity
-       spectrum
-       raw_file
-       retention_time[min]
-       Scan index
+    mz_array
+    intensity
+    spectrum
+    raw_file
+    retention_time[min]
+    Scan index
     """
     df = df[df.intensity > threshold]
     df["_index_"] = range(len(df))

@@ -13,7 +13,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("--fasta", help="Fasta file.", required=True)
     parser.add_argument(
-        "--mqpar", required=True, help="MaxQuant parameter template file (mqpar.xml).",
+        "--mqpar",
+        required=True,
+        help="MaxQuant parameter template file (mqpar.xml).",
     )
     parser.add_argument(
         "--run-dir", help="Temporary directory to perform the calculation."

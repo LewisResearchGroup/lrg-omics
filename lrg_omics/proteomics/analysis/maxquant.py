@@ -53,15 +53,15 @@ def get_protein_quant(
     mq_run_name=None,
 ):
     """
-    Gets the proteinGroups file based on the .RAW name 
-    and the pipename. Records starting with REV or CON 
+    Gets the proteinGroups file based on the .RAW name
+    and the pipename. Records starting with REV or CON
     are removed. The "Reporter intensity corrected"
     columns are extracted.
     -----
     Args:
         - divide_by_column_mean: bool
             * divide intensities by column-wise mean
-        - take_log: apply log2p1 transformation, devide_by_mean 
+        - take_log: apply log2p1 transformation, devide_by_mean
             is applied before log-transformation if set to True.
         - normed:
             * None: Don't apply further normalization
@@ -175,15 +175,15 @@ def extract_protein_quant(
     protein_col="Majority protein IDs",
 ):
     """
-    Gets the proteinGroups file based on the .RAW name 
-    and the pipename. Records starting with REV or CON 
+    Gets the proteinGroups file based on the .RAW name
+    and the pipename. Records starting with REV or CON
     are removed. The "Reporter intensity corrected"
     columns are extracted.
     -----
     Args:
         - divide_by_column_mean: bool
             * divide intensities by column-wise mean
-        - take_log: apply log1p transformation, devide_by_mean 
+        - take_log: apply log1p transformation, devide_by_mean
             is applied before log-transformation if set to True.
         - normed:
             * None: Don't apply further normalization

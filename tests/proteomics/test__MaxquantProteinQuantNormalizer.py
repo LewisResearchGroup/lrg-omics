@@ -16,7 +16,7 @@ def generate_input(n_proteins=10, generator=lambda r, c: 1):
     for r in df.index:
         for c in range(11):
             df.iloc[r, c] = generator(r, c)
-    df = df.apply(pd.to_numeric, errors='ignore')
+    df = df.apply(pd.to_numeric, errors="ignore")
     return df
 
 
@@ -30,7 +30,7 @@ def generate_result(n_proteins=10, generator=lambda r, c: 0):
         for c in range(10):
             df.iloc[r, c] = generator(r, c)
     df.columns.name = "TMT_CHANNEL"
-    df = df.apply(pd.to_numeric, errors='ignore')
+    df = df.apply(pd.to_numeric, errors="ignore")
     return df
 
 

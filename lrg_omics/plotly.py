@@ -43,7 +43,9 @@ def plotly_heatmap(
 
     fig = go.Figure(data=go.Heatmap(z=df, y=y, x=x, hoverongaps=False))
 
-    fig.update_layout(title=title,)
+    fig.update_layout(
+        title=title,
+    )
 
     fig.update_layout(
         title={"text": title, "y": 0.9, "x": 0.5, "xanchor": "center", "yanchor": "top"}

@@ -22,14 +22,14 @@ class MaxquantProteinQuantNormalizer:
         The name of the folder is taken as RawName.
 
         It should be something like:
-        
+
         .../SA001-A/proteinGroups.txt
         .../SA001-B/proteinGroups.txt
 
         Then the data in this file will be stored as RawFile=SA001-A, RawFile=SA001-B, etc.
 
-        Usage example:        
-            
+        Usage example:
+
             mpqn = MaxquantProteinQuantNormalizer()
             mpqn.read(paths)
             df = mpqn.normalize(...)
@@ -63,7 +63,7 @@ class MaxquantProteinQuantNormalizer:
     @staticmethod
     def normalize_func(df):
         df = df.replace(0, np.NaN)
-        df = df.apply(pd.to_numeric, errors='ignore')
+        df = df.apply(pd.to_numeric, errors="ignore")
         channels = df.columns.to_list()
         channels_except_first = channels[1:]
         # Didvide by column mean
@@ -80,7 +80,9 @@ class MaxquantProteinQuantNormalizer:
         return df.values
 
     def normalize(
-        self, fmt="plex", protein_col="Majority protein IDs",
+        self,
+        fmt="plex",
+        protein_col="Majority protein IDs",
     ):
         """
         Applies normalization and returns normalized datafame in specific format.
@@ -88,7 +90,7 @@ class MaxquantProteinQuantNormalizer:
          Args:
         - divide_by_column_mean: bool
             * divide intensities by column-wise mean
-        - take_log: apply log1p transformation, devide_by_mean 
+        - take_log: apply log1p transformation, devide_by_mean
             is applied before log-transformation if set to True.
         - normed:
             * None: Don't apply further normalization
@@ -97,7 +99,7 @@ class MaxquantProteinQuantNormalizer:
             * fold_change: Divide by reference intensities.
         - drop_zero_q
         - melt: Return a melted DataFrame
-    
+
         """
 
         df = self.df_protein_groups.set_index("RawFile").copy()

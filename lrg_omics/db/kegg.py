@@ -12,7 +12,7 @@ def get(ID="K18766", db_id=None):
         - 'ec' : request to enzyme database
         - 'cpd': request to compound database
         - 'rn' : request to reaction database
-    
+
     If db_id is None the request will be directed
     based on the first letter of the ID.
       C -> compound

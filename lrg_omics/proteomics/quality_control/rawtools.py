@@ -119,7 +119,7 @@ def rawtools_metrics_cmd(
 
 def rawtools_qc_cmd(input_dir, output_dir, rerun=False):
     """
-    Generates command to run rawtools quality control to 
+    Generates command to run rawtools quality control to
     generate the file QcDataTable.csv.
     """
     os.makedirs(output_dir, exist_ok=True)

@@ -13,31 +13,38 @@ import aiohttp
 
 import nest_asyncio
 
+
 class ProteomicsQC:
     """
     Python API to interact with the Proteomics QC pipeline.
-    
+
     -------
     Example:
-    
+
     pqc = ProteomicsQC(
-                host='https://proteomics.resistancedb.org', 
+                host='https://proteomics.resistancedb.org',
                 uid='your-user-uuid',     # Optional, required for upload of RAW files
                 pid='your-pipeline-uuid'  # Optional, required for upload of RAW files
                 )
-                
+
     pqc.get_projects()
-    
+
     pqc.get_pipelines(project='lsarp')
-    
+
     pqc.get_qc_data(project='lsarp', pipeline='staphylococcus-aureus-tmt11', data_range=100)
-    
+
     pqc.upload_raw(fns=[list-of-filenames])  # Requires uid and pid
-    
+
     """
 
     def __init__(
-        self, host="https://localhost:8000", pid=None, uid=None, verbose=False, project_slug=None, pipeline_slug=None
+        self,
+        host="https://localhost:8000",
+        pid=None,
+        uid=None,
+        verbose=False,
+        project_slug=None,
+        pipeline_slug=None,
     ):
 
         self._host = host
@@ -64,15 +71,19 @@ class ProteomicsQC:
         r = requests.post(url, data=data, headers=headers).json()
         return pd.DataFrame(r)
 
-    def get_qc_data(self, project_slug=None, pipeline_slug=None, columns=None, data_range=30):
+    def get_qc_data(
+        self, project_slug=None, pipeline_slug=None, columns=None, data_range=30
+    ):
         url = f"{self._host}/api/mq/qc-data"
         headers = {"Content-type": "application/json"}
         # if columns is None: columns = ['Index', 'Date', 'RawFile',  'DateAcquired',
         #                               'Use Downstream','Flagged', 'N_protein_groups']
 
-        if project_slug is None: project_slug = self._project_slug
-        if pipeline_slug is None: pipeline_slug = self._pipeline_slug
-        
+        if project_slug is None:
+            project_slug = self._project_slug
+        if pipeline_slug is None:
+            pipeline_slug = self._pipeline_slug
+
         data_dict = dict(
             project=project_slug, pipeline=pipeline_slug, data_range=data_range
         )
@@ -116,50 +127,52 @@ class ProteomicsQC:
         url = f"{self._host}/api/download"
         print(url)
 
-        
     def flag(self, fns):
-        future = asyncio.ensure_future( self.change_flag(fns, 'create') )
+        future = asyncio.ensure_future(self.change_flag(fns, "create"))
         self._loop.run_until_complete(future)
-        
+
     def unflag(self, fns):
-        future = asyncio.ensure_future( self.change_flag(fns, 'delete') )
+        future = asyncio.ensure_future(self.change_flag(fns, "delete"))
         self._loop.run_until_complete(future)
-        
+
     async def change_flag(self, fns, what):
-        fns = [P(fn).with_suffix('.raw').name for fn in fns]
+        fns = [P(fn).with_suffix(".raw").name for fn in fns]
+        print(fns)
         tasks = []
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=2)) as session:
+        async with aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(limit=2)
+        ) as session:
             for fn in fns:
-                task =  self._change_flag(fn, what, session)
+                task = self._change_flag(fn, what, session)
                 tasks.append(task)
             responses = await asyncio.gather(*tasks)
         return responses
 
-    
-    async def _change_flag(self, fn, what, session): 
+    async def _change_flag(self, fn, what, session):
         project_slug = self._project_slug
-        pipeline_slug = self._pipeline_slug  
+        pipeline_slug = self._pipeline_slug
         url = f"{self._host}/api/flag/{what}"
         data = {
-            "project": project_slug, 
-            "pipeline": pipeline_slug, 
-            "user": self._user_uuid, 
-            "raw_files": [fn]
+            "project": project_slug,
+            "pipeline": pipeline_slug,
+            "user": self._user_uuid,
+            "raw_files": [fn],
         }
         async with session.post(url, data=data) as response:
-           response = asyncio.ensure_future( response.read() )
+            response = asyncio.ensure_future(response.read())
         return response
-    
-    
+
     def flag_multi(self, fns, what):
+        fns = [P(fn).with_suffix(".raw").name for fn in fns]
         project_slug = self._project_slug
-        pipeline_slug = self._pipeline_slug  
+        pipeline_slug = self._pipeline_slug
         url = f"{self._host}/api/flag/{what}"
         data = {
-            "project": project_slug, 
-            "pipeline": pipeline_slug, 
-            "user": self._user_uuid, 
-            "raw_files": [fns]
+            "project": project_slug,
+            "pipeline": pipeline_slug,
+            "user": self._user_uuid,
+            "raw_files": fns,
         }
+        print(data)
         response = requests.post(url, data=data)
         print(response)

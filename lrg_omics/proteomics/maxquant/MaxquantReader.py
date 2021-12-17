@@ -122,7 +122,8 @@ class MaxquantReader:
         return df
 
     def process_protein_groups(
-        self, df,
+        self,
+        df,
     ):
 
         standard_cols = [
@@ -155,7 +156,7 @@ class MaxquantReader:
             "Oxidation (M) site IDs",
             "Oxidation (M) site positions",
         ]
-        
+
         quant_cols = df.filter(regex="Reporter intensity corrected").columns.to_list()
 
         df = df[standard_cols + quant_cols].rename(

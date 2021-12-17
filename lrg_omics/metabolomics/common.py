@@ -118,7 +118,7 @@ def read_plate_2(plate, path, worklist):
 
 
 def classic_lstsqr(x_list, y_list):
-    """ Computes the least-squares solution to a linear matrix equation by fixing the slope to 1
+    """Computes the least-squares solution to a linear matrix equation by fixing the slope to 1
     its suitable to work on the log-scale.
     """
 
@@ -143,7 +143,7 @@ def classic_lstsqr(x_list, y_list):
 
 
 def find_linear_range(x, y, th):
-    """ this algorith searches the range of x values in which the data behaves linearly with slope 1"""
+    """this algorith searches the range of x values in which the data behaves linearly with slope 1"""
     """ suitable to work on the log-scale """
     x_c = x
     y_c = y

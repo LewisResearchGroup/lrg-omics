@@ -27,12 +27,12 @@ def run_maxquant(
     execute=True,
 ):
     """
-    Uses a combination of a raw-file, fasta-file and mqpar-template to 
-    create folder structure, commands and batch files to start 
+    Uses a combination of a raw-file, fasta-file and mqpar-template to
+    create folder structure, commands and batch files to start
     MaxQuant jobs.
     ====
     Args:
-        raw: str or PosixPath 
+        raw: str or PosixPath
             - absolute path to a RAW file
         fasta: str or PosixPath
             - absolute path to a FASTA file (protein library)
@@ -43,7 +43,7 @@ def run_maxquant(
             - whether or not to start run when folders are
               already present
         submit: bool, default False
-            - whether or not to submit the generated batch file to 
+            - whether or not to submit the generated batch file to
               the queue system (supported SLURM)
     """
 
