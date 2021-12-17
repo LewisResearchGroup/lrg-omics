@@ -22,13 +22,20 @@ class ProteomicsQC:
 
     Methods
     -------
-    get_projects() - Returns a dataframe with information about all available projects on server.
-    get_pipelines(project_slug) - Returns list of pipelines in project space
-    get_qc_data(data_range=30) - Downloads the Quality Control data for the last <data_range> files in the currently selected pipeline.
-    upload_raw(fns=[list-of-local-path-to-raw-file]) - Upload raw files to currently selected pipeline.
+    get_projects() - Returns a dataframe with information about all 
+        available projects on server.
+    get_pipelines(project_slug) - Returns list of pipelines in 
+        project space
+    get_qc_data(data_range=30) - Downloads the Quality Control data 
+        for the last <data_range> files in the currently selected 
+        pipeline.
+    upload_raw(fns=[list-of-local-path-to-raw-file]) - Upload raw files
+        to currently selected pipeline.
     download_maxquant_data() - ...
-    flag(fns=[list-of-local-path-to-raw-file]) - Set flags for files in list in currently selected pipeline.
-    unflag(fns=[list-of-local-path-to-raw-file]) - Unset flags for files in currently selected pipeline.
+    flag(fns=[list-of-local-path-to-raw-file]) - Set flags for files 
+        in list in currently selected pipeline.
+    unflag(fns=[list-of-local-path-to-raw-file]) - Unset flags for files
+        in currently selected pipeline.
 
     Example
     -------

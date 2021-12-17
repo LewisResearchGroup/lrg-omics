@@ -16,5 +16,3 @@ psims
 black
 coverage-badge
 pytest
-aiohttp
-nest_asyncio
