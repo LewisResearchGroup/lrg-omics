@@ -131,7 +131,6 @@ class MaxquantProteinQuantNormalizer:
                 .first()
                 .reset_index(level=protein_col)
             )
-            display(df)
 
         df = df.set_index(protein_col, append=True)
         df = df[intensity_cols[1:]]

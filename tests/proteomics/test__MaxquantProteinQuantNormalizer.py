@@ -38,8 +38,10 @@ def test__MaxquantProteinQuantNormalizer_all_ones_returns_all_zeros():
     norm = MaxquantProteinQuantNormalizer()
     df = generate_input()
     norm.df_protein_groups = df
-    result = norm.normalize()
-    expected = generate_result()
+    result = norm.normalize().astype(float)
+    expected = generate_result().astype(float)
+    print(result)
+    print(expected)
     assert result.equals(expected)
 
 
@@ -47,8 +49,10 @@ def test__MaxquantProteinQuantNormalizer_mean_removed():
     df = generate_input(generator=lambda r, c: 1 + (c * 2))
     norm = MaxquantProteinQuantNormalizer()
     norm.df_protein_groups = df
-    result = norm.normalize()
-    expected = generate_result()
+    result = norm.normalize().astype(float)
+    expected = generate_result().astype(float)
+    print(result)
+    print(expected)
     assert result.equals(expected)
 
 
@@ -69,5 +73,5 @@ def test__MaxquantProteinQuantNormalizer_same_results_one_or_more_files():
     result_multiple = output_multiple[
         output_multiple.index.get_level_values("RawFile") == "A"
     ]
-
+    
     assert result_single.equals(result_multiple)
