@@ -7,33 +7,50 @@ import logging
 from tqdm import tqdm
 from pathlib import Path as P
 
-import asyncio
-
-import aiohttp
-
-import nest_asyncio
-
 
 class ProteomicsQC:
     """
-    Python API to interact with the Proteomics QC pipeline.
+    Python API to interact with the Proteomics-QC pipeline server (PQC).
 
+    Parameters
+    ----------
+    host :  str, default='http://localhost:8000'
+    pid : str, default=None
+    uid : str, default=None
+    project_slug : str, default=None
+    pipeline_slug : str, default=None
+
+    Methods
     -------
-    Example:
+    get_projects() - Returns a dataframe with information about all available projects on server.
+    get_pipelines(project_slug) - Returns list of pipelines in project space
+    get_qc_data(data_range=30) - Downloads the Quality Control data for the last <data_range> files in the currently selected pipeline.
+    upload_raw(fns=[list-of-local-path-to-raw-file]) - Upload raw files to currently selected pipeline.
+    download_maxquant_data() - ...
+    flag(fns=[list-of-local-path-to-raw-file]) - Set flags for files in list in currently selected pipeline.
+    unflag(fns=[list-of-local-path-to-raw-file]) - Unset flags for files in currently selected pipeline.
 
+    Example
+    -------
     pqc = ProteomicsQC(
-                host='https://proteomics.resistancedb.org',
-                uid='your-user-uuid',     # Optional, required for upload of RAW files
-                pid='your-pipeline-uuid'  # Optional, required for upload of RAW files
-                )
+            host='https://proteomics.resistancedb.org',
+            uid='your-user-uuid',         # Optional, required for upload of RAW files
+            uid='your-pipeline-uuid'      # Optional, required for upload of RAW files
+            project_slug='project-slug'   
+            pipeline_slug='pipeline-slug'
+    )
 
     pqc.get_projects()
 
     pqc.get_pipelines(project='lsarp')
 
-    pqc.get_qc_data(project='lsarp', pipeline='staphylococcus-aureus-tmt11', data_range=100)
+    pqc.get_qc_data(data_range=100)
 
-    pqc.upload_raw(fns=[list-of-filenames])  # Requires uid and pid
+    pqc.upload_raw(fns=[list-of-filenames])  # Requires uid and pid set
+
+    pqc.flag(fns=[list-of-filenames])
+
+    pqc.unflag(fns=[list-of-filenames])
 
     """
 
@@ -55,8 +72,6 @@ class ProteomicsQC:
         self._project_slug = project_slug
         self._pipeline_slug = pipeline_slug
         self._qc_data = None
-        nest_asyncio.apply()
-        self._loop = asyncio.get_event_loop()
 
     def get_projects(self):
         url = f"{self._host}/api/projects"
@@ -76,9 +91,7 @@ class ProteomicsQC:
     ):
         url = f"{self._host}/api/mq/qc-data"
         headers = {"Content-type": "application/json"}
-        # if columns is None: columns = ['Index', 'Date', 'RawFile',  'DateAcquired',
-        #                               'Use Downstream','Flagged', 'N_protein_groups']
-
+        
         if project_slug is None:
             project_slug = self._project_slug
         if pipeline_slug is None:
