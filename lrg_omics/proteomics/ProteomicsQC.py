@@ -141,58 +141,27 @@ class ProteomicsQC:
                     if status_code == 201:
                         print(" success")
                     else:
-                        print(" failed ([{status_code}])")
+                        print(f" failed ([{status_code}])")
 
     def download_maxquant_data(self, project_slug, pipeline_slug, filename):
         url = f"{self._host}/api/download"
-        print(url)
 
     def flag(self, fns):
-        future = asyncio.ensure_future(self.change_flag(fns, "create"))
-        self._loop.run_until_complete(future)
+        self.change_flag(fns, "create")
 
     def unflag(self, fns):
-        future = asyncio.ensure_future(self.change_flag(fns, "delete"))
-        self._loop.run_until_complete(future)
+        self.change_flag(fns, "delete")
 
-    async def change_flag(self, fns, what):
-        fns = [P(fn).with_suffix(".raw").name for fn in fns]
-        print(fns)
-        tasks = []
-        async with aiohttp.ClientSession(
-            connector=aiohttp.TCPConnector(limit=2)
-        ) as session:
-            for fn in fns:
-                task = self._change_flag(fn, what, session)
-                tasks.append(task)
-            responses = await asyncio.gather(*tasks)
-        return responses
-
-    async def _change_flag(self, fn, what, session):
-        project_slug = self._project_slug
-        pipeline_slug = self._pipeline_slug
-        url = f"{self._host}/api/flag/{what}"
-        data = {
-            "project": project_slug,
-            "pipeline": pipeline_slug,
-            "user": self._user_uuid,
-            "raw_files": [fn],
-        }
-        async with session.post(url, data=data) as response:
-            response = asyncio.ensure_future(response.read())
-        return response
-
-    def flag_multi(self, fns, what):
+    def change_flags(self, fns, how):
+        if isinstance(fns, str): fns = [fns]
         fns = [P(fn).with_suffix(".raw").name for fn in fns]
         project_slug = self._project_slug
         pipeline_slug = self._pipeline_slug
-        url = f"{self._host}/api/flag/{what}"
+        url = f"{self._host}/api/flag/{how}"
         data = {
             "project": project_slug,
             "pipeline": pipeline_slug,
             "user": self._user_uuid,
             "raw_files": fns,
         }
-        print(data)
         response = requests.post(url, data=data)
-        print(response)
