@@ -147,10 +147,10 @@ class ProteomicsQC:
         url = f"{self._host}/api/download"
 
     def flag(self, fns):
-        self.change_flag(fns, "create")
+        self.change_flags(fns, "create")
 
     def unflag(self, fns):
-        self.change_flag(fns, "delete")
+        self.change_flags(fns, "delete")
 
     def change_flags(self, fns, how):
         if isinstance(fns, str): fns = [fns]
