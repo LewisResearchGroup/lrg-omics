@@ -121,7 +121,7 @@ class ProteomicsQC:
             fns = [fns]
         url = f"{self._host}/api/upload/raw"
         pipeline = self._pipeline_uuid
-        user = self._user_uuid
+        uid = self._user_uuid
 
         if (pipeline is None) or (user is None):
             logging.error(
@@ -132,7 +132,7 @@ class ProteomicsQC:
         for fn in tqdm(fns):
             with open(fn, "rb") as file:
                 files = {"orig_file": file}
-                data = {"pipeline": pipeline, "user": user}
+                data = {"pipeline": pipeline, "uid": user}
                 if self._verbose:
                     print(f"Uploading {fn}...", end="")
                 r = requests.post(url, files=files, data=data)
@@ -161,7 +161,23 @@ class ProteomicsQC:
         data = {
             "project": project_slug,
             "pipeline": pipeline_slug,
-            "user": self._user_uuid,
+            "uid": self._user_uuid,
             "raw_files": fns,
         }
         response = requests.post(url, data=data)
+
+    def rawfile(self, fns, action):
+        if isinstance(fns, str): fns = [fns]
+        fns = [P(fn).with_suffix(".raw").name for fn in fns]
+        project_slug = self._project_slug
+        pipeline_slug = self._pipeline_slug
+        url = f"{self._host}/api/rawfile"
+        data = {
+            "project": project_slug,
+            "pipeline": pipeline_slug,
+            "uid": self._user_uuid,
+            "raw_files": fns,
+            "action": action
+        }
+        response = requests.post(url, data=data)
+        return response.json()
