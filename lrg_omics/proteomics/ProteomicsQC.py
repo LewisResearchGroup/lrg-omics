@@ -120,7 +120,7 @@ class ProteomicsQC:
         if isinstance(fns, str):
             fns = [fns]
         url = f"{self._host}/api/upload/raw"
-        pipeline = self._pipeline_uuid
+        pid = self._pipeline_uuid
         uid = self._user_uuid
 
         if (pipeline is None) or (user is None):
@@ -132,7 +132,7 @@ class ProteomicsQC:
         for fn in tqdm(fns):
             with open(fn, "rb") as file:
                 files = {"orig_file": file}
-                data = {"pipeline": pipeline, "uid": user}
+                data = {"pid": pid, "uid": uid}
                 if self._verbose:
                     print(f"Uploading {fn}...", end="")
                 r = requests.post(url, files=files, data=data)
