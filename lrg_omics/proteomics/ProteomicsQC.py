@@ -123,7 +123,7 @@ class ProteomicsQC:
         pid = self._pipeline_uuid
         uid = self._user_uuid
 
-        if (pipeline is None) or (user is None):
+        if (pid is None) or (uid is None):
             logging.error(
                 "Please, initiate D3PO with user_uuid "
                 "and pipeline_uuid to submit RAW files."
