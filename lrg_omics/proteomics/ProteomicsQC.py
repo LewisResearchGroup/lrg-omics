@@ -87,7 +87,7 @@ class ProteomicsQC:
         return self.projects
 
     def get_pipelines(self, project_slug):
-        url = f"{self._host}/api/mq/pipelines"
+        url = f"{self._host}/api/pipelines"
         headers = {"Content-type": "application/json"}
         data = json.dumps(dict(project=project_slug))
         r = requests.post(url, data=data, headers=headers).json()
@@ -96,7 +96,7 @@ class ProteomicsQC:
     def get_qc_data(
         self, project_slug=None, pipeline_slug=None, columns=None, data_range=30
     ):
-        url = f"{self._host}/api/mq/qc-data"
+        url = f"{self._host}/api/qc-data"
         headers = {"Content-type": "application/json"}
         
         if project_slug is None:
