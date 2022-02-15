@@ -3,7 +3,13 @@ from matplotlib import pyplot as plt
 
 
 def plot_metabolomics_hist2d(
-    df, figsize=(10, 10), dpi=300, set_dim=True, cmap="binary"
+    df,
+    figsize=(10, 10),
+    dpi=300,
+    set_dim=True,
+    cmap="binary",
+    rt_range=(0, 15),
+    mz_range=(0, 1000),
 ):
 
     if set_dim:
@@ -17,7 +23,7 @@ def plot_metabolomics_hist2d(
         vmin=1,
         vmax=20,
         cmap=cmap,
-        range=([0, 15], [0, 1000]),
+        range=(rt_range, mz_range),
     )
 
     plt.xlabel("Retention Time [min]")
