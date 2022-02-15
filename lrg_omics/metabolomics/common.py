@@ -128,7 +128,7 @@ def classic_lstsqr(x_list, y_list):
     var_x, cov_xy = 0, 0
     for x, y in zip(x_list, y_list):
         temp = x - x_avg
-        var_x += temp ** 2
+        var_x += temp**2
         cov_xy += temp * (y - y_avg)
     slope = 1.0
     y_interc = y_avg - slope * x_avg

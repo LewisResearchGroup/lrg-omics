@@ -22,17 +22,17 @@ class ProteomicsQC:
 
     Methods
     -------
-    get_projects() - Returns a dataframe with information about all 
+    get_projects() - Returns a dataframe with information about all
         available projects on server.
-    get_pipelines(project_slug) - Returns list of pipelines in 
+    get_pipelines(project_slug) - Returns list of pipelines in
         project space
-    get_qc_data(data_range=30) - Downloads the Quality Control data 
-        for the last <data_range> files in the currently selected 
+    get_qc_data(data_range=30) - Downloads the Quality Control data
+        for the last <data_range> files in the currently selected
         pipeline.
     upload_raw(fns=[list-of-local-path-to-raw-file]) - Upload raw files
         to currently selected pipeline.
     download_maxquant_data() - ...
-    flag(fns=[list-of-local-path-to-raw-file]) - Set flags for files 
+    flag(fns=[list-of-local-path-to-raw-file]) - Set flags for files
         in list in currently selected pipeline.
     unflag(fns=[list-of-local-path-to-raw-file]) - Unset flags for files
         in currently selected pipeline.
@@ -43,7 +43,7 @@ class ProteomicsQC:
             host='https://proteomics.resistancedb.org',
             uid='your-user-uuid',         # Optional, required for upload of RAW files
             uid='your-pipeline-uuid'      # Optional, required for upload of RAW files
-            project_slug='project-slug'   
+            project_slug='project-slug'
             pipeline_slug='pipeline-slug'
     )
 
@@ -98,7 +98,7 @@ class ProteomicsQC:
     ):
         url = f"{self._host}/api/qc-data"
         headers = {"Content-type": "application/json"}
-        
+
         if project_slug is None:
             project_slug = self._project_slug
         if pipeline_slug is None:
@@ -153,7 +153,8 @@ class ProteomicsQC:
         self.change_flags(fns, "delete")
 
     def change_flags(self, fns, how):
-        if isinstance(fns, str): fns = [fns]
+        if isinstance(fns, str):
+            fns = [fns]
         fns = [P(fn).with_suffix(".raw").name for fn in fns]
         project_slug = self._project_slug
         pipeline_slug = self._pipeline_slug
@@ -167,7 +168,8 @@ class ProteomicsQC:
         response = requests.post(url, data=data)
 
     def rawfile(self, fns, action):
-        if isinstance(fns, str): fns = [fns]
+        if isinstance(fns, str):
+            fns = [fns]
         fns = [P(fn).with_suffix(".raw").name for fn in fns]
         project_slug = self._project_slug
         pipeline_slug = self._pipeline_slug
@@ -177,7 +179,7 @@ class ProteomicsQC:
             "pipeline": pipeline_slug,
             "uid": self._user_uuid,
             "raw_files": fns,
-            "action": action
+            "action": action,
         }
         response = requests.post(url, data=data)
         return response.json()

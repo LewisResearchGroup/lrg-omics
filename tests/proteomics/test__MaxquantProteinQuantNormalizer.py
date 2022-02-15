@@ -73,5 +73,5 @@ def test__MaxquantProteinQuantNormalizer_same_results_one_or_more_files():
     result_multiple = output_multiple[
         output_multiple.index.get_level_values("RawFile") == "A"
     ]
-    
+
     assert result_single.equals(result_multiple)

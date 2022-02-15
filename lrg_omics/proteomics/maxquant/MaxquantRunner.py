@@ -26,13 +26,13 @@ class MaxquantRunner:
         output_dir=None,
     ):
         """
-        Runs MaxQuant jobs using a mqpar.txt template, 
+        Runs MaxQuant jobs using a mqpar.txt template,
         a fasta file, and a .RAW file as input. It
-        performes the calculations in the run-directory and 
-        then moves the results to the output directory. 
+        performes the calculations in the run-directory and
+        then moves the results to the output directory.
         It also creates a batch submission file for
         the slurm queing system.
-        
+
         ARGS
         ----
 
@@ -101,7 +101,7 @@ class MaxquantRunner:
         raw_file: str|pathlib.Path, path to a proteomics.raw file
         cold_run: bool, default=False
             * True: do not execute, only return the commands
-            * False: 
+            * False:
         rerun: bool, default=False
             * True: execute even if output-dir is already present, and replace results
             * False: ommit run, if output-dir exists
