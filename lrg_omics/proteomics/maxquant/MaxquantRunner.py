@@ -25,6 +25,33 @@ class MaxquantRunner:
         verbose=False,
         output_dir=None,
     ):
+        """
+        Runs MaxQuant jobs using a mqpar.txt template, 
+        a fasta file, and a .RAW file as input. It
+        performes the calculations in the run-directory and 
+        then moves the results to the output directory. 
+        It also creates a batch submission file for
+        the slurm queing system.
+        
+        ARGS
+        ----
+
+        fasta_file: str|pathlib.Path, absolute path to a fasta file
+        mqpar_file: str|pathlib.Path, absolute path to a mqpar.xml template file
+        maxquantcmd: str, command to run maxquant
+            - Example: '/usr/bin/mono ~/software/MaxQuant/bin/MaxQuantCmd.exe'
+        run_dir: str|pathlib.Path, path to the run-directory
+        out_dir: str|pathlib.Path, path to the output-diretory
+        add_raw_name_to_outdir: bool, default=False
+            * True: store files in a subdirectory of output-directory: <output-dir>/<name-of-raw-file>/
+            * False: store files in output directory without sub-directory: <output-dir>/
+        add_uuid_to_rundir: bool, default=False
+        sbatch_cmds: additional commands to add to the sbatch.file
+            - Example: 'conda activate myenv\\nMYENV=test'
+        cleanup: bool, default=False
+            * True: removes the files in the run directory when run finishes
+            * False: keep the run files, e.g. for debugging
+        """
 
         if output_dir is not None:
             logging.warning('"output_dir" is deprecated use "out_dir" instead.')
@@ -67,7 +94,24 @@ class MaxquantRunner:
         run=True,
         with_time=True,
     ):
-
+        """
+        Executes MaxQuant run or only prepares output and run directories.
+        ARGS
+        ----
+        raw_file: str|pathlib.Path, path to a proteomics.raw file
+        cold_run: bool, default=False
+            * True: do not execute, only return the commands
+            * False: 
+        rerun: bool, default=False
+            * True: execute even if output-dir is already present, and replace results
+            * False: ommit run, if output-dir exists
+        submit: bool, default=False
+            * True: submit batch-file to slurm queing system
+            * False: do not submit batch-file
+        with_time: bool, default=True
+            * True: time the MaxQuant run using /usr/bin/time
+            * False: do not time MaxQuant execution
+        """
         raw_file = abspath(raw_file)
         if raw_file.lower().endswith(".raw"):
             raw_label = basename(raw_file[:-4])
