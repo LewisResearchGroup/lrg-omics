@@ -2,6 +2,7 @@ import os
 
 from . import metabolomics
 from . import proteomics
+from . import db
 
 from ._version import get_versions
 
