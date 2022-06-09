@@ -1,6 +1,6 @@
-![](images/coverage.svg)
-[![Python version](https://img.shields.io/badge/Python-3.8-blue?style=plastic)](https://www.python.org/)
 [![GitHub Actions Status](https://github.com/LSARP/lrg-omics/actions/workflows/python-package.yml/badge.svg?branch=develop)](https://github.com/LSARP/lrg-omics/actions/?query=workflow)
+[![Python version](https://img.shields.io/badge/Python-3.8-blue?style=plastic)](https://www.python.org/)
+![](images/coverage.svg)
 [![Documentation Status](https://readthedocs.org/projects/lrg-omics/badge?/?version=stable)](https://lsarp.github.io/lrg-omics/?badge=stable)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/LewisResearchGroup/lrg-omics.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/lrg-omics/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/LewisResearchGroup/lrg-omics.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LewisResearchGroup/lrg-omics/context:python)
