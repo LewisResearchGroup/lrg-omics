@@ -7,11 +7,11 @@ def combine_fasta_files(fn_a, fn_b, output_fn='combined.faa', prefix_a='REF__', 
 
     sequences = []
 
-    for record in records_ref:
+    for record in records_a:
         record.id = prefix_a+record.id
         sequences.append(record)
                         
-    for record in records_search:
+    for record in records_b:
         record.id = prefix_b+record.id
         sequences.append(record)
 
