@@ -245,7 +245,7 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
             }
             result.update(dict_info_qc3)
         except Exception as e:
-            logging.error('{e}: in maxquant_qc_protein_groups()')
+            logging.error(f'{e}: in maxquant_qc_protein_groups()')
     else:
         dict_info_qc3 = {
             "N_of_Protein_qc_pepts": "not detected",
