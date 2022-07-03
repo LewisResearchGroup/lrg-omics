@@ -104,6 +104,8 @@ def maxquant_qc_csv(
         df = pd.read_csv(abs_path)
     else:
         df = maxquant_qc(txt_path)
+        if df is None:
+            return None
         if out_fn is not None:
             df.to_csv(abs_path, index=False)
     df = df.reindex(columns=expected_columns)
@@ -219,29 +221,31 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
 
     df_qc3 = df[df["Protein IDs"].str.contains(protein[0], na=False, case=True)]
     if len(df_qc3) != 0:
-        dict_info_qc3 = {
-            "N_of_Protein_qc_pepts": df_qc3["Peptide counts (all)"].to_list(),
-            "N_Protein_qc_missing_values": df_qc3.filter(
-                regex="Reporter intensity corrected"
-            )
-            .replace(np.nan, 0)
-            .isin([0])
-            .sum()
-            .to_list(),
-            "reporter_intensity_corrected_Protein_qc_ave": float(
-                df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1)
-            ),
-            "reporter_intensity_corrected_Protein_qc_sd": float(
-                df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
-            ),
-            "reporter_intensity_corrected_Protein_qc_cv": float(
-                df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
-            )
-            / float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
-            * 100,
-        }
-
-        result.update(dict_info_qc3)
+        try:
+            dict_info_qc3 = {
+                "N_of_Protein_qc_pepts": df_qc3["Peptide counts (all)"].to_list(),
+                "N_Protein_qc_missing_values": df_qc3.filter(
+                    regex="Reporter intensity corrected"
+                )
+                .replace(np.nan, 0)
+                .isin([0])
+                .sum()
+                .to_list(),
+                "reporter_intensity_corrected_Protein_qc_ave": float(
+                    df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1)
+                ),
+                "reporter_intensity_corrected_Protein_qc_sd": float(
+                    df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
+                ),
+                "reporter_intensity_corrected_Protein_qc_cv": float(
+                    df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
+                )
+                / float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
+                * 100,
+            }
+            result.update(dict_info_qc3)
+        except Exception as e:
+            logging.error('{e}: in maxquant_qc_protein_groups()')
     else:
         dict_info_qc3 = {
             "N_of_Protein_qc_pepts": "not detected",

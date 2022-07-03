@@ -34,6 +34,7 @@ def load_maxquant_data_from(path="/var/www/html/proteomics/files/"):
         return None
     df = collect_maxquant_qc_data(path)
     if df is None:
+        logging.warning("Got no data from: {path}")
         return None
     df.index = df.iloc[::-1].index
     df.reset_index(inplace=True)
