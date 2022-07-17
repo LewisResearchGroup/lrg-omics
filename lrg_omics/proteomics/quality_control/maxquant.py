@@ -224,15 +224,30 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
     if len(df_qc3) != 0:
         dict_info_qc3 = {
             "Protein_qc": protein[0],
-            "N_of_Protein_qc_pepts": ";".join([str(x) for x in df_qc3['Peptide counts (all)'].to_list()]),
-            "N_Protein_qc_missing_values": ";".join([str(x) for x in df_qc3.filter(regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()]),
+            "N_of_Protein_qc_pepts": ";".join(
+                [str(x) for x in df_qc3["Peptide counts (all)"].to_list()]
+            ),
+            "N_Protein_qc_missing_values": ";".join(
+                [
+                    str(x)
+                    for x in df_qc3.filter(regex="Reporter intensity corrected")
+                    .replace(np.nan, 0)
+                    .isin([0])
+                    .sum()
+                    .to_list()
+                ]
+            ),
             "reporter_intensity_corrected_Protein_qc_ave": float(
-                df_qc3.filter(regex='Reporter intensity corrected').mean(axis=1)),
+                df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1)
+            ),
             "reporter_intensity_corrected_Protein_qc_sd": float(
-                df_qc3.filter(regex='Reporter intensity corrected').std(axis=1, ddof=0)),
+                df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
+            ),
             "reporter_intensity_corrected_Protein_qc_cv": float(
-                df_qc3.filter(regex='Reporter intensity corrected').std(axis=1, ddof=0)) / float(df_qc3.filter(
-                regex='Reporter intensity corrected').mean(axis=1)) * 100
+                df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
+            )
+            / float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
+            * 100,
         }
 
         result.update(dict_info_qc3)
@@ -319,24 +334,37 @@ def maxquant_qc_evidence(txt_path, pept_list=None):
     }
 
     if pept_list is None:
-        pept_list = ['HVLTSIGEK', 'LTILEELR', 'ATEEQLK', 'AEFVEVTK', 'QTALVELLK', 'TVMENFVAFVDK']
+        pept_list = [
+            "HVLTSIGEK",
+            "LTILEELR",
+            "ATEEQLK",
+            "AEFVEVTK",
+            "QTALVELLK",
+            "TVMENFVAFVDK",
+        ]
     elif len(pept_list) < 6:
-        pept_list = pept_list + (6 - len(pept_list)) * ['dummy_peptide']
+        pept_list = pept_list + (6 - len(pept_list)) * ["dummy_peptide"]
     elif len(pept_list) > 6:
         pept_list = pept_list[:6]
-
 
     for i in pept_list:
         df_pept = df[df.Sequence == i]
         if not df_pept.empty:
-            charges = ";".join([str(x) for x in df_pept['Charge'].to_list()])
+            charges = ";".join([str(x) for x in df_pept["Charge"].to_list()])
             df_pept = df_pept[df.Intensity == df_pept.Intensity.max()]
             dict_info_qc = {
                 f"qc{pept_list.index(i) + 1}_peptide": i,
                 f"qc{pept_list.index(i) + 1}_peptide_charges": charges,
-                f"N_qc{pept_list.index(i) + 1}_missing_values": ";".join([str(x) for x in df_pept.filter(
-                    regex='Reporter intensity corrected').replace(np.nan, 0).isin([0]).sum().to_list()]),
-                    
+                f"N_qc{pept_list.index(i) + 1}_missing_values": ";".join(
+                    [
+                        str(x)
+                        for x in df_pept.filter(regex="Reporter intensity corrected")
+                        .replace(np.nan, 0)
+                        .isin([0])
+                        .sum()
+                        .to_list()
+                    ]
+                ),
                 f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_ave": float(
                     df_pept.filter(regex="Reporter intensity corrected").mean(axis=1)
                 ),
