@@ -26,7 +26,7 @@ jobs:
 
     - name: Setup DVC?
       uses: iterative/setup-cml@v1    
-    - name: Pull data with DVC
+    - name: Pull test data with DVC
       run:
         dvc pull -r storage
       env:
