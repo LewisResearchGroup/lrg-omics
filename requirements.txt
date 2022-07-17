@@ -16,3 +16,4 @@ psims
 black
 coverage-badge
 pytest
+dvc[gdrive]
