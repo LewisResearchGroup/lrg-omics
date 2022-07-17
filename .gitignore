@@ -1,11 +1,10 @@
-lrg_omics_test_data
+!.dvc
 .localhistory
 .ipynb_checkpoints
 .*.ipynb
 .pytest_cache
 *egg-info*
 __pycache__
-.*
 devel
 output
 build
@@ -16,3 +15,4 @@ Untitled*.ipynb
 nohup.out 
 run
 combined
+.coverage
