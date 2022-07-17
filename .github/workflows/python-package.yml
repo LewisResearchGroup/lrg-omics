@@ -20,7 +20,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: iterative/setup-cml@v1
+    - uses: iterative/setup-cml@v1    
+    - name: Pull data with DVC
+      run:
+        dvc pull -r storage
+      env:
+        GDRIVE_CREDENTIALS_DATA : ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -39,7 +44,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        dvc pull -r storage
         pytest
-      env:
-        GDRIVE_CREDENTIALS_DATA : ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
