@@ -27,11 +27,11 @@ jobs:
     - name: Setup DVC?
       uses: iterative/setup-cml@v1    
     - name: Pull test data with DVC
-      run:
+      run: |
+        pip install -U dvc[gdrive] pydrive2
         dvc pull -r storage
       env:
         GDRIVE_CREDENTIALS_DATA : ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
