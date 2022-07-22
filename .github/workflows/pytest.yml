@@ -29,7 +29,7 @@ jobs:
     - name: Pull test data with DVC
       run: |
         pip install -U dvc[gdrive] pydrive2
-        dvc pull -r storage
+        dvc pull
       env:
         GDRIVE_CREDENTIALS_DATA : ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
     - name: Install dependencies
