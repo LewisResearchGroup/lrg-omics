@@ -5,7 +5,7 @@ name: PyTest
 
 on:
   push:
-    branches: [ develop, master, dvc]
+    branches: [ develop, master, tidy-up]
   pull_request:
     branches: [ develop, master ]
 
