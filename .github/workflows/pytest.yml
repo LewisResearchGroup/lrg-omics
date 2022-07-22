@@ -30,7 +30,7 @@ jobs:
       run: |
         pip install -U dvc[gdrive] pydrive2
         dvc doctor
-        dvc pull
+        dvc pull -v
       env:
         GDRIVE_CREDENTIALS_DATA : ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}       
