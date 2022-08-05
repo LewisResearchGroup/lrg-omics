@@ -29,6 +29,7 @@ jobs:
     - name: Pull test data with DVC
       run: |
         pip install -U dvc[gdrive] pydrive2
+        dvc remote modify storage gdrive_service_account_json_file_path .dvc/lrg-omics-f94be8f80556.json
         dvc doctor
         dvc pull -v
       env:
