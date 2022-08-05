@@ -1,7 +1,7 @@
 from os.path import isfile, join, abspath
 from glob import glob
 
-from lrg_omics.proteomics.pipelines.maxquant import run_maxquant
+from lrg_omics.proteomics.maxquant.pipeline import run_maxquant
 
 PATH = abspath(join("tests", "data"))
 
