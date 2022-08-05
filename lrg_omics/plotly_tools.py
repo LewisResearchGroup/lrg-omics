@@ -9,6 +9,9 @@ import plotly.express as px
 import dash_table as dt
 
 
+COLORS = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
+
+
 def set_template():
     pio.templates["draft"] = go.layout.Template(
         layout=dict(font={"size": 10}, margin=dict(l=50, r=0, t=100, b=100))
@@ -126,10 +129,9 @@ def plotly_table(df):
         style_cell={"font_size": "10px", "padding-left": "1em", "padding-right": "1em"},
     )
 
-COLORS = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
 
 def lines_plot(rawtools_matrix, cols, colors=None, title=None, **kwargs):
-    if colors is None: 
+    if colors is None:
         colors = COLORS
     fig = go.Figure()
     for i, col in enumerate(cols):
@@ -158,7 +160,7 @@ def histograms(rawtools_matrix, cols=None, title=None, colors=None):
     if cols is None:
         cols = ["ParentIonMass"]
     if colors is None:
-        color = COLORS
+        colors = COLORS
     fig = go.Figure()
     if len(cols) == 1:
         fig.update_layout(title=cols[0])
