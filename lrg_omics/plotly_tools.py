@@ -154,9 +154,11 @@ def lines_plot(rawtools_matrix, cols, colors=None, title=None, **kwargs):
     return fig
 
 
-def histograms(rawtools_matrix, cols=None, title=None, colors=colors):
+def histograms(rawtools_matrix, cols=None, title=None, colors=None):
     if cols is None:
         cols = ["ParentIonMass"]
+    if colors is None:
+        color = COLORS
     fig = go.Figure()
     if len(cols) == 1:
         fig.update_layout(title=cols[0])
