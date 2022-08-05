@@ -126,9 +126,11 @@ def plotly_table(df):
         style_cell={"font_size": "10px", "padding-left": "1em", "padding-right": "1em"},
     )
 
-colors = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
+COLORS = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
 
-def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
+def lines_plot(rawtools_matrix, cols, colors=None, title=None, **kwargs):
+    if colors is None: 
+        colors = COLORS
     fig = go.Figure()
     for i, col in enumerate(cols):
         fig.add_trace(
@@ -152,7 +154,9 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
     return fig
 
 
-def histograms(rawtools_matrix, cols=["ParentIonMass"], title=None, colors=colors):
+def histograms(rawtools_matrix, cols=None, title=None, colors=colors):
+    if cols is None:
+        cols = ["ParentIonMass"]
     fig = go.Figure()
     if len(cols) == 1:
         fig.update_layout(title=cols[0])
