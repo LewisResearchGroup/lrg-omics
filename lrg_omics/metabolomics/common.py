@@ -21,7 +21,9 @@ def mode_to_none(value):
 
 
 def metadata_from_filename(filename):
-    """Function to extract the information contained in the file names"""
+    """
+    Function to extract the information contained in the file names
+    """
 
     base = os.path.basename(filename)
 
@@ -76,7 +78,9 @@ def metadata_from_filename(filename):
 
 
 def read_plate(path, worklist):
-    """Function to read the files in a plate and organize them as a dataframe"""
+    """
+    Function to read the files in a plate and organize them as a dataframe.
+    """
 
     filenames = [os.path.basename(x) for x in glob.glob(path + "/*.mzXML")]
     frames = []
@@ -95,7 +99,9 @@ def read_plate(path, worklist):
 
 
 def read_plate_2(plate, path, worklist):
-    """Function to read the files in a plate and organize them as a dataframe"""
+    """
+    Function to read the files in a plate and organize them as a dataframe.
+    """
 
     filenames = [
         os.path.basename(x) for x in glob.glob(path + "/*" + plate + "*.mzXML")
@@ -118,7 +124,8 @@ def read_plate_2(plate, path, worklist):
 
 
 def classic_lstsqr(x_list, y_list):
-    """Computes the least-squares solution to a linear matrix equation by fixing the slope to 1
+    """
+    Computes the least-squares solution to a linear matrix equation by fixing the slope to 1
     its suitable to work on the log-scale.
     """
 
@@ -143,8 +150,10 @@ def classic_lstsqr(x_list, y_list):
 
 
 def find_linear_range(x, y, th):
-    """this algorith searches the range of x values in which the data behaves linearly with slope 1"""
-    """ suitable to work on the log-scale """
+    """
+    This algorith searches the range of x values in which the data behaves linearly with slope 1
+    suitable to work on the log-scale
+    """
     x_c = x
     y_c = y
     y_intercept, res, r_ini, r_last = classic_lstsqr(x_c, y_c)

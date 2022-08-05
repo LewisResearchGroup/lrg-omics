@@ -6,7 +6,7 @@ from uuid import uuid1
 from pathlib import Path as P
 import logging
 
-from ..common import maybe_create_symlink
+from ...common import maybe_create_symlink
 from .MqparParser import MqparParser
 
 
