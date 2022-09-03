@@ -1,7 +1,7 @@
 import os
 import logging
 
-from .rawtools.quality_control import collect_rawtools_qc_data
+from .rawtools.rawtools import collect_rawtools_qc_data
 from .maxquant.quality_control import collect_maxquant_qc_data
 
 

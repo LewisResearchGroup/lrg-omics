@@ -5,7 +5,7 @@ from os.path import isdir, isfile, dirname, abspath, join
 from glob import glob
 from pathlib import Path as P
 
-from ..common import relative_path, maybe_create_symlink, get_all_raws
+from ...common import relative_path, maybe_create_symlink, get_all_raws
 
 
 def collect_rawtools_qc_data(root_path):
