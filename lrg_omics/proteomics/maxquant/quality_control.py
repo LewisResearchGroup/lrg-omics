@@ -105,8 +105,8 @@ def maxquant_qc_csv(
     else:
         df = maxquant_qc(txt_path)
         if df is None:
+            logging.warning(f'maxquant_qc_csv(): No data generated from {txt_path}')
             return None
-
         if out_fn is not None:
             df.to_csv(abs_path, index=False)
     df = df.reindex(columns=expected_columns)
@@ -130,17 +130,14 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
     if isfile(meta_json):
         meta = pd.read_json(meta_json, typ="series")
         dfs.append(meta)
-    try:
-        for df in [
-            maxquant_qc_summary(txt_path),
-            maxquant_qc_protein_groups(txt_path, protein),
-            maxquant_qc_peptides(txt_path),
-            maxquant_qc_msmScans(txt_path),
-            maxquant_qc_evidence(txt_path, pept_list),
-        ]:
-            dfs.append(df)
-    except Exception as e:
-        logging.error(e)
+    for df in [
+        maxquant_qc_summary(txt_path),
+        maxquant_qc_protein_groups(txt_path, protein),
+        maxquant_qc_peptides(txt_path),
+        maxquant_qc_msmScans(txt_path),
+        maxquant_qc_evidence(txt_path, pept_list),
+    ]:
+        dfs.append(df)
     if len(dfs) == 0:
         return None
     df = pd.concat(dfs, sort=False).to_frame().T
