@@ -1,4 +1,4 @@
-[![GitHub Actions Status](https://github.com/LSARP/lrg-omics/actions/workflows/python-package.yml/badge.svg?branch=develop)](https://github.com/LSARP/lrg-omics/actions/?query=workflow)
+[![Python Package](https://github.com/LewisResearchGroup/lrg-omics/actions/workflows/pytest.yml/badge.svg)](https://github.com/LewisResearchGroup/lrg-omics/actions/workflows/pytest.yml)
 [![Python version](https://img.shields.io/badge/Python-3.8-blue?style=plastic)](https://www.python.org/)
 ![](images/coverage.svg)
 [![Documentation Status](https://readthedocs.org/projects/lrg-omics/badge?/?version=stable)](https://lsarp.github.io/lrg-omics/?badge=stable)
