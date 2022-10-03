@@ -215,7 +215,7 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
         result.update(dic_m_v)
 
     if protein is None:
-        protein = ["BSA"]
+        protein = ["QC3_BSA"]  # name must be unique, otherwise generates a df with more than one row and ends up in error
 
     df_qc3 = df[df["Protein IDs"].str.contains(protein[0], na=False, case=True)]
     if len(df_qc3) != 0:
