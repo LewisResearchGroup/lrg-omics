@@ -1,7 +1,6 @@
 lxml
 pandas
 matplotlib
-scikit-learn
 tables
 xlrd
 openpyxl
