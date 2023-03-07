@@ -1,8 +1,8 @@
 import os
 import logging
 
-from .quality_control.rawtools import collect_rawtools_qc_data
-from .quality_control.maxquant import collect_maxquant_qc_data
+from .rawtools.quality_control import collect_rawtools_qc_data
+from .maxquant.quality_control import collect_maxquant_qc_data
 
 
 def load_rawtools_data_from(path="/var/www/html/proteomics/files/raw"):

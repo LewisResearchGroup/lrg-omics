@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from lrg_omics.proteomics.quality_control.maxquant import (
+from lrg_omics.proteomics.maxquant.quality_control import (
     maxquant_qc,
     maxquant_qc_summary,
     maxquant_qc_protein_groups,
