@@ -69,3 +69,19 @@ options:
   --cleanup             Remove run directory after running MaxQuant
   --verbose
 ```
+
+
+## lrg_mzML2mzMLb.py
+
+A script that can be used to convert metabolomics `mzML` files to `mzMLb` format.
+
+```
+usage: lrg_mzML2mzMLb.py [-h] [-i INPUT] [-o OUTPUT] [-d OUTPUT_DIRECTORY]
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+  -o OUTPUT, --output OUTPUT
+  -d OUTPUT_DIRECTORY, --output-directory OUTPUT_DIRECTORY
+```
+
