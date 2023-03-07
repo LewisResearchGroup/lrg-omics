@@ -41,7 +41,7 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 
 ## lrg_run_maxquant.py
 
-A script to run MaxQuant runs from the Linux command line.
+A script to run MaxQuant runs from the Linux command line. The script can be used to on SLURM HPC clusters to create and submit jobs. The job is executed in the temporary directory `--run-dir` and then the only the results are copied to the output directory `--out-dir`. By default a unique id is added to the rundir name and the run is executed in a subdirectory of `--run-dir` which is the name of the .RAW file that is going to be processed. This way many files can be processed with the same settings without confusing the results. One limitation of the script is that it expects exactly one .RAW file per run. It is not tested for multiple .RAW files at once. If you have installed MaxQuant with `conda`, the you can use `--maxquantcmd maxquant`. You can run any version of MaxQuant using `mono`. In that case the command loosk like `--maxquantcmd "mono /path/to/MaxQuantCmd.exe". Note that, not every `mono` version works with every `MaxQuant` version.
 
 ```
 usage: lrg_run_maxquant.py [-h] --raw [RAW ...] --fasta FASTA --mqpar MQPAR [--run-dir RUN_DIR] [--out-dir OUT_DIR] [--cold-run] [--rerun] [--submit] [--batch-cmd BATCH_CMD] --maxquantcmd MAXQUANTCMD [--add-raw-name-to-outdir]
