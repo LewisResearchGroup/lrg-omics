@@ -25,4 +25,3 @@ typing-extensions<5.0
 graphviz
 joblib~=1.0.1
 pyLDAvis
-psims

@@ -36,6 +36,10 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 - Luis Ponce Alvares
 - Estefania Barreto-Ojeda (@ojeda-e)
 
+# Release notes
+
+- Support for Python 3.6 and 3.7 was dropped.
+
 
 # Scripts
 
@@ -83,5 +87,34 @@ options:
   -i INPUT, --input INPUT
   -o OUTPUT, --output OUTPUT
   -d OUTPUT_DIRECTORY, --output-directory OUTPUT_DIRECTORY
+```
+
+## lrg_thermo_worklist_converter.py
+
+Command line tool to extract data from ThermoFisher instrument worklists.
+
+```
+Usage: cat [OPTION]... [FILE]...
+Concatenate FILE(s) to standard output.
+
+With no FILE, or when FILE is -, read standard input.
+
+  -A, --show-all           equivalent to -vET
+  -b, --number-nonblank    number nonempty output lines, overrides -n
+  -e                       equivalent to -vE
+  -E, --show-ends          display $ at end of each line
+  -n, --number             number all output lines
+  -s, --squeeze-blank      suppress repeated empty output lines
+  -t                       equivalent to -vT
+  -T, --show-tabs          display TAB characters as ^I
+  -u                       (ignored)
+  -v, --show-nonprinting   use ^ and M- notation, except for LFD and TAB
+      --help     display this help and exit
+      --version  output version information and exit
+
+Examples:
+  cat f - g  Output f's contents, then standard input, then g's contents.
+  cat        Copy standard input to standard output.
+
 ```
 
