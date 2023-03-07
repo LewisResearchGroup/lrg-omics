@@ -89,7 +89,7 @@ options:
   -d OUTPUT_DIRECTORY, --output-directory OUTPUT_DIRECTORY
 ```
 
-## lrg_thermo_worklist_converter.py
+## lrg_thermo_worklist_parser.py
 
 Command line tool to extract data from ThermoFisher instrument worklists.
 
