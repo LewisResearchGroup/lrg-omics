@@ -73,7 +73,7 @@ options:
 
 ## lrg_mzML2mzMLb.py
 
-A script that can be used to convert metabolomics `mzML` files to `mzMLb` format.
+A script that can be used to convert metabolomics `mzML` files to `mzMLb` format. The script uses the `psims` library.
 
 ```
 usage: lrg_mzML2mzMLb.py [-h] [-i INPUT] [-o OUTPUT] [-d OUTPUT_DIRECTORY]
