@@ -14,7 +14,7 @@ install_requires = []
 scripts = [
     "scripts/lrg_run_maxquant.py",
     "scripts/lrg_metabolomics_metadata_from_worklist.py",
-    "scripts/lrg_pd_convert.py",
+    "scripts/lrg_thermo_worklist_converter.py",
     "scripts/lrg_fake_maxquant.sh",
     "scripts/lrg_get_maxquant_qc_data_from_path.py",
     "scripts/lrg_get_rawtools_qc_data_from_path.py",
