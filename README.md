@@ -118,3 +118,17 @@ Examples:
 
 ```
 
+## Metabolomics
+
+
+    from lrg_omics.metabolomics.Eatogram import Eatogram
+    eatogram = Eatogram('input/230420-MINT__LSARP-FAES__results.csv',  # MINT results table
+                        'input/230420-MINT__LSARP-FAES__metadata.csv', # MINT metadata table
+                        'E. faecium')
+    eatogram.run()
+    plt.title('$E. faecium$')
+    
+    
+![](./images/eatogram.png)    
+
+
