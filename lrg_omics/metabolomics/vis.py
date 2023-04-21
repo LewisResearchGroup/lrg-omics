@@ -2,7 +2,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
 def plot_metabolomics_hist2d(
     df,
     figsize=(10, 10),
@@ -17,13 +16,13 @@ def plot_metabolomics_hist2d(
         plt.figure(figsize=figsize, dpi=dpi)
 
     if mz_range is None:
-        mz_range = ( df.mz.min(), df.mz.max())
-    
-    if rt_range is None:
-        rt_range = ( df.scan_time.min(), df.scan_time.max())
+        mz_range = (df.mz.min(), df.mz.max())
 
-    rt_bins = int( (rt_range[1] - rt_range[0])/2 )
-    #mz_bins = int(mz_range[1] - mz_range[0])*100
+    if rt_range is None:
+        rt_range = (df.scan_time.min(), df.scan_time.max())
+
+    rt_bins = int((rt_range[1] - rt_range[0]) / 2)
+    # mz_bins = int(mz_range[1] - mz_range[0])*100
 
     fig = plt.hist2d(
         df["scan_time"],

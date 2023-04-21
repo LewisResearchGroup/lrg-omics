@@ -98,7 +98,7 @@ class ProteomicsQC:
     ):
         url = f"{self._host}/api/qc-data"
         headers = {"Content-type": "application/json"}
-        
+
         if self._verbose:
             print(url)
         if project_slug is None:
