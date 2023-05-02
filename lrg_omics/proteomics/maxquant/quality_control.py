@@ -143,7 +143,7 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
     df = pd.concat(dfs, sort=False).to_frame().T
     df["RUNDIR"] = str(txt_path)
     df = df.reindex(columns=expected_columns)
-    return df
+    return df.infer_objects()
 
 
 def maxquant_qc_summary(txt_path):
