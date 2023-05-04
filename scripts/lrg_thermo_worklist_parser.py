@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     assert fn_inp != fn_out
 
-    assert args.overwrite or not fn_out.is_file, f"{fn_out} exists."
+    assert (not fn_out.is_file()) or (args.overwrite), f"{fn_out} exists."
 
     sep = args.sep
 

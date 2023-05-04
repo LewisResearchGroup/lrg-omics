@@ -256,7 +256,7 @@ class TestClass:
         # check if there is any NaN values in out
         assert (
             ~out.isnull().values.any()
-        ), f"NaN value at {actual_ndx[out.isna().any()].tolist()}"
+        ), f"NaN value at {out[out.isna()].index.to_list()}"
 
     def test__maxquant_qc_columns(self):
         result = maxquant_qc(PATH, protein=None, pept_list=None)
