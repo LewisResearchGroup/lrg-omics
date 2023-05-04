@@ -10,7 +10,8 @@ class Eatogram():
     def __init__(self, df=None, fn_mint_data=None, fn_mint_meta=None,
                  sample_id_col='ms_file', batch_col_name='batch', 
                  sample_type_col_name='sample_type', media_name='media', 
-                 intensity_col_name='intensity', peak_label_col_name='peak_label'):
+                 intensity_col_name='intensity', peak_label_col_name='peak_label',
+                 low_value_mask=0):
         
         self.df = df
         self.media_name = media_name
@@ -22,9 +23,9 @@ class Eatogram():
         except KeyError as e:
             print(self.df.columns.to_list())
             raise e
-            
-        self.df.columns = ['sample_id', 'sample_type', 'batch', 'peak_label', 'intensity']
         
+        self.df.columns = ['Sample ID', 'Type', 'Batch', 'Metabolite', 'Intensity']
+        self.df['Mask'] = (self.df.Intensity >= low_value_mask)
         self.df_transformed = None
         
     def get_data_from_mint_files(self, fn_mint_data, fn_mint_meta):
@@ -36,19 +37,19 @@ class Eatogram():
     @staticmethod
     def to_mh_score(df, media_name):
 
-        media_type_data = df[df.sample_type == media_name]
+        media_type_data = df[df['Type'] == media_name]
 
         mh_mean = (
-            media_type_data.groupby(["peak_label", "batch"], dropna=False)
-            .intensity.mean()
+            media_type_data.groupby(["Metabolite", "Batch"], dropna=False)
+            .Intensity.mean()
             .to_frame()
             .add_suffix("_mh_mean")
             .reset_index()
         )
 
         mh_std = (
-            media_type_data.groupby(["peak_label", "batch"], dropna=False)
-            .intensity.std()
+            media_type_data.groupby(["Metabolite", "Batch"], dropna=False)
+            .Intensity.std()
             .to_frame()
             .add_suffix("_mh_std")
             .reset_index()
@@ -56,14 +57,14 @@ class Eatogram():
         )
 
         # Merging mean and standard deviation with the main dataframe
-        df = pd.merge(df, mh_mean, on=["peak_label", "batch"])
-        df = pd.merge(df, mh_std, on=["peak_label", "batch"])
+        df = pd.merge(df, mh_mean, on=["Metabolite", "Batch"])
+        df = pd.merge(df, mh_std, on=["Metabolite", "Batch"])
 
-        df["intensity"] = (
-            df.intensity - df.intensity_mh_mean
-        ) / (df.intensity_mh_std)    
-
-        return df[['sample_id', 'sample_type', 'batch', 'peak_label', 'intensity']]    
+        df["Intensity"] = (
+            df.Intensity - df.Intensity_mh_mean
+        ) / (df.Intensity_mh_std)    
+        
+        return df[['Sample ID', 'Type', 'Batch', 'Metabolite', 'Intensity', 'Mask']]    
 
     @staticmethod
     def durbin_transformation(X, c=1):
@@ -87,7 +88,7 @@ class Eatogram():
     
     @staticmethod
     def long_to_dense_form(df):
-        return df.set_index(['sample_id', 'sample_type', 'batch', 'peak_label']).unstack('peak_label')   
+        return df.set_index(['Sample ID', 'Type', 'Batch', 'Metabolite', 'Mask']).unstack('Metabolite')   
     
     def transform(self, c=1):
         df_mh = self.to_mh_score(self.df, self.media_name)
@@ -95,22 +96,22 @@ class Eatogram():
         durbin = self.durbin_transformation(dense)
         durbin = durbin.stack().reset_index()
         durbin = self.to_mh_score(durbin, media_name=self.media_name)
-        durbin = pd.concat([ durbin[durbin.sample_type != self.media_name], durbin[durbin.sample_type == self.media_name]])
+        durbin = pd.concat([ durbin[durbin['Type'] != self.media_name], durbin[durbin['Type'] == self.media_name]])
         self.df_transformed = durbin
         
-    def plot(self, order=None, height=4, aspect=3, dodge=False, hue_order='default', marker='.', low_values_mask=None):
+    def plot(self, order=None, height=6, aspect=3, dodge=False, hue_order='default', marker='.', low_values_mask=None):
         
         if order is None:
-            order = self.df_transformed.groupby('peak_label')['intensity'].mean().sort_values().index.to_list()
+            order = self.df_transformed[self.df_transformed['Mask']].groupby('Metabolite')['Intensity'].mean().sort_values().index.to_list()
 
         if hue_order == 'default':
             hue_order = ["Biological sample", self.media_name]
             
         g = sns.catplot(
                 data=self.df_transformed,
-                x="peak_label",
-                y="intensity",
-                hue='sample_type',
+                x="Metabolite",
+                y="Intensity",
+                hue='Type',
                 dodge=False,
                 hue_order=hue_order,
                 order=order,
@@ -127,4 +128,5 @@ class Eatogram():
         ax.axhline(1, color="k", ls="--", lw=0.5)
         ax.axhline(-1, color="k", ls="--", lw=0.5)
         return g
+    
     
