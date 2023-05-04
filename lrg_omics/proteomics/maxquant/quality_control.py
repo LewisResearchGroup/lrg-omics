@@ -121,7 +121,8 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
     Args:
         txt_path: path with MaxQuant txt output.
         protein: list with protein name (only the first one will be processed). If None then protein = ['BSA']
-        pept_list: list with peptides names (only the first two will be processed). If None then pept_list = ['HVLTSIGEK', 'LTILEELR']
+        pept_list: list with peptides names (only the first six will be processed). If None then
+        pept_list = ["HVLTSIGEK", "LTILEELR", "ATEEQLK", "AEFVEVTK", "QTALVELLK", "TVMENFVAFVDK"]
     """
     txt_path = P(abspath(txt_path))
     meta_json = txt_path / P("meta.json")
@@ -361,7 +362,7 @@ def maxquant_qc_evidence(txt_path, pept_list=None):
             if ave != 0:
                 cv = std / ave * 100
             else:
-                cv = None
+                cv = 'not calculated'
 
             dict_info_qc = {
                 f"qc{pept_list.index(i) + 1}_peptide": i,
@@ -393,14 +394,14 @@ def maxquant_qc_evidence(txt_path, pept_list=None):
             result.update(dict_info_qc)
         else:
             dict_info_qc = {
-                f"qc{pept_list.index(i) + 1}_peptide_charges": None,
-                f"N_qc{pept_list.index(i) + 1}_missing_values": None,
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_ave": None,
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_sd": None,
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_cv": None,
-                f"calibrated_retention_time_qc{pept_list.index(i) + 1}": None,
-                f"retention_length_qc{pept_list.index(i) + 1}": None,
-                f"N_of_scans_qc{pept_list.index(i) + 1}": None,
+                f"qc{pept_list.index(i) + 1}_peptide_charges": 'not detected',
+                f"N_qc{pept_list.index(i) + 1}_missing_values": 'not detected',
+                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_ave": 'not detected',
+                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_sd": 'not detected',
+                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_cv": 'not detected',
+                f"calibrated_retention_time_qc{pept_list.index(i) + 1}": 'not detected',
+                f"retention_length_qc{pept_list.index(i) + 1}": 'not detected',
+                f"N_of_scans_qc{pept_list.index(i) + 1}": 'not detected',
             }
             result.update(dict_info_qc)
 
