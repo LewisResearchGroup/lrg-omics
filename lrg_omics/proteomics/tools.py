@@ -27,8 +27,16 @@ def load_rawtools_data_from(path="/var/www/html/proteomics/files/raw"):
 
 formated_rawtools_data_from = load_rawtools_data_from
 
+SEPARATED_VALUE_COLS_MAXQUANT = [
+ 'qc1_peptide_charges',
+ 'N_qc1_missing_values',
+ 'qc2_peptide_charges',
+ 'N_qc2_missing_values',
+ 'N_of_Protein_qc_pepts',
+ 'N_Protein_qc_missing_values'
+]
 
-def load_maxquant_data_from(path="/var/www/html/proteomics/files/"):
+def load_maxquant_data_from(path="/var/www/html/proteomics/files/", unpack=False):
     if not os.path.isdir(path):
         logging.warning(f"FileNotFound: {path}")
         return None
@@ -51,4 +59,16 @@ def load_maxquant_data_from(path="/var/www/html/proteomics/files/"):
             df[col] = df[col].apply(os.path.basename)
         except:
             pass
+    if unpack:    
+      df = unpack_separated_values(df, SEPARATED_VALUE_COLS_MAXQUANT)
+    return df
+
+def split_and_replace(df, column, sep=',', suffix='_'):
+    split_columns = df[column].str.split(sep, expand=True)
+    split_columns.columns = [f'{column}{suffix}{i+1}' for i in split_columns.columns]
+    return df.drop(column, axis=1).join(split_columns)
+
+def unpack_separated_values(df, columns):
+    for col in comma_cols:
+        df = split_and_replace(df, col, sep=';')
     return df
