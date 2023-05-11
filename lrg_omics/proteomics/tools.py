@@ -69,6 +69,6 @@ def split_and_replace(df, column, sep=',', suffix='_'):
     return df.drop(column, axis=1).join(split_columns)
 
 def unpack_separated_values(df, columns):
-    for col in comma_cols:
+    for col in columns:
         df = split_and_replace(df, col, sep=';')
     return df
