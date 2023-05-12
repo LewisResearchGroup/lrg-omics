@@ -225,15 +225,16 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
     if not df_qc3[df_qc3.Intensity == df_qc3.Intensity.max()].empty:
         df_qc3 = df_qc3[df_qc3.Intensity == df_qc3.Intensity.max()]
 
-    ave = float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
-    std = float(df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0))
-
-    if ave != 0:
-        cv = std / ave * 100
-    else:
-        cv = None
-
     if not df_qc3.empty:
+
+        ave = float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
+        std = float(df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0))
+
+        if ave != 0:
+            cv = std / ave * 100
+        else:
+            cv = None
+
         dict_info_qc3 = {
             "Protein_qc": protein[0],
             "N_of_Protein_qc_pepts": ";".join(
