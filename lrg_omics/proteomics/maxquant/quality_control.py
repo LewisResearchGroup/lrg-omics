@@ -171,7 +171,7 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
     n_true_hits = len(df) - (n_contaminants + n_reverse)
     mean_sequence_coverage = df[
         (df["Potential contaminant"].isnull()) & (df["Reverse"].isnull())
-    ]["Sequence coverage [%]"].mean(skipna=True)
+        ]["Sequence coverage [%]"].mean(skipna=True)
 
     df1 = df[
         (df["Potential contaminant"] != "+")
@@ -179,7 +179,7 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
         & (df["Majority protein IDs"] != "QC1|Peptide1")
         & (df["Majority protein IDs"] != "QC2|Peptide2")
         & (df["Only identified by site"] != "+")
-    ]
+        ]
 
     m_v = (
         df1.filter(regex="Reporter intensity corrected")
@@ -221,7 +221,19 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
         ]  # name must be unique, otherwise generates a df with more than one row and ends up in error
 
     df_qc3 = df[df["Protein IDs"].str.contains(protein[0], na=False, case=True)]
-    if len(df_qc3) != 0:
+
+    if not df_qc3[df_qc3.Intensity == df_qc3.Intensity.max()].empty:
+        df_qc3 = df_qc3[df_qc3.Intensity == df_qc3.Intensity.max()]
+
+    ave = float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
+    std = float(df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0))
+
+    if ave != 0:
+        cv = std / ave * 100
+    else:
+        cv = None
+
+    if not df_qc3.empty:
         dict_info_qc3 = {
             "Protein_qc": protein[0],
             "N_of_Protein_qc_pepts": ";".join(
@@ -231,23 +243,15 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
                 [
                     str(x)
                     for x in df_qc3.filter(regex="Reporter intensity corrected")
-                    .replace(np.nan, 0)
-                    .isin([0])
-                    .sum()
-                    .to_list()
+                .replace(np.nan, 0)
+                .isin([0])
+                .sum()
+                .to_list()
                 ]
             ),
-            "reporter_intensity_corrected_Protein_qc_ave": float(
-                df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1)
-            ),
-            "reporter_intensity_corrected_Protein_qc_sd": float(
-                df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
-            ),
-            "reporter_intensity_corrected_Protein_qc_cv": float(
-                df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0)
-            )
-            / float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
-            * 100,
+            "reporter_intensity_corrected_Protein_qc_ave": ave,
+            "reporter_intensity_corrected_Protein_qc_sd": std,
+            "reporter_intensity_corrected_Protein_qc_cv": cv,
         }
 
         result.update(dict_info_qc3)
