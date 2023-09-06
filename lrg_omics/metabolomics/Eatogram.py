@@ -7,11 +7,18 @@ from matplotlib import pyplot as plt
 
 
 class Eatogram():
-    def __init__(self, df=None, fn_mint_data=None, fn_mint_meta=None,
-                 sample_id_col='ms_file', batch_col_name='batch', 
-                 sample_type_col_name='sample_type', media_name='media', 
-                 intensity_col_name='intensity', peak_label_col_name='peak_label',
-                 low_value_mask=0):
+    def __init__(self, df=None, 
+                 fn_mint_data=None, 
+                 fn_mint_meta=None,
+                 sample_id_col='ms_file', 
+                 batch_col_name='batch', 
+                 sample_type_col_name='type', 
+                 media_name='MH-Pool',
+                 include_types=None,
+                 intensity_col_name='peak_area_top3', 
+                 peak_label_col_name='peak_label',
+                 low_value_mask=0,
+                 noise_factor=0):
         
         self.df = df
         self.media_name = media_name
@@ -25,6 +32,12 @@ class Eatogram():
             raise e
         
         self.df.columns = ['Sample ID', 'Type', 'Batch', 'Metabolite', 'Intensity']
+        if include_types:
+            self.df = self.df[self.df.Type.isin(include_types+[media_name])]
+            
+        if noise_factor > 0:
+            self.df['Intensity'] = self.df['Intensity']+ (noise_factor * np.random.normal(size=len(self.df)))
+            
         self.df['Mask'] = (self.df.Intensity >= low_value_mask)
         self.df_transformed = None
         
