@@ -43,10 +43,10 @@ class Eatogram():
     eatogram = Eatogram(
                 fn_mint_data='MINT__results.csv', 
                 fn_mint_meta='MINT__metadata.csv',
-                sample_col='MS-file',
-                sample_type_col='Type',
+                sample_col='ms_file_label',
+                sample_type_col='sample_type',
                 media_name='MH-Pool',
-                batch_col='PLATE',
+                batch_col='plate',
                 intensity_col='peak_area_top3',
                 low_value_mask=1e4
     )
