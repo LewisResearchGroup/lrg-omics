@@ -75,8 +75,8 @@ class Eatogram():
             If greater than zero, random noise scaled by this factor will be added to the intensity values.
 
         
-        Example:
-        --------
+        Example 1:
+        ----------
         eatogram = Eatogram(
                     fn_mint_data='MINT__results.csv', 
                     fn_mint_meta='MINT__metadata.csv',
@@ -90,6 +90,34 @@ class Eatogram():
 
         eatogram.transform(c=10)
         eatogram.plot()
+        
+        Example 2:
+        ----------
+        Create a dataframe (df) of the following format:
+        
+                  sample_col     sample_type  batch_col  metabolite_col  intensity_col
+        0         S1             Media        Plate-1     Glucose        100.5e6
+        1         S1             Media        Plate-1     Lactose         25.3e3
+        2         S2             Biological   Plate-1     Glucose         90.2e5
+        3         S2             Biological   Plate-1     Lactose         22.4e4
+        4         S3             Media        Plate-2     Glucose        105.0e5
+        5         S3             Media        Plate-2     Lactose         24.1e6
+        6         S4             Biological   Plate-2     Glucose         92.8e5
+        7         S4             Biological   Plate-2     Lactose         20.2e4
+        
+        eatogram = Eatogram(
+                    df=df,
+                    sample_col='sample_col',
+                    sample_type_col='sample_type',
+                    media_name='Media',
+                    batch_col='batch_col',
+                    intensity_col='intensity_col',
+                    low_value_mask=0
+        )
+
+        eatogram.transform(c=10)
+        eatogram.plot()
+        
         """
         self.df = df
         self.sample_col = sample_col
