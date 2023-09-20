@@ -67,7 +67,7 @@ class MaxquantRunner:
         self._tgt_dir = P(out_dir) if isinstance(out_dir, str) else out_dir
         self._add_raw_name_to_outdir = add_raw_name_to_outdir
         self._add_uuid_to_rundir = add_uuid_to_rundir
-        self._time = time
+        self._runtime = runtime
         
         if sbatch_cmds is None:
             sbatch_cmds = ""
