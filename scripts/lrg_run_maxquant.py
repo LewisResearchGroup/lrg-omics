@@ -67,7 +67,7 @@ if __name__ == "__main__":
         help="Remove run directory after running MaxQuant",
     )
     parser.add_argument("--verbose", action="store_true")
-    parser.add_argument("--time", default='5:00:00')
+    parser.add_argument("--runtime", default='10:00:00')
     
     args = parser.parse_args()
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         cleanup=args.cleanup,
         add_raw_name_to_outdir=args.add_raw_name_to_outdir,
         add_uuid_to_rundir=args.add_uuid_to_rundir,
-        time=args.time
+        runtime=args.runtime
     )
 
     for raw_file in args.raw[0]:

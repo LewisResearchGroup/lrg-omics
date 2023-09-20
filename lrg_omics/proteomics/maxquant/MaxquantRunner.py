@@ -24,7 +24,7 @@ class MaxquantRunner:
         cleanup=False,
         verbose=False,
         output_dir=None,
-        time='5:00:00',
+        runtime='10:00:00',
     ):
         """
         Runs MaxQuant jobs using a mqpar.txt template,
@@ -97,7 +97,7 @@ class MaxquantRunner:
         submit=False,
         run=True,
         with_time=True,
-        time='5:00:00'
+        runtime=None,
     ):
         """
         Executes MaxQuant run or only prepares output and run directories.
@@ -132,8 +132,8 @@ class MaxquantRunner:
             tgt_dir = abspath(self._tgt_dir)
         if self._add_raw_name_to_outdir:
             tgt_dir = join(tgt_dir, raw_label)
-        if self._time:
-            time = self._time
+        if runtime is None:
+            runtime = self._runtime
             
         run_id = f"{raw_label}"
 
@@ -179,6 +179,8 @@ class MaxquantRunner:
             f"if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi",
             f"cp time.txt maxquant.err maxquant.out {run_mqpar} {run_dir}/combined/txt/",
             f"mv {run_dir}/combined/txt/* {tgt_dir}",
+            f"rm -rf {run_dir}/combined",
+            f"rm -rf {run_dir}/{raw_label}"
         ]
 
         if self._cleanup:
@@ -214,7 +216,7 @@ class MaxquantRunner:
             submit=submit,
             maxquantcmd=self._mqcmd,
             rundir=run_dir,
-            time=time
+            runtime=runtime
         )
 
         cmds = "; ".join(cmds)
@@ -233,12 +235,12 @@ def gen_sbatch_file(
     fn="run.sbatch",
     cold_run=False,
     maxquantcmd="maxqant",
-    time='5:00:00',
     rundir=None,
+    runtime="10:00:00"
 ):
     cmds_txt = "\n\n".join(commands)
     txt = f"""#!/bin/bash
-#SBATCH --time={time}
+#SBATCH --time={runtime}
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --mem=5000
