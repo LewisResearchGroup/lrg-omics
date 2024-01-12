@@ -167,17 +167,6 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
 
 def maxquant_qc_summary(txt_path):
     filename = "summary.txt"
-    cols = [
-        "MS",
-        "MS/MS",
-        "MS3",
-        "MS/MS Submitted",
-        "MS/MS Identified",
-        "MS/MS Identified [%]",
-        "Peptide Sequences Identified",
-        "Av. Absolute Mass Deviation [mDa]",
-        "Mass Standard Deviation [mDa]",
-    ]
 
     df_summary = pd.read_csv(txt_path / P(filename), sep="\t", nrows=1).T[0]
 
