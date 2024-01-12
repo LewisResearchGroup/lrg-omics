@@ -19,12 +19,12 @@ def test__time(tmpdir):
 
 
 def test__missing_faa_raises_exception(tmpdir):
-
     fn_raw = PATH / "fake" / "fake.raw"
     fn_mqp = PATH / "maxquant" / "tmt11" / "mqpar" / "mqpar.xml"
     fn_faa = PATH / "fasta" / "minimal.faa"
     run_dir = P(tmpdir) / "run"
     out_dir = P(tmpdir) / "out"
+    
     cmd = (
         f"lrg_run_maxquant.py --fasta {fn_faa} --raw {fn_raw} --mqpar {fn_mqp}"
         f" --run-dir {run_dir} --out-dir {out_dir}"

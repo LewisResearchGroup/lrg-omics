@@ -24,6 +24,7 @@ class MaxquantRunner:
         cleanup=False,
         verbose=False,
         output_dir=None,
+        runtime='10:00:00',
     ):
         """
         Runs MaxQuant jobs using a mqpar.txt template,
@@ -51,6 +52,7 @@ class MaxquantRunner:
         cleanup: bool, default=False
             * True: removes the files in the run directory when run finishes
             * False: keep the run files, e.g. for debugging
+        time: str, default='5:00:00'
         """
 
         if output_dir is not None:
@@ -65,9 +67,11 @@ class MaxquantRunner:
         self._tgt_dir = P(out_dir) if isinstance(out_dir, str) else out_dir
         self._add_raw_name_to_outdir = add_raw_name_to_outdir
         self._add_uuid_to_rundir = add_uuid_to_rundir
-
+        self._runtime = runtime
+        
         if sbatch_cmds is None:
             sbatch_cmds = ""
+            
         self._sbatch_cmds = [i.strip() for i in sbatch_cmds.split(";")]
         self._cleanup = cleanup
         self._verbose = verbose
@@ -93,6 +97,7 @@ class MaxquantRunner:
         submit=False,
         run=True,
         with_time=True,
+        runtime=None,
     ):
         """
         Executes MaxQuant run or only prepares output and run directories.
@@ -125,10 +130,11 @@ class MaxquantRunner:
             tgt_dir = abspath(join(os.getcwd(), "out"))
         else:
             tgt_dir = abspath(self._tgt_dir)
-
         if self._add_raw_name_to_outdir:
             tgt_dir = join(tgt_dir, raw_label)
-
+        if runtime is None:
+            runtime = self._runtime
+            
         run_id = f"{raw_label}"
 
         if self._add_uuid_to_rundir:
@@ -173,6 +179,8 @@ class MaxquantRunner:
             f"if [ ! -d {run_dir}/combined/txt ]; then mkdir {run_dir}/combined/txt ; fi",
             f"cp time.txt maxquant.err maxquant.out {run_mqpar} {run_dir}/combined/txt/",
             f"mv {run_dir}/combined/txt/* {tgt_dir}",
+            f"rm -rf {run_dir}/combined",
+            f"rm -rf {run_dir}/{raw_label}"
         ]
 
         if self._cleanup:
@@ -208,6 +216,7 @@ class MaxquantRunner:
             submit=submit,
             maxquantcmd=self._mqcmd,
             rundir=run_dir,
+            runtime=runtime
         )
 
         cmds = "; ".join(cmds)
@@ -227,10 +236,11 @@ def gen_sbatch_file(
     cold_run=False,
     maxquantcmd="maxqant",
     rundir=None,
+    runtime="10:00:00"
 ):
     cmds_txt = "\n\n".join(commands)
     txt = f"""#!/bin/bash
-#SBATCH --time=5:00:00
+#SBATCH --time={runtime}
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --mem=5000

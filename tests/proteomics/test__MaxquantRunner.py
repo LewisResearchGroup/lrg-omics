@@ -40,10 +40,8 @@ class TestMaxquantRunner:
             del mq
 
     def test_input_files_created(self, tmpdir):
-
         run_dir = P(tmpdir) / "run"
         out_dir = P(tmpdir) / "out"
-
         fn_raw = PATH / "fake" / "fake.raw"
         fn_mqp = PATH / "maxquant" / "tmt11" / "mqpar" / "mqpar.xml"
         fn_faa = PATH / "fasta" / "minimal.faa"
