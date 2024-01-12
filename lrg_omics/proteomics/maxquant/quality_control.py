@@ -7,8 +7,7 @@ from pathlib import Path as P
 from glob import glob
 from os.path import dirname, isdir, isfile, join, abspath
 
-expected_columns = [
-    "Date",
+summary_columns_v1 = [
     "MS",
     "MS/MS",
     "MS3",
@@ -17,7 +16,22 @@ expected_columns = [
     "MS/MS Identified [%]",
     "Peptide Sequences Identified",
     "Av. Absolute Mass Deviation [mDa]",
-    "Mass Standard Deviation [mDa]",
+    "Mass Standard Deviation [mDa]"
+]
+
+summary_columns_v2 = [
+    "MS",
+    "MS/MS",
+    "MS3",
+    "MS/MS submitted",
+    "MS/MS identified",
+    "MS/MS identified [%]",
+    "Peptide sequences identified",
+    "Av. absolute mass deviation [mDa]",
+    "Mass standard deviation [mDa]"
+]
+
+expected_columns = [
     "N_protein_groups",
     "N_protein_true_hits",
     "N_protein_potential_contaminants",
@@ -143,7 +157,11 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
         return None
     df = pd.concat(dfs, sort=False).to_frame().T
     df["RUNDIR"] = str(txt_path)
-    df = df.reindex(columns=expected_columns)
+
+    if "MS/MS Submitted" in df.columns:
+        df = df.reindex(columns=["Date"] + summary_columns_v1 + expected_columns)
+    elif "MS/MS submitted" in df.columns:
+        df = df.reindex(columns=["Date"] + summary_columns_v2 + expected_columns)
     return df.infer_objects()
 
 
@@ -160,8 +178,13 @@ def maxquant_qc_summary(txt_path):
         "Av. Absolute Mass Deviation [mDa]",
         "Mass Standard Deviation [mDa]",
     ]
-    return pd.read_csv(txt_path / P(filename), sep="\t", nrows=1, usecols=cols).T[0]
 
+    df_summary = pd.read_csv(txt_path / P(filename), sep="\t", nrows=1).T[0]
+
+    if "MS/MS Submitted" in df_summary.index:
+        return df_summary[summary_columns_v1]
+    elif "MS/MS submitted" in df_summary.index:
+        return df_summary[summary_columns_v2]
 
 def maxquant_qc_protein_groups(txt_path, protein=None):
     filename = "proteinGroups.txt"
