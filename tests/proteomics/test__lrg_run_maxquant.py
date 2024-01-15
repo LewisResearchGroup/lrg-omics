@@ -41,7 +41,7 @@ def test__missing_faa_raises_exception(tmpdir):
         (out_dir / "maxquant.err").is_file(),
         (out_dir / "maxquant.out").is_file(),
         (out_dir / "time.txt").is_file(),
-        (run_dir / "combined").is_dir(),
+        (out_dir / "summary.txt").is_file(),
     ]
 
     assert all(files_generated), files_generated
