@@ -31,7 +31,7 @@ def test__missing_faa_raises_exception(tmpdir):
         " --maxquantcmd lrg_fake_maxquant.sh --verbose --add-raw-name-to-outdir --add-uuid-to-rundir"
     )
 
-    print(cmd)
+    print(f'COMMAND: `{cmd}`')
 
     return_value = os.system(cmd)
 

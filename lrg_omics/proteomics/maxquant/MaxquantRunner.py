@@ -180,7 +180,8 @@ class MaxquantRunner:
             f"cp time.txt maxquant.err maxquant.out {run_mqpar} {run_dir}/combined/txt/",
             f"mv {run_dir}/combined/txt/* {tgt_dir}",
             f"rm -rf {run_dir}/combined",
-            f"rm -rf {run_dir}/{raw_label}"
+            f"rm -rf {run_dir}/{raw_label}",
+            f"ls -artlh {tgt_dir}"
         ]
 
         if self._cleanup:
@@ -197,7 +198,7 @@ class MaxquantRunner:
             print(f"Create link: {raw_file} {run_raw_ref}")
             print("Commands:")
             for cmd in cmds:
-                print(cmd)
+                print('\t'+cmd)
 
         create_mqpar(
             self._mqpar,
@@ -222,7 +223,7 @@ class MaxquantRunner:
         cmds = "; ".join(cmds)
 
         if run and not submit:
-            print("Running", run_id, run_dir)
+            print(f"Running run_id={run_id} in {run_dir}")
             os.system(cmds)
 
         return cmds

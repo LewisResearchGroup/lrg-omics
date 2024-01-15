@@ -4,7 +4,8 @@ if [[ $1 = '--version' ]]; then
     echo "lrg_fake_maxquant.sh v0"
     exit 256
 
-elif [[ $1 == *.xml ]]; then
+else
+    echo 'Running fake MaxQuant...'
     mkdir combined
     mkdir combined/txt
     touch combined/txt/210913-Mario__mqpar_no_FDR.xml   
@@ -29,4 +30,3 @@ elif [[ $1 == *.xml ]]; then
     touch maxquant.out
 fi
 
-exit 5
