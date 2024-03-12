@@ -23,7 +23,8 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 
 ## Install LRG kernel in JupyterLab
 
-    ipython kernel install --name "LRG" --user
+    conda activate lrg
+    python -m ipykernel install --name lrg --display-name 'LRG' --user
 
 
 ## Authors
