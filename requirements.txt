@@ -15,21 +15,14 @@ psims
 black
 coverage-badge
 pytest
-#numpy==1.19.5
 numpy
-#scikit-learn==0.23.2
 scikit-learn
-#scipy<=1.5.4
 scipy
-#alembic<=1.4.1
 alembic
 typing-extensions<4
-#markupsafe~=2.0.1
 markupsafe
-#typing-extensions<5.0
 typing-extensions
 graphviz
-#joblib~=1.0.1
 joblib
 pyLDAvis
 
