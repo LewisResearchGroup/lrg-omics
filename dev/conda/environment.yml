@@ -1,4 +1,4 @@
-name: lrg-omics-dev
+name: lrg
 channels:
   - defaults
   - conda-forge
