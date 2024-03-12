@@ -14,7 +14,7 @@ Lewis Research Group (LRG) codebase for omics data generation, processing, quali
 
 ##  Download and install from source
 
-    git clone https://github.com/LewisResearchGroup/lrg-omics
+    git clone git@github.com:LewisResearchGroup/lrg-omics.git
     cd lrg-omics
     conda env create -f dev/conda/environment.yml
     conda activate lrg
