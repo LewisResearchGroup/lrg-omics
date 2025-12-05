@@ -190,7 +190,8 @@ class MaxquantRunner:
         if not cold_run:
             os.makedirs(run_dir, exist_ok=True)
             os.makedirs(tgt_dir, exist_ok=True)
-            maybe_create_symlink(raw_file, run_raw_ref)
+            # maybe_create_symlink(raw_file, run_raw_ref)
+            shutil.copy2(raw_file, run_raw_ref) # prevent errors with symlinks in newer MaxQuant versions
 
         if self._verbose or cold_run:
             print(f"Create run directory: {run_dir}")
