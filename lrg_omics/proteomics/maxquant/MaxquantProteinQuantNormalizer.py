@@ -62,7 +62,7 @@ class MaxquantProteinQuantNormalizer:
 
     @staticmethod
     def normalize_func(df):
-        df = df.replace(0, np.NaN)
+        df = df.replace(0, np.nan)
         df = df.apply(pd.to_numeric, errors="ignore")
         channels = df.columns.to_list()
         channels_except_first = channels[1:]

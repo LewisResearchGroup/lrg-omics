@@ -92,7 +92,7 @@ def get_protein_quant(
     # Just the reporter intensities
     reporter_intensity = df.iloc[:, list(range(22, 33))]
     # Replace 0 with NaN
-    reporter_intensity = reporter_intensity.replace(0, np.NaN)
+    reporter_intensity = reporter_intensity.replace(0, np.nan)
     assert normed in [
         None,
         "fold_change",
@@ -214,7 +214,7 @@ def extract_protein_quant(
     # Just the reporter intensities
     reporter_intensity = df.iloc[:, list(range(22, 33))]
     # Replace 0 with NaN
-    reporter_intensity = reporter_intensity.replace(0, np.NaN)
+    reporter_intensity = reporter_intensity.replace(0, np.nan)
     assert normed in [None, "fold_change", "diff_to_ref"]
     if divide_by_column_mean is True:
         # Devide by the mean column-wise
