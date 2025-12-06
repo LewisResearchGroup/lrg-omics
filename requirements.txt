@@ -25,5 +25,5 @@ typing-extensions
 graphviz
 joblib
 pyLDAvis
-
+plotly-resampler
 

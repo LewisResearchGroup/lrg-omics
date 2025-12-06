@@ -1,34 +1,44 @@
 from ...plotly_tools import set_template
 import plotly.graph_objects as go
+try:
+    from plotly_resampler import FigureResampler, register_plotly_resampler
+except ImportError:  # graceful fallback if dependency missing
+    FigureResampler = None
+    def register_plotly_resampler():
+        return None
 
 colors = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
 
 set_template()
+register_plotly_resampler()
 
 
 def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
-    fig = go.Figure()
+    fig = FigureResampler(go.Figure()) if FigureResampler else go.Figure()
     for i, col in enumerate(cols):
-        fig.add_trace(
-            go.Scatter(
-                x=rawtools_matrix.index,
-                y=rawtools_matrix[col],
-                name=col,
-                mode="lines",
-                line=dict(width=0.5, color=colors[i]),
-                **kwargs
-            ),
+        trace = go.Scattergl(  # Scattergl for better performance on dense series
+            x=rawtools_matrix.index,
+            y=rawtools_matrix[col],
+            name=col,
+            mode="lines",
+            line=dict(width=0.5, color=colors[i]),
+            **kwargs
         )
+        if FigureResampler and isinstance(fig, FigureResampler):
+            fig.add_trace(trace, max_n_samples=1500)
+        else:
+            fig.add_trace(trace)
 
     fig.update_layout(
         legend_title_text="",
         autosize=True,
         title=title,
         legend=dict(orientation="h"),
-        margin=dict(l=50, r=10, b=50, t=50, pad=0),
+        margin=dict(l=70, r=10, b=50, t=50, pad=0),
     )
 
     fig.update_xaxes(title_text=rawtools_matrix.index.name)
+    fig.update_yaxes(ticks="outside", ticklen=8, automargin=True)
 
     return fig
 
@@ -57,7 +67,9 @@ def histograms(rawtools_matrix, cols=["ParentIonMass"], title=None, colors=color
         autosize=True,
         title=title,
         legend=dict(orientation="h"),
-        margin=dict(l=50, r=10, b=50, t=50, pad=0),
+        margin=dict(l=70, r=10, b=50, t=50, pad=0),
     )
+
+    fig.update_yaxes(ticks="outside", ticklen=8, automargin=True)
 
     return fig
