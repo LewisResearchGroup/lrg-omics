@@ -8,13 +8,24 @@ except ImportError:  # graceful fallback if dependency missing
         return None
 
 colors = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
+DEFAULT_MAX_SAMPLES = 1000  # how many points to show per trace when resampling
 
 set_template()
 register_plotly_resampler()
 
 
 def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
-    fig = FigureResampler(go.Figure()) if FigureResampler else go.Figure()
+    # Prefer FigureResampler for interactive downsampling; fall back to plain Plotly
+    if FigureResampler:
+        try:
+            fig = FigureResampler(
+                go.Figure(), default_n_shown_samples=DEFAULT_MAX_SAMPLES
+            )
+        except Exception:
+            fig = go.Figure()
+    else:
+        fig = go.Figure()
+
     for i, col in enumerate(cols):
         trace = go.Scattergl(  # Scattergl for better performance on dense series
             x=rawtools_matrix.index,
@@ -25,7 +36,7 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
             **kwargs
         )
         if FigureResampler and isinstance(fig, FigureResampler):
-            fig.add_trace(trace, max_n_samples=1500)
+            fig.add_trace(trace, max_n_samples=DEFAULT_MAX_SAMPLES)
         else:
             fig.add_trace(trace)
 
@@ -43,7 +54,14 @@ def lines_plot(rawtools_matrix, cols, colors=colors, title=None, **kwargs):
     return fig
 
 
-def histograms(rawtools_matrix, cols=["ParentIonMass"], title=None, colors=colors):
+def histograms(
+    rawtools_matrix,
+    cols=["ParentIonMass"],
+    title=None,
+    colors=colors,
+    xbins=None,
+    nbinsx=None,
+):
     fig = go.Figure()
     if len(cols) == 1:
         fig.update_layout(title=cols[0])
@@ -52,6 +70,8 @@ def histograms(rawtools_matrix, cols=["ParentIonMass"], title=None, colors=color
         fig.add_trace(
             go.Histogram(
                 x=rawtools_matrix[col],
+                xbins=xbins,
+                nbinsx=nbinsx,
                 visible="legendonly" if i > 0 else None,
                 name=col,
                 marker_color=colors[i],
