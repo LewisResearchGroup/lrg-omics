@@ -6,7 +6,7 @@ import plotly.figure_factory as ff
 
 import plotly.io as pio
 import plotly.express as px
-import dash_table as dt
+from dash import dash_table as dt
 
 
 COLORS = ["rgba(100, 0, 0, 0.5)", "rgba(0, 100, 0, 0.5)", "rgba(0, 0, 100, 0.5)"]
