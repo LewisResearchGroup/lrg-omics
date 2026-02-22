@@ -106,10 +106,13 @@ def rawtools_metrics_cmd(
         *_Ms2_TIC_chromatogram.txt
         *.mgf
     """
+    raw = abspath(str(raw))
+    output_dir = abspath(str(output_dir))
+    raw_basename = os.path.basename(raw)
     os.makedirs(output_dir, exist_ok=True)
-    if not isfile(join(output_dir, raw, "_Matrix.txt")) or rerun:
+    if not isfile(join(output_dir, f"{raw_basename}_Matrix.txt")) or rerun:
         cmd = (
-            f'cd {output_dir}; rawtools.sh -f "{raw}" -o "{output_dir}" '
+            f'cd "{output_dir}"; rawtools.sh -f "{raw}" -o "{output_dir}" '
             f"{arguments}  2>rawtools_metrics.err 1>rawtools_metrics.out"
         )
     else:
@@ -122,10 +125,12 @@ def rawtools_qc_cmd(input_dir, output_dir, rerun=False):
     Generates command to run rawtools quality control to
     generate the file QcDataTable.csv.
     """
+    input_dir = abspath(str(input_dir))
+    output_dir = abspath(str(output_dir))
     os.makedirs(output_dir, exist_ok=True)
     if not isfile(join(output_dir, "QcDataTable.csv")) or rerun:
         cmd = (
-            f'cd {output_dir}; rawtools.sh -d "{input_dir}" '
+            f'cd "{output_dir}"; rawtools.sh -d "{input_dir}" '
             f'-qc "{output_dir}" 2>rawtools_qc.err 1>rawtools_qc.out'
         )
     else:
