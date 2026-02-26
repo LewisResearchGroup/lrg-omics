@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import pytest
 
 from lrg_omics.proteomics.maxquant.quality_control import (
     maxquant_qc,
@@ -11,6 +12,41 @@ from lrg_omics.proteomics.maxquant.quality_control import (
 )
 
 PATH = os.path.join("tests", "data", "maxquant", "tmt11", "example-0")
+
+
+def _write_tsv(path, filename, data):
+    pd.DataFrame(data).to_csv(os.path.join(path, filename), sep="\t", index=False)
+
+
+def _build_protein_groups(path, channels, rows=None):
+    row_template = {
+        "Potential contaminant": None,
+        "Reverse": None,
+        "Majority protein IDs": "P00001",
+        "Only identified by site": None,
+        "Sequence coverage [%]": 50.0,
+        "Protein IDs": "P00001",
+        "Intensity": 1000.0,
+        "Peptide counts (all)": 5,
+    }
+    if rows is None:
+        rows = [
+            {**row_template},
+            {
+                **row_template,
+                "Majority protein IDs": "QC3_BSA",
+                "Protein IDs": "QC3_BSA",
+                "Intensity": 2000.0,
+                "Peptide counts (all)": 11,
+            },
+        ]
+
+    for row_idx, row in enumerate(rows):
+        for ch in range(1, channels + 1):
+            row[f"Reporter intensity corrected {ch}"] = (
+                0 if (row_idx == 0 and ch % 2 == 0) else 1000 + ch
+            )
+    _write_tsv(path, "proteinGroups.txt", rows)
 
 
 class TestClass:
@@ -230,19 +266,6 @@ class TestClass:
             "N_of_scans_qc6",
         ]
 
-        print("Index, Expected, Actual")
-        for i in range(max(len(actual_ndx), len(expected_ndx))):
-            try:
-                a = actual_ndx[i]
-            except IndexError:
-                a = "---"
-            try:
-                e = expected_ndx[i]
-            except IndexError:
-                e = "---"
-            if a != e:
-                print(i, e, a)
-
         assert len(expected_ndx) - len(actual_ndx) == 0, (
             f"New columns {actual_ndx[len(expected_ndx):]} in output "
             f"file. Adjust expected_cols variable accordingly"
@@ -336,17 +359,127 @@ class TestClass:
             "reporter_intensity_corrected_Protein_qc_cv",
         ]
 
-        print("Index, Expected, Actual")
-        for i in range(max(len(actual_cols), len(expected_cols))):
-            try:
-                a = actual_cols[i]
-            except IndexError:
-                a = "---"
-            try:
-                e = expected_cols[i]
-            except IndexError:
-                e = "---"
-            if a != e:
-                print(i, e, a)
+        assert set(expected_cols).issubset(set(actual_cols)), actual_cols
 
-        assert all(actual_cols == expected_cols), actual_cols
+    @pytest.mark.parametrize("channels", [2, 6, 11, 18])
+    def test__dynamic_tmt_channel_counts(self, tmp_path, channels):
+        _build_protein_groups(tmp_path, channels)
+
+        out = maxquant_qc_protein_groups(tmp_path, protein=["QC3_BSA"])
+
+        for idx in range(1, channels + 1):
+            assert f"TMT{idx}_missing_values" in out.index
+
+        missing_values = out["N_Protein_qc_missing_values"].split(";")
+        assert len(missing_values) == channels
+        assert out["N_of_Protein_qc_pepts"] == "11"
+
+    def test__dynamic_tmt_multiple_max_intensity_rows(self, tmp_path):
+        rows = [
+            {
+                "Potential contaminant": None,
+                "Reverse": None,
+                "Majority protein IDs": "QC3_BSA",
+                "Only identified by site": None,
+                "Sequence coverage [%]": 55.0,
+                "Protein IDs": "QC3_BSA",
+                "Intensity": 3000.0,
+                "Peptide counts (all)": 7,
+            },
+            {
+                "Potential contaminant": None,
+                "Reverse": None,
+                "Majority protein IDs": "QC3_BSA",
+                "Only identified by site": None,
+                "Sequence coverage [%]": 60.0,
+                "Protein IDs": "QC3_BSA",
+                "Intensity": 3000.0,
+                "Peptide counts (all)": 9,
+            },
+        ]
+        _build_protein_groups(tmp_path, channels=6, rows=rows)
+        out = maxquant_qc_protein_groups(tmp_path, protein=["QC3_BSA"])
+
+        assert out["N_of_Protein_qc_pepts"] in {"7", "9"}
+        assert ";" not in out["N_of_Protein_qc_pepts"]
+
+    def test__empty_peptides_file(self, tmp_path):
+        _write_tsv(
+            tmp_path,
+            "peptides.txt",
+            {
+                "Potential contaminant": [],
+                "Reverse": [],
+                "Oxidation (M) site IDs": [],
+                "Missed cleavages": [],
+                "Last amino acid": [],
+            },
+        )
+        out = maxquant_qc_peptides(tmp_path)
+
+        assert out["N_peptides"] == 0
+        assert out["N_missed_cleavages_total"] == 0
+        assert out["Oxidations [%]"] == 0.0
+
+    def test__empty_evidence_file(self, tmp_path):
+        _write_tsv(
+            tmp_path,
+            "evidence.txt",
+            {
+                "Sequence": [],
+                "Charge": [],
+                "Intensity": [],
+                "Calibrated retention time": [],
+                "Retention length": [],
+                "Number of scans": [],
+                "Uncalibrated - Calibrated m/z [ppm]": [],
+                "Uncalibrated - Calibrated m/z [Da]": [],
+                "Reporter intensity corrected 1": [],
+                "Reporter intensity corrected 2": [],
+            },
+        )
+        out = maxquant_qc_evidence(tmp_path)
+
+        assert out["qc1_peptide_charges"] == "not detected"
+        assert out["N_qc1_missing_values"] == "not detected"
+        assert out["reporter_intensity_corrected_qc1_cv"] == "not detected"
+
+    def test__empty_protein_groups_file(self, tmp_path):
+        _write_tsv(
+            tmp_path,
+            "proteinGroups.txt",
+            {
+                "Potential contaminant": [],
+                "Reverse": [],
+                "Majority protein IDs": [],
+                "Only identified by site": [],
+                "Sequence coverage [%]": [],
+                "Protein IDs": [],
+                "Intensity": [],
+                "Peptide counts (all)": [],
+                "Reporter intensity corrected 1": [],
+                "Reporter intensity corrected 2": [],
+            },
+        )
+        out = maxquant_qc_protein_groups(tmp_path, protein=["QC3_BSA"])
+
+        assert out["N_protein_groups"] == 0
+        assert out["TMT1_missing_values"] == 0
+        assert out["TMT2_missing_values"] == 0
+        assert out["Protein_qc"] == "not detected"
+
+    def test__key_metric_regression_against_fixture(self):
+        result = maxquant_qc(PATH, protein=None, pept_list=None).iloc[0]
+        fixture = pd.read_csv(os.path.join(PATH, "maxquant_quality_control.csv")).iloc[0]
+
+        assert result["N_protein_groups"] == pytest.approx(fixture["N_protein_groups"])
+        assert result["N_peptides"] == pytest.approx(fixture["N_peptides"])
+
+        fixture_parent_frac_key = (
+            "Mean_parent_int_frac"
+            if "Mean_parent_int_frac" in fixture.index
+            else "Mean_parent_intensity_fraction"
+        )
+        assert result["Mean_parent_int_frac"] == pytest.approx(
+            fixture[fixture_parent_frac_key]
+        )

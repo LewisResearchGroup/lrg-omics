@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import logging
+import re
 
 from pathlib import Path as P
 from glob import glob
@@ -37,17 +38,56 @@ expected_columns = [
     "N_protein_potential_contaminants",
     "N_protein_reverse_seq",
     "Protein_mean_seq_cov [%]",
-    "TMT1_missing_values",
-    "TMT2_missing_values",
-    "TMT3_missing_values",
-    "TMT4_missing_values",
-    "TMT5_missing_values",
-    "TMT6_missing_values",
-    "TMT7_missing_values",
-    "TMT8_missing_values",
-    "TMT9_missing_values",
-    "TMT10_missing_values",
-    "TMT11_missing_values",
+    "N_peptides",
+    "N_peptides_potential_contaminants",
+    "N_peptides_reverse",
+    "Oxidations [%]",
+    "N_missed_cleavages_total",
+    "N_missed_cleavages_eq_0 [%]",
+    "N_missed_cleavages_eq_1 [%]",
+    "N_missed_cleavages_eq_2 [%]",
+    "N_missed_cleavages_gt_3 [%]",
+    "N_peptides_last_amino_acid_K [%]",
+    "N_peptides_last_amino_acid_R [%]",
+    "N_peptides_last_amino_acid_other [%]",
+    "Mean_parent_int_frac",
+    "Uncalibrated - Calibrated m/z [ppm] (ave)",
+    "Uncalibrated - Calibrated m/z [ppm] (sd)",
+    "Uncalibrated - Calibrated m/z [Da] (ave)",
+    "Uncalibrated - Calibrated m/z [Da] (sd)",
+    "Peak Width(ave)",
+    "Peak Width (std)",
+    "qc1_peptide_charges",
+    "N_qc1_missing_values",
+    "reporter_intensity_corrected_qc1_ave",
+    "reporter_intensity_corrected_qc1_sd",
+    "reporter_intensity_corrected_qc1_cv",
+    "calibrated_retention_time_qc1",
+    "retention_length_qc1",
+    "N_of_scans_qc1",
+    "qc2_peptide_charges",
+    "N_qc2_missing_values",
+    "reporter_intensity_corrected_qc2_ave",
+    "reporter_intensity_corrected_qc2_sd",
+    "reporter_intensity_corrected_qc2_cv",
+    "calibrated_retention_time_qc2",
+    "retention_length_qc2",
+    "N_of_scans_qc2",
+    "N_of_Protein_qc_pepts",
+    "N_Protein_qc_missing_values",
+    "reporter_intensity_corrected_Protein_qc_ave",
+    "reporter_intensity_corrected_Protein_qc_sd",
+    "reporter_intensity_corrected_Protein_qc_cv",
+]
+
+expected_columns_pre_tmt = [
+    "N_protein_groups",
+    "N_protein_true_hits",
+    "N_protein_potential_contaminants",
+    "N_protein_reverse_seq",
+    "Protein_mean_seq_cov [%]",
+]
+expected_columns_post_tmt = [
     "N_peptides",
     "N_peptides_potential_contaminants",
     "N_peptides_reverse",
@@ -91,6 +131,128 @@ expected_columns = [
 ]
 
 
+def _read_txt_table(path, filename, **kwargs):
+    """Read a MaxQuant TXT table and return an empty DataFrame for empty files."""
+    table_path = P(path) / P(filename)
+    try:
+        return pd.read_csv(table_path, sep="\t", **kwargs)
+    except pd.errors.EmptyDataError:
+        logging.warning("Empty MaxQuant table: %s", table_path)
+        return pd.DataFrame()
+
+
+def _safe_numeric_stat(df, column, fn):
+    """Compute a numeric statistic for a column if it exists; otherwise NaN."""
+    if column not in df.columns:
+        return np.nan
+    series = pd.to_numeric(df[column], errors="coerce")
+    return fn(series)
+
+
+def _safe_eq_plus_count(df, column):
+    if column not in df.columns:
+        return 0
+    return df[column].fillna("-").eq("+").sum()
+
+
+def _safe_string_contains(df, column, pattern):
+    if column not in df.columns:
+        return pd.Series(False, index=df.index)
+    return df[column].astype(str).str.contains(pattern, na=False, case=True)
+
+
+def _safe_filter_not_equal(df, column, value):
+    if column not in df.columns:
+        return pd.Series(True, index=df.index)
+    return df[column].fillna("").ne(value)
+
+
+def _safe_column_as_str(df, column, default="not detected"):
+    if column not in df.columns:
+        return default
+    return ";".join([str(x) for x in df[column].to_list()])
+
+
+def _missing_counts_by_channel(df, reporter_cols):
+    if not reporter_cols:
+        return []
+    return df[reporter_cols].replace(np.nan, 0).isin([0]).sum().to_list()
+
+
+def _missing_counts_as_str(df, reporter_cols, default="not detected"):
+    if not reporter_cols:
+        return default
+    return ";".join([str(x) for x in _missing_counts_by_channel(df, reporter_cols)])
+
+
+def _row_reporter_stats(df, reporter_cols, cv_when_mean_zero=None):
+    """
+    Compute per-row reporter mean/std/cv on the first row of `df`.
+    Returns (mean, std, cv).
+    """
+    if df.empty or not reporter_cols:
+        return (np.nan, np.nan, cv_when_mean_zero)
+
+    row = pd.to_numeric(df[reporter_cols].iloc[0], errors="coerce")
+    ave = float(row.mean(skipna=True))
+    std = float(row.std(ddof=0, skipna=True))
+
+    if pd.isna(ave):
+        cv = np.nan
+    elif ave != 0:
+        cv = std / ave * 100
+    else:
+        cv = cv_when_mean_zero
+    return ave, std, cv
+
+
+def _select_max_intensity_row(df, intensity_col="Intensity"):
+    """Select a deterministic single row with max intensity."""
+    if df.empty:
+        return df
+    if intensity_col not in df.columns:
+        return df.head(1)
+    max_intensity = pd.to_numeric(df[intensity_col], errors="coerce").max(skipna=True)
+    if pd.isna(max_intensity):
+        return df.head(1)
+    return df[pd.to_numeric(df[intensity_col], errors="coerce").eq(max_intensity)].head(1)
+
+
+def _reporter_intensity_columns(df):
+    cols = df.filter(regex=r"^Reporter intensity corrected").columns.to_list()
+    return sorted(
+        cols,
+        key=lambda col: int(re.search(r"\b(\d+)\b", str(col)).group(1))
+        if re.search(r"\b(\d+)\b", str(col))
+        else 10**9,
+    )
+
+
+def _tmt_missing_value_columns(df):
+    cols = [
+        c
+        for c in df.columns
+        if isinstance(c, str) and re.match(r"^TMT\d+_missing_values$", c)
+    ]
+    return sorted(cols, key=lambda c: int(re.search(r"\d+", c).group(0)))
+
+
+def _ordered_columns(df):
+    if "MS/MS Submitted" in df.columns:
+        summary_cols = [c for c in summary_columns_v1 if c in df.columns]
+    elif "MS/MS submitted" in df.columns:
+        summary_cols = [c for c in summary_columns_v2 if c in df.columns]
+    else:
+        summary_cols = []
+
+    tmt_cols = _tmt_missing_value_columns(df)
+    # Keep backward-compatible schema by always exposing legacy core columns.
+    core_cols = ["Date"] + summary_cols + expected_columns_pre_tmt + tmt_cols + expected_columns_post_tmt
+    core_cols = list(dict.fromkeys(core_cols))
+    extra_cols = [c for c in df.columns if c not in core_cols]
+    return core_cols + extra_cols
+
+
 def collect_maxquant_qc_data(root_path, force_update=False, from_csvs=True):
     """
     Generate MaxQuant quality control in all
@@ -123,7 +285,7 @@ def maxquant_qc_csv(
             return None
         if out_fn is not None:
             df.to_csv(abs_path, index=False)
-    df = df.reindex(columns=expected_columns)
+    df = df.reindex(columns=_ordered_columns(df))
     return df
 
 
@@ -158,48 +320,51 @@ def maxquant_qc(txt_path, protein=None, pept_list=None):
     df = pd.concat(dfs, sort=False).to_frame().T
     df["RUNDIR"] = str(txt_path)
 
-    if "MS/MS Submitted" in df.columns:
-        df = df.reindex(columns=["Date"] + summary_columns_v1 + expected_columns)
-    elif "MS/MS submitted" in df.columns:
-        df = df.reindex(columns=["Date"] + summary_columns_v2 + expected_columns)
+    df = df.reindex(columns=_ordered_columns(df))
     return df.infer_objects()
 
 
 def maxquant_qc_summary(txt_path):
     filename = "summary.txt"
 
-    df_summary = pd.read_csv(txt_path / P(filename), sep="\t", nrows=1).T[0]
+    df_summary_df = _read_txt_table(txt_path, filename, nrows=1)
+    if df_summary_df.empty:
+        return pd.Series(dtype=object)
+    df_summary = df_summary_df.T[0]
 
     if "MS/MS Submitted" in df_summary.index:
         return df_summary[summary_columns_v1]
     elif "MS/MS submitted" in df_summary.index:
         return df_summary[summary_columns_v2]
+    return pd.Series(dtype=object)
 
 def maxquant_qc_protein_groups(txt_path, protein=None):
     filename = "proteinGroups.txt"
-    df = pd.read_csv(txt_path / P(filename), sep="\t")
-    n_contaminants = df["Potential contaminant"].eq("+").sum()
-    n_reverse = df["Reverse"].fillna("-").eq("+").sum()
+    df = _read_txt_table(txt_path, filename)
+    n_contaminants = _safe_eq_plus_count(df, "Potential contaminant")
+    n_reverse = _safe_eq_plus_count(df, "Reverse")
     n_true_hits = len(df) - (n_contaminants + n_reverse)
-    mean_sequence_coverage = df[
-        (df["Potential contaminant"].isnull()) & (df["Reverse"].isnull())
+    if (
+        "Potential contaminant" in df.columns
+        and "Reverse" in df.columns
+        and "Sequence coverage [%]" in df.columns
+    ):
+        mean_sequence_coverage = df[
+            (df["Potential contaminant"].isnull()) & (df["Reverse"].isnull())
         ]["Sequence coverage [%]"].mean(skipna=True)
+    else:
+        mean_sequence_coverage = np.nan
 
     df1 = df[
-        (df["Potential contaminant"] != "+")
-        & (df.Reverse != "+")
-        & (df["Majority protein IDs"] != "QC1|Peptide1")
-        & (df["Majority protein IDs"] != "QC2|Peptide2")
-        & (df["Only identified by site"] != "+")
-        ]
+        _safe_filter_not_equal(df, "Potential contaminant", "+")
+        & _safe_filter_not_equal(df, "Reverse", "+")
+        & _safe_filter_not_equal(df, "Majority protein IDs", "QC1|Peptide1")
+        & _safe_filter_not_equal(df, "Majority protein IDs", "QC2|Peptide2")
+        & _safe_filter_not_equal(df, "Only identified by site", "+")
+    ]
 
-    m_v = (
-        df1.filter(regex="Reporter intensity corrected")
-        .replace(np.nan, 0)
-        .isin([0])
-        .sum()
-        .to_list()
-    )
+    reporter_cols = _reporter_intensity_columns(df1)
+    m_v = _missing_counts_by_channel(df1, reporter_cols)
 
     result = {
         "N_protein_groups": len(df),
@@ -210,21 +375,7 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
     }
 
     if len(m_v) != 0:
-        l_1 = [
-            "TMT1_missing_values",
-            "TMT2_missing_values",
-            "TMT3_missing_values",
-            "TMT4_missing_values",
-            "TMT5_missing_values",
-            "TMT6_missing_values",
-            "TMT7_missing_values",
-            "TMT8_missing_values",
-            "TMT9_missing_values",
-            "TMT10_missing_values",
-            "TMT11_missing_values",
-        ]
-        l_2 = m_v + (11 - len(m_v)) * ["not detected"]
-        dic_m_v = dict(zip(l_1, l_2))
+        dic_m_v = {f"TMT{i + 1}_missing_values": v for i, v in enumerate(m_v)}
         result.update(dic_m_v)
 
     if protein is None:
@@ -232,35 +383,20 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
             "QC3_BSA"
         ]  # name must be unique, otherwise generates a df with more than one row and ends up in error
 
-    df_qc3 = df[df["Protein IDs"].str.contains(protein[0], na=False, case=True)]
-
-    if not df_qc3[df_qc3.Intensity == df_qc3.Intensity.max()].empty:
-        df_qc3 = df_qc3[df_qc3.Intensity == df_qc3.Intensity.max()]
+    df_qc3 = df[_safe_string_contains(df, "Protein IDs", protein[0])]
+    df_qc3 = _select_max_intensity_row(df_qc3)
 
     if not df_qc3.empty:
-
-        ave = float(df_qc3.filter(regex="Reporter intensity corrected").mean(axis=1))
-        std = float(df_qc3.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0))
-
-        if ave != 0:
-            cv = std / ave * 100
-        else:
-            cv = None
+        reporter_cols_qc3 = _reporter_intensity_columns(df_qc3)
+        ave, std, cv = _row_reporter_stats(
+            df_qc3, reporter_cols_qc3, cv_when_mean_zero=None
+        )
 
         dict_info_qc3 = {
             "Protein_qc": protein[0],
-            "N_of_Protein_qc_pepts": ";".join(
-                [str(x) for x in df_qc3["Peptide counts (all)"].to_list()]
-            ),
-            "N_Protein_qc_missing_values": ";".join(
-                [
-                    str(x)
-                    for x in df_qc3.filter(regex="Reporter intensity corrected")
-                .replace(np.nan, 0)
-                .isin([0])
-                .sum()
-                .to_list()
-                ]
+            "N_of_Protein_qc_pepts": _safe_column_as_str(df_qc3, "Peptide counts (all)"),
+            "N_Protein_qc_missing_values": _missing_counts_as_str(
+                df_qc3, reporter_cols_qc3
             ),
             "reporter_intensity_corrected_Protein_qc_ave": ave,
             "reporter_intensity_corrected_Protein_qc_sd": std,
@@ -285,69 +421,105 @@ def maxquant_qc_protein_groups(txt_path, protein=None):
 
 def maxquant_qc_peptides(txt_path):
     filename = "peptides.txt"
-    df = pd.read_csv(txt_path / P(filename), sep="\t")
+    df = _read_txt_table(txt_path, filename)
     max_missed_cleavages = 3
     last_amino_acids = ["K", "R"]
     n_peptides = len(df)
-    n_contaminants = df["Potential contaminant"].eq("+").sum()
-    n_reverse = df["Reverse"].fillna("-").eq("+").sum()
-    ox_pep_seq = len(df) - df["Oxidation (M) site IDs"].isnull().sum()
+    if n_peptides == 0:
+        return pd.Series(
+            {
+                "N_peptides": 0,
+                "N_peptides_potential_contaminants": 0,
+                "N_peptides_reverse": 0,
+                "Oxidations [%]": 0.0,
+                "N_missed_cleavages_total": 0,
+                "N_missed_cleavages_eq_0 [%]": 0.0,
+                "N_missed_cleavages_eq_1 [%]": 0.0,
+                "N_missed_cleavages_eq_2 [%]": 0.0,
+                "N_missed_cleavages_gt_3 [%]": 0.0,
+                "N_peptides_last_amino_acid_K [%]": 0.0,
+                "N_peptides_last_amino_acid_R [%]": 0.0,
+                "N_peptides_last_amino_acid_other [%]": 0.0,
+            }
+        )
+    n_contaminants = _safe_eq_plus_count(df, "Potential contaminant")
+    n_reverse = _safe_eq_plus_count(df, "Reverse")
+    if "Oxidation (M) site IDs" in df.columns:
+        ox_pep_seq = len(df) - df["Oxidation (M) site IDs"].isnull().sum()
+    else:
+        ox_pep_seq = 0
     ox_pep_seq_percent = ox_pep_seq / n_peptides * 100
+    missed_cleavages = (
+        pd.to_numeric(df["Missed cleavages"], errors="coerce")
+        if "Missed cleavages" in df.columns
+        else pd.Series([np.nan] * n_peptides)
+    )
+    last_aa = df["Last amino acid"] if "Last amino acid" in df.columns else pd.Series([""] * n_peptides)
     result = {
         "N_peptides": n_peptides,
         "N_peptides_potential_contaminants": n_contaminants,
         "N_peptides_reverse": n_reverse,
         "Oxidations [%]": ox_pep_seq_percent,
-        "N_missed_cleavages_total": (df["Missed cleavages"] != 0).sum(),
+        "N_missed_cleavages_total": (missed_cleavages != 0).sum(),
     }
     for n in range(max_missed_cleavages):
         result[f"N_missed_cleavages_eq_{n} [%]"] = (
-            (df["Missed cleavages"] == n).sum() / n_peptides * 100
+            (missed_cleavages == n).sum() / n_peptides * 100
         )
     result[f"N_missed_cleavages_gt_{max_missed_cleavages} [%]"] = (
-        (df["Missed cleavages"] > max_missed_cleavages).sum() / n_peptides * 100
+        (missed_cleavages > max_missed_cleavages).sum() / n_peptides * 100
     )
     for amino in last_amino_acids:
         result[f"N_peptides_last_amino_acid_{amino} [%]"] = (
-            df["Last amino acid"].eq(amino).sum() / n_peptides * 100
+            last_aa.eq(amino).sum() / n_peptides * 100
         )
     result["N_peptides_last_amino_acid_other [%]"] = (
-        (~df["Last amino acid"].isin(last_amino_acids)).sum() / n_peptides * 100
+        (~last_aa.isin(last_amino_acids)).sum() / n_peptides * 100
     )
     return pd.Series(result).round(2)
 
 
 def maxquant_qc_msmScans(txt_path, t0=None, tf=None):
     filename = "msmsScans.txt"
-    df = pd.read_csv(txt_path / P(filename), sep="\t")
-    if t0 is None:
+    df = _read_txt_table(txt_path, filename)
+    if t0 is None and "Retention time" in df.columns:
         t0 = df["Retention time"].min()
-    if tf is None:
+    if tf is None and "Retention time" in df.columns:
         tf = df["Retention time"].max()
-    mean_parent_int_frac = df["Parent intensity fraction"].mean(skipna=True)
+    mean_parent_int_frac = _safe_numeric_stat(
+        df, "Parent intensity fraction", lambda s: s.mean(skipna=True)
+    )
     results = {"Mean_parent_int_frac": mean_parent_int_frac}
     return pd.Series(results).round(2)
 
 
 def maxquant_qc_evidence(txt_path, pept_list=None):
     filename = "evidence.txt"
-    df = pd.read_csv(txt_path / P(filename), sep="\t")
+    df = _read_txt_table(txt_path, filename)
 
     result = {
-        "Uncalibrated - Calibrated m/z [ppm] (ave)": df[
-            "Uncalibrated - Calibrated m/z [ppm]"
-        ].mean(skipna=True),
-        "Uncalibrated - Calibrated m/z [ppm] (sd)": df[
-            "Uncalibrated - Calibrated m/z [ppm]"
-        ].std(ddof=0, skipna=True),
-        "Uncalibrated - Calibrated m/z [Da] (ave)": df[
-            "Uncalibrated - Calibrated m/z [Da]"
-        ].mean(skipna=True),
-        "Uncalibrated - Calibrated m/z [Da] (sd)": df[
-            "Uncalibrated - Calibrated m/z [Da]"
-        ].std(ddof=0, skipna=True),
-        "Peak Width(ave)": df["Retention length"].mean(skipna=True),
-        "Peak Width (std)": df["Retention length"].std(ddof=0, skipna=True),
+        "Uncalibrated - Calibrated m/z [ppm] (ave)": _safe_numeric_stat(
+            df, "Uncalibrated - Calibrated m/z [ppm]", lambda s: s.mean(skipna=True)
+        ),
+        "Uncalibrated - Calibrated m/z [ppm] (sd)": _safe_numeric_stat(
+            df,
+            "Uncalibrated - Calibrated m/z [ppm]",
+            lambda s: s.std(ddof=0, skipna=True),
+        ),
+        "Uncalibrated - Calibrated m/z [Da] (ave)": _safe_numeric_stat(
+            df, "Uncalibrated - Calibrated m/z [Da]", lambda s: s.mean(skipna=True)
+        ),
+        "Uncalibrated - Calibrated m/z [Da] (sd)": _safe_numeric_stat(
+            df,
+            "Uncalibrated - Calibrated m/z [Da]",
+            lambda s: s.std(ddof=0, skipna=True),
+        ),
+        "Peak Width(ave)": _safe_numeric_stat(
+            df, "Retention length", lambda s: s.mean(skipna=True)
+        ),
+        "Peak Width (std)": _safe_numeric_stat(
+            df, "Retention length", lambda s: s.std(ddof=0, skipna=True)
+        ),
     }
 
     if pept_list is None:
@@ -364,61 +536,49 @@ def maxquant_qc_evidence(txt_path, pept_list=None):
     elif len(pept_list) > 6:
         pept_list = pept_list[:6]
 
-    for i in pept_list:
-        print(i)
-        df_pept = df[df.Sequence == i]
+    for idx, peptide in enumerate(pept_list, start=1):
+        if "Sequence" in df.columns:
+            df_pept = df[df["Sequence"] == peptide]
+        else:
+            df_pept = pd.DataFrame()
         if not df_pept.empty:
-            charges = ";".join([str(x) for x in df_pept["Charge"].to_list()])
+            charges = _safe_column_as_str(df_pept, "Charge")
+            df_pept = _select_max_intensity_row(df_pept)
 
-            if not df_pept[df_pept.Intensity == df_pept.Intensity.max()].empty:
-                df_pept = df_pept[df_pept.Intensity == df_pept.Intensity.max()]
-
-            ave = float(df_pept.filter(regex="Reporter intensity corrected").mean(axis=1))
-            std = float(df_pept.filter(regex="Reporter intensity corrected").std(axis=1, ddof=0))
-
-            if ave != 0:
-                cv = std / ave * 100
-            else:
-                cv = 'not calculated'
+            reporter_cols = _reporter_intensity_columns(df_pept)
+            ave, std, cv = _row_reporter_stats(
+                df_pept, reporter_cols, cv_when_mean_zero="not calculated"
+            )
 
             dict_info_qc = {
-                f"qc{pept_list.index(i) + 1}_peptide": i,
-                f"qc{pept_list.index(i) + 1}_peptide_charges": charges,
-                f"N_qc{pept_list.index(i) + 1}_missing_values": ";".join(
-                    [
-                        str(x)
-                        for x in df_pept.filter(regex="Reporter intensity corrected")
-                    .replace(np.nan, 0)
-                    .isin([0])
-                    .sum()
-                    .to_list()
-                    ]
+                f"qc{idx}_peptide": peptide,
+                f"qc{idx}_peptide_charges": charges,
+                f"N_qc{idx}_missing_values": _missing_counts_as_str(df_pept, reporter_cols),
+                f"reporter_intensity_corrected_qc{idx}_ave": ave,
+                f"reporter_intensity_corrected_qc{idx}_sd": std,
+                f"reporter_intensity_corrected_qc{idx}_cv": cv,
+                f"calibrated_retention_time_qc{idx}": _safe_numeric_stat(
+                    df_pept, "Calibrated retention time", lambda s: float(s.iloc[0])
                 ),
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_ave": ave,
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_sd": std,
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_cv": cv,
-                f"calibrated_retention_time_qc{pept_list.index(i) + 1}": float(
-                    df_pept["Calibrated retention time"]
+                f"retention_length_qc{idx}": _safe_numeric_stat(
+                    df_pept, "Retention length", lambda s: float(s.iloc[0])
                 ),
-                f"retention_length_qc{pept_list.index(i) + 1}": float(
-                    df_pept["Retention length"]
-                ),
-                f"N_of_scans_qc{pept_list.index(i) + 1}": float(
-                    df_pept["Number of scans"]
+                f"N_of_scans_qc{idx}": _safe_numeric_stat(
+                    df_pept, "Number of scans", lambda s: float(s.iloc[0])
                 ),
             }
 
             result.update(dict_info_qc)
         else:
             dict_info_qc = {
-                f"qc{pept_list.index(i) + 1}_peptide_charges": 'not detected',
-                f"N_qc{pept_list.index(i) + 1}_missing_values": 'not detected',
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_ave": 'not detected',
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_sd": 'not detected',
-                f"reporter_intensity_corrected_qc{pept_list.index(i) + 1}_cv": 'not detected',
-                f"calibrated_retention_time_qc{pept_list.index(i) + 1}": 'not detected',
-                f"retention_length_qc{pept_list.index(i) + 1}": 'not detected',
-                f"N_of_scans_qc{pept_list.index(i) + 1}": 'not detected',
+                f"qc{idx}_peptide_charges": "not detected",
+                f"N_qc{idx}_missing_values": "not detected",
+                f"reporter_intensity_corrected_qc{idx}_ave": "not detected",
+                f"reporter_intensity_corrected_qc{idx}_sd": "not detected",
+                f"reporter_intensity_corrected_qc{idx}_cv": "not detected",
+                f"calibrated_retention_time_qc{idx}": "not detected",
+                f"retention_length_qc{idx}": "not detected",
+                f"N_of_scans_qc{idx}": "not detected",
             }
             result.update(dict_info_qc)
 
