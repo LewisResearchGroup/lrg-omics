@@ -544,6 +544,20 @@ def maxquant_qc_evidence(txt_path, pept_list=None):
         if not df_pept.empty:
             charges = _safe_column_as_str(df_pept, "Charge")
             df_pept = _select_max_intensity_row(df_pept)
+            # Defensive guard: if selection logic returns no row, treat peptide as not detected.
+            if df_pept.empty:
+                dict_info_qc = {
+                    f"qc{idx}_peptide_charges": "not detected",
+                    f"N_qc{idx}_missing_values": "not detected",
+                    f"reporter_intensity_corrected_qc{idx}_ave": "not detected",
+                    f"reporter_intensity_corrected_qc{idx}_sd": "not detected",
+                    f"reporter_intensity_corrected_qc{idx}_cv": "not detected",
+                    f"calibrated_retention_time_qc{idx}": "not detected",
+                    f"retention_length_qc{idx}": "not detected",
+                    f"N_of_scans_qc{idx}": "not detected",
+                }
+                result.update(dict_info_qc)
+                continue
 
             reporter_cols = _reporter_intensity_columns(df_pept)
             ave, std, cv = _row_reporter_stats(

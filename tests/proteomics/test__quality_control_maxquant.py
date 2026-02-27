@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import pytest
 
+import lrg_omics.proteomics.maxquant.quality_control as qc_mod
 from lrg_omics.proteomics.maxquant.quality_control import (
     maxquant_qc,
     maxquant_qc_summary,
@@ -443,6 +444,31 @@ class TestClass:
         assert out["qc1_peptide_charges"] == "not detected"
         assert out["N_qc1_missing_values"] == "not detected"
         assert out["reporter_intensity_corrected_qc1_cv"] == "not detected"
+
+    def test__evidence_handles_empty_selected_qc_row(self, tmp_path, monkeypatch):
+        _write_tsv(
+            tmp_path,
+            "evidence.txt",
+            {
+                "Sequence": ["HVLTSIGEK"],
+                "Charge": [2],
+                "Intensity": [123.0],
+                "Calibrated retention time": [10.0],
+                "Retention length": [0.5],
+                "Number of scans": [4],
+                "Uncalibrated - Calibrated m/z [ppm]": [0.1],
+                "Uncalibrated - Calibrated m/z [Da]": [0.01],
+                "Reporter intensity corrected 1": [1000.0],
+                "Reporter intensity corrected 2": [1100.0],
+            },
+        )
+        monkeypatch.setattr(qc_mod, "_select_max_intensity_row", lambda df: df.iloc[0:0])
+
+        out = maxquant_qc_evidence(tmp_path, pept_list=["HVLTSIGEK"])
+
+        assert out["qc1_peptide_charges"] == "not detected"
+        assert out["calibrated_retention_time_qc1"] == "not detected"
+        assert out["N_of_scans_qc1"] == "not detected"
 
     def test__empty_protein_groups_file(self, tmp_path):
         _write_tsv(
