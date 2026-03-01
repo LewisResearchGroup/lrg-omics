@@ -1,4 +1,5 @@
 import os
+import sys
 
 import lrg_omics
 
@@ -17,10 +18,11 @@ def test__lrg_thermo_worklist_parser(tmpdir):
     assert not fn_out.is_file(), fn_out
 
     cmd = (
-        f"python {src_dir}/scripts/lrg_thermo_worklist_parser.py -f {fn_in} -o {fn_out}"
+        f"{sys.executable} {src_dir}/scripts/lrg_thermo_worklist_parser.py -f {fn_in} -o {fn_out}"
     )
-    os.system(cmd)
+    return_code = os.system(cmd)
 
     print(cmd)
+    assert return_code == 0, return_code
 
     assert fn_out.is_file(), fn_out
