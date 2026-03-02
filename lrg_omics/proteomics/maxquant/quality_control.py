@@ -136,6 +136,9 @@ def _read_txt_table(path, filename, **kwargs):
     table_path = P(path) / P(filename)
     try:
         return pd.read_csv(table_path, sep="\t", **kwargs)
+    except FileNotFoundError:
+        logging.warning("Missing MaxQuant table: %s", table_path)
+        return pd.DataFrame()
     except pd.errors.EmptyDataError:
         logging.warning("Empty MaxQuant table: %s", table_path)
         return pd.DataFrame()
